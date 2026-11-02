@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AC circuits: an introduction | PHY2049</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' },
+  options: { menuOptions: { settings: { assistiveMml: true } } }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+<style>
+:root{
+  --bg:#EEF2F5; --surface:#FFFFFF; --surface-2:#F6F8FA; --ink:#14233A; --muted:#4A5868;
+  --line:#C5D0DA; --accent:#0B6B60; --accent-ink:#FFFFFF; --accent-soft:#DDF1EE;
+  --volt:#B3261E; --curr:#3343A8; --ok:#1A6B2C; --ok-soft:#E3F3E6; --bad:#A3231B; --bad-soft:#FBE8E6;
+  --focus:#1F4FD1; --lock:#565F6B;
+  --scope-frame:#26323E; --scope-bg:#0E3532; --scope-grid:#2E6C64; --scope-tick:#4F978C; --trace:#A8F7E1; --guide:#FFD15C;
+  --radius:10px;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E151D; --surface:#16202B; --surface-2:#1C2834; --ink:#E7EDF3; --muted:#AAB7C4;
+    --line:#2F3D4C; --accent:#5FD3C1; --accent-ink:#04201C; --accent-soft:#163B37;
+    --volt:#FF8C82; --curr:#A3B0FF; --ok:#86DE98; --ok-soft:#173222; --bad:#FF8C82; --bad-soft:#3A1C1A;
+    --focus:#8FB0FF; --lock:#8994A0; --scope-frame:#0A0F14;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E151D; --surface:#16202B; --surface-2:#1C2834; --ink:#E7EDF3; --muted:#AAB7C4;
+  --line:#2F3D4C; --accent:#5FD3C1; --accent-ink:#04201C; --accent-soft:#163B37;
+  --volt:#FF8C82; --curr:#A3B0FF; --ok:#86DE98; --ok-soft:#173222; --bad:#FF8C82; --bad-soft:#3A1C1A;
+  --focus:#8FB0FF; --lock:#8994A0; --scope-frame:#0A0F14;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 80px)}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size:1.0625rem; line-height:1.6;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+a{color:var(--accent)}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip{position:absolute;left:12px;top:-60px;background:var(--accent);color:var(--accent-ink);padding:10px 14px;border-radius:8px;z-index:50;font-weight:700}
+.skip:focus{top:calc(env(safe-area-inset-top,0px) + 10px)}
+
+/* Header */
+.topbar{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:5;
+  background:var(--surface); border-bottom:1px solid var(--line);
+  display:flex; align-items:center; gap:14px; padding:10px 20px;
+}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand svg{flex:none}
+.brand-text{min-width:0}
+.brand-text .course{font-size:.85rem;color:var(--muted);display:block}
+.brand-text .title{font-weight:700;font-size:1.05rem;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .spacer{flex:1}
+.score{display:flex;align-items:center;gap:8px;font-weight:700;white-space:nowrap}
+.score-meter{width:110px;height:10px;border-radius:5px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.score-meter span{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+.toc-toggle{display:none}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:0;max-width:1240px;margin:0 auto}
+nav.toc{border-right:1px solid var(--line);padding:18px 12px 30px 16px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 62px);align-self:start;max-height:calc(100vh - 62px);overflow:auto}
+nav.toc h2{font-size:.95rem;color:var(--muted);margin:4px 8px 10px;font-weight:700}
+nav.toc ol{list-style:none;margin:0;padding:0;counter-reset:sec}
+nav.toc li{margin:2px 0}
+nav.toc a{display:flex;align-items:flex-start;gap:10px;padding:7px 10px;border-radius:8px;text-decoration:none;color:var(--ink);min-height:36px;line-height:1.35}
+nav.toc a .num{flex:none;width:1.7em;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+nav.toc a .lbl{flex:1}
+nav.toc a .st{flex:none;font-size:.85rem}
+nav.toc a:hover{background:var(--surface-2)}
+nav.toc a[aria-current="page"]{background:var(--accent-soft);font-weight:700}
+nav.toc a[aria-disabled="true"]{color:var(--lock)}
+nav.toc a.is-cp .lbl{font-weight:700}
+.st-done{color:var(--ok)}
+.st-lock{color:var(--lock)}
+
+main{padding:26px 28px 60px;min-width:0}
+main:focus{outline:none}
+section.page{max-width:820px}
+section.page[hidden]{display:none}
+.kicker{color:var(--muted);font-size:.92rem;margin:0 0 2px}
+h2.ptitle{font-size:clamp(1.55rem,2.6vw,2.05rem);line-height:1.2;margin:0 0 14px;letter-spacing:-.01em}
+h2.ptitle:focus{outline:none}
+h3{font-size:1.2rem;margin:26px 0 8px}
+p,li{max-width:72ch}
+.lead{font-size:1.12rem}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:18px 0}
+.note{background:var(--accent-soft);border-left:5px solid var(--accent);border-radius:6px;padding:12px 16px;margin:16px 0}
+.deriv{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:6px 20px 10px;margin:16px 0}
+.deriv ol{padding-left:1.3em}
+.deriv li{margin:10px 0}
+.mjx-wrap{overflow-x:auto;overflow-y:hidden;max-width:100%}
+mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%;padding:4px 0}
+table.qty{border-collapse:collapse;width:100%;margin:12px 0;background:var(--surface)}
+.table-scroll{overflow-x:auto;max-width:100%}
+table.qty caption{text-align:left;font-weight:700;padding:6px 0}
+table.qty th,table.qty td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:middle}
+table.qty thead th{background:var(--surface-2)}
+
+/* Buttons and controls */
+button,.btn{font:inherit;cursor:pointer;border-radius:8px;border:2px solid var(--accent);background:var(--surface);color:var(--accent);padding:8px 16px;min-height:44px;font-weight:700}
+button.primary{background:var(--accent);color:var(--accent-ink)}
+button:disabled{cursor:not-allowed;opacity:.55}
+button:hover:not(:disabled){filter:brightness(1.05)}
+input[type="text"],input[type="number"],select{font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--muted);border-radius:8px;padding:8px 10px;min-height:44px}
+input[type="range"]{width:100%;accent-color:var(--accent);min-height:28px}
+label{font-weight:700}
+
+/* Pager */
+.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:36px;padding-top:18px;border-top:1px solid var(--line);flex-wrap:wrap;max-width:820px}
+.pager .pos{color:var(--muted)}
+.pager-hint{color:var(--muted);font-size:.95rem;max-width:820px;margin:8px 0 0;text-align:right}
+
+/* Oscilloscope */
+.scope-wrap{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:16px;align-items:start;margin:14px 0}
+.scope-screen{background:var(--scope-frame);padding:12px;border-radius:14px}
+.scope-screen svg{display:block;width:100%;height:auto;border-radius:6px}
+.scope-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.scope-panel .ctl{margin:0 0 12px}
+.scope-panel .ctl label{display:block;font-size:.95rem;margin-bottom:3px}
+.scope-panel .ctl output{font-weight:400;color:var(--muted)}
+.scope-panel select,.scope-panel input[type="number"]{width:100%}
+.settings dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px}
+.settings dt{font-weight:700}
+.settings dd{margin:0}
+.check{display:flex;align-items:center;gap:8px;font-weight:700}
+.check input{width:22px;height:22px;accent-color:var(--accent)}
+.readout{margin:10px 0 0;padding:10px 12px;background:var(--surface-2);border-radius:8px;font-size:.98rem}
+details{margin:10px 0}
+details summary{cursor:pointer;font-weight:700;color:var(--accent);min-height:32px;display:list-item}
+
+/* Phasor sim */
+.sim{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:16px 0}
+.sim .svgwrap{overflow-x:auto;border-radius:8px}
+.sim svg.phasor{min-width:600px;display:block;width:100%;height:auto;background:var(--surface-2);border-radius:8px}
+.sim .legend{display:flex;gap:20px;flex-wrap:wrap;margin:8px 4px;font-size:.95rem}
+.sim .legend span{display:inline-flex;align-items:center;gap:8px}
+.sim .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px 18px;margin-top:12px}
+.sim .controls .ctl label{display:block;font-size:.95rem}
+.sim .controls output{font-weight:400;color:var(--muted)}
+.sim .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.sim dl.ro{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px 16px;margin:12px 0 0;padding:10px 12px;background:var(--surface-2);border-radius:8px}
+.sim dl.ro div{display:flex;gap:6px;flex-wrap:wrap}
+.sim dl.ro dt{font-weight:700}
+.sim dl.ro dd{margin:0;font-variant-numeric:tabular-nums}
+.ext{display:inline-flex;align-items:center;gap:6px}
+
+/* Checkpoints */
+.cp{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:var(--radius);padding:18px 20px;margin:16px 0}
+.cp-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cp-head .pts{color:var(--muted);font-weight:700}
+.practice{background:var(--surface-2);border:1px dashed var(--line);border-radius:8px;padding:8px 12px;margin:6px 0 12px;font-size:.95rem}
+fieldset{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:14px 0}
+legend{font-weight:700;padding:0 6px}
+.opt{display:flex;align-items:center;gap:12px;padding:6px 8px;border-radius:6px;min-height:44px}
+.opt input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+.opt label{font-weight:400;cursor:pointer;flex:1}
+.opt:hover{background:var(--surface-2)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.attempts{color:var(--muted);font-size:.95rem}
+.feedback{margin:12px 0 0;padding:0;border-radius:8px}
+.feedback:not(:empty){padding:10px 14px}
+.feedback.ok{background:var(--ok-soft);color:var(--ink);border:2px solid var(--ok)}
+.feedback.bad{background:var(--bad-soft);color:var(--ink);border:2px solid var(--bad)}
+.feedback .tag{font-weight:700}
+.feedback.ok .tag{color:var(--ok)}
+.feedback.bad .tag{color:var(--bad)}
+.solution{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}
+.match-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,260px) 2.2em;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.match-row:last-child{border-bottom:none}
+.match-row .mark{font-weight:700;font-size:1.1rem;text-align:center}
+.mark.ok{color:var(--ok)} .mark.bad{color:var(--bad)}
+.numrow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:10px 0}
+.numrow input{width:11em}
+.numrow .unit{font-weight:700}
+
+/* Tiles */
+.tiles-board{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:12px}
+.tray{border:2px dashed var(--line);border-radius:10px;padding:10px;min-height:120px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:10px;background:var(--surface-2)}
+.tray.drop-hover,.slot.drop-hover{border-color:var(--accent);background:var(--accent-soft)}
+.tile{border:2px solid var(--curr);color:var(--ink);background:var(--surface);border-radius:8px;padding:8px 14px;min-height:44px;min-width:7.5em;font-weight:700;font-variant-numeric:tabular-nums;touch-action:none;user-select:none;-webkit-user-select:none}
+.tile[aria-pressed="true"]{background:var(--curr);color:var(--surface);box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--curr)}
+.tile.dragging{opacity:.35}
+.ghost{position:fixed;pointer-events:none;z-index:100;transform:translate(-50%,-50%) rotate(-3deg);box-shadow:0 8px 18px rgba(0,0,0,.25)}
+.slots{display:flex;flex-direction:column;gap:8px}
+.slot-row{display:grid;grid-template-columns:8.5em minmax(0,1fr) 1.8em;gap:10px;align-items:center}
+.slot-time{font-weight:700}
+.slot{border:2px dashed var(--muted);border-radius:8px;min-height:52px;padding:3px;display:flex;align-items:center}
+.slot .empty{border:none;background:transparent;color:var(--muted);font-weight:400;width:100%;text-align:left;min-height:42px}
+.slot .tile{width:100%}
+.slot[data-result="ok"]{border-style:solid;border-color:var(--ok)}
+.slot[data-result="bad"]{border-style:solid;border-color:var(--bad)}
+
+/* Welcome and completion */
+.name-form{display:flex;gap:10px 16px;flex-wrap:wrap;align-items:flex-start;margin-top:8px}
+.name-form button{margin-top:1.75em}
+.name-form .field{display:flex;flex-direction:column;gap:4px;flex:1 1 220px;max-width:320px}
+.name-form .field input{width:100%}
+.cert{background:var(--surface);border:2px solid var(--accent);border-radius:16px;padding:20px;margin:18px 0;text-align:center;position:relative;overflow:hidden}
+.cert h3{font-size:1.7rem;margin:10px 0 4px}
+.cert .when{font-size:1.1rem}
+.cert svg{max-width:420px;width:100%;height:auto}
+.confetti{position:fixed;top:-20px;width:10px;height:16px;z-index:90;pointer-events:none;border-radius:2px;animation:fall 2.8s linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg)}}
+.err{color:var(--bad);font-weight:700;margin:6px 0 0}
+
+@media (max-width: 900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:fixed;top:calc(env(safe-area-inset-top,0px) + 60px);left:0;bottom:0;width:min(320px,88vw);background:var(--surface);z-index:20;border-right:1px solid var(--line);box-shadow:4px 0 18px rgba(0,0,0,.18);max-height:none;display:none}
+  nav.toc.open{display:block}
+  .toc-toggle{display:inline-flex;align-items:center}
+  main{padding:20px 16px 50px}
+  .scope-wrap{grid-template-columns:1fr}
+  .tiles-board{grid-template-columns:1fr}
+  .score-meter{display:none}
+}
+@media (max-width: 560px){
+  .brand-text .course{display:none}
+  .match-row{grid-template-columns:1fr 2em}
+  .match-row select{grid-column:1/2}
+  .slot-row{grid-template-columns:6.5em minmax(0,1fr) 1.6em}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+@media print{
+  body *{visibility:hidden}
+  .cert,.cert *{visibility:visible}
+  .cert{position:absolute;left:0;top:0;width:100%}
+  .cert button{display:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" id="skiplink">Skip to lesson content</a>
+
+<header class="topbar">
+  <button class="toc-toggle" id="tocToggle" aria-expanded="false" aria-controls="toc">Contents</button>
+  <div class="brand">
+    <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true" focusable="false"><circle cx="19" cy="19" r="16" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M8 19 C 11 10, 15 10, 19 19 S 27 28, 30 19" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <div class="brand-text"><span class="course">PHY2049 Physics 2</span><span class="title">AC circuits: an introduction</span></div>
+  </div>
+  <span class="spacer"></span>
+  <div class="score" aria-label="Score">
+    <span id="scoreText">Score 0 of 45</span>
+    <div class="score-meter" aria-hidden="true"><span id="scoreBar"></span></div>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" id="toc" aria-label="Lesson sections">
+  <h2>Sections</h2>
+  <ol id="tocList"></ol>
+</nav>
+
+<main id="main" tabindex="-1">
+<noscript><p class="box">This lesson needs JavaScript for its simulations and quiz questions. Please open it in a browser with JavaScript turned on.</p></noscript>
+
+<!-- 1 Welcome -->
+<section class="page" data-key="welcome" data-title="Welcome" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Welcome to AC circuits</h2>
+  <p class="lead">This lesson takes you from the signal coming out of an AC source to the current in circuits with a resistor, with a capacitor and with an inductor. Each short section has an explanation, a derivation or a simulation, and nine of them are checkpoints.</p>
+  <div class="box">
+    <h3 style="margin-top:0">How it works</h3>
+    <ul>
+      <li>There are 9 checkpoints worth 5 points each, 45 points in total.</li>
+      <li>You have unlimited attempts. The next section opens once the current checkpoint is solved.</li>
+      <li>The numbers in each checkpoint are chosen at random, so your values may differ from a classmate’s.</li>
+      <li>Every simulation works with a keyboard: use Tab to move between controls and the arrow keys to change a slider.</li>
+      <li>Moving pictures never start on their own. Use the Play and Pause buttons.</li>
+      <li>Your progress is kept in this browser if you leave and come back.</li>
+    </ul>
+  </div>
+  <form class="box" id="nameForm" novalidate>
+    <h3 style="margin-top:0">Before you start</h3>
+    <div class="name-form">
+      <div class="field">
+        <label for="firstName">Your first name</label>
+        <input type="text" id="firstName" autocomplete="given-name" maxlength="40" aria-describedby="nameHelp nameErr" required>
+        <span id="nameHelp" class="attempts">First name only. It appears on your completion card.</span>
+      </div>
+      <div class="field">
+        <label for="secondName">Partner’s first name</label>
+        <input type="text" id="secondName" autocomplete="off" maxlength="40" aria-describedby="name2Help">
+        <span id="name2Help" class="attempts">Optional. Fill in only if you work with a partner.</span>
+      </div>
+      <button type="submit" class="primary">Start the lesson</button>
+    </div>
+    <p class="err" id="nameErr" role="alert"></p>
+  </form>
+  <div class="actions">
+    <button type="button" id="resetBtn">Start over and clear my progress</button>
+  </div>
+</section>
+
+<!-- 2 What is AC -->
+<section class="page" data-key="ac-intro" data-title="What is an AC circuit?" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">What is an AC circuit?</h2>
+  <p>Alternating-current (AC) circuits consist of a time-dependent source connected to components such as resistors, capacitors and inductors. Many time dependences are possible for the source, but here we restrict ourselves to periodic signals with a sinusoidal shape. People call this a “sine wave” even when the function is written as a cosine.</p>
+  <div class="box" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+    <svg width="90" height="90" viewBox="0 0 90 90" role="img" aria-labelledby="acsymT"><title id="acsymT">Schematic symbol of an AC source: a circle with a wavy tilde line inside, connected to wires on both sides.</title><line x1="0" y1="45" x2="17" y2="45" stroke="currentColor" stroke-width="3"/><line x1="73" y1="45" x2="90" y2="45" stroke="currentColor" stroke-width="3"/><circle cx="45" cy="45" r="28" fill="none" stroke="currentColor" stroke-width="3"/><path d="M29 45 C 34 33, 40 33, 45 45 S 56 57, 61 45" fill="none" stroke="currentColor" stroke-width="3"/></svg>
+    <p style="margin:0;flex:1;min-width:220px">In a circuit diagram an AC source is drawn as a circle with a small wave inside. Its emf is written \(\mathcal{E}(t)\) to remind us that it changes with time \(t\).</p>
+  </div>
+  <h3>The central question</h3>
+  <p>The source voltage swings back and forth between \(+\mathcal{E}_0\) and \(-\mathcal{E}_0\), repeating every period \(T\). Every current and every component voltage in the circuit then oscillates at the same frequency, but not necessarily in step with the source. Analyzing an AC circuit means finding two things for each quantity:</p>
+  <ul>
+    <li>its size, the peak value it reaches, and</li>
+    <li>its timing, the phase that says when it reaches that peak compared with the source.</li>
+  </ul>
+  <p>You will first learn to read a signal on an oscilloscope, then describe it with an equation and with a rotating vector called a phasor, and finally apply these tools to a resistor, a capacitor and an inductor.</p>
+</section>
+
+<!-- 3 Oscilloscope sim -->
+<section class="page" data-key="oscilloscope" data-title="The oscilloscope" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Seeing an AC source on an oscilloscope</h2>
+  <p>An oscilloscope draws voltage on the vertical axis against time on the horizontal axis. Its screen is a grid of divisions, also called blocks. Two settings turn divisions into physical quantities: <strong>seconds per division</strong> for the horizontal direction and <strong>volts per division</strong> for the vertical direction.</p>
+  <div id="scopeSim"></div>
+  <h3>Try this</h3>
+  <ul>
+    <li>Change the input from a sine wave to a square wave, then to a triangle wave.</li>
+    <li>Vary the frequency and watch how many cycles fit on the screen.</li>
+    <li>Vary the amplitude of the signal with the gain.</li>
+    <li>Adjust the grid used to measure those quantities with the horizontal and vertical offsets.</li>
+    <li>Set the frequency to 500 Hz and the time scale to 1 ms per division. Check that one period covers 2 divisions, so \(T = 2\ \text{ms}\), and that \(f = 1/T = 500\ \text{Hz}\). You could find the frequency from the screen even without knowing it in advance.</li>
+  </ul>
+  <div class="note">
+    <p style="margin:0">To see a live signal from your microphone, open the <a class="ext" href="https://academo.org/demos/virtual-oscilloscope/" target="_blank" rel="noopener">Academo virtual oscilloscope (opens in a new tab)</a>, choose the live input and make some noise in front of your computer. That external page may not work fully with a screen reader or keyboard; the simulation above covers everything needed for this lesson.</p>
+  </div>
+</section>
+
+<!-- 4 Reading the screen -->
+<section class="page" data-key="reading" data-title="Reading the screen" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Reading period and peak voltage from the screen</h2>
+  <p>Every measurement on an oscilloscope is a count of divisions multiplied by a setting.</p>
+  <div class="deriv">
+    \[T = (\text{divisions in one period})\times(\text{seconds per division}),\qquad f=\frac{1}{T}\]
+    \[\mathcal{E}_0 = (\text{divisions from center line to peak})\times(\text{volts per division})\]
+    \[\mathcal{E}_{\text{pp}} = 2\,\mathcal{E}_0 \quad\text{(peak-to-peak voltage)}\]
+  </div>
+  <h3>Example 1: the period</h3>
+  <p>Here the signal is set to 500 Hz and the time scale to 1 ms per division. Neighboring peaks are 2 divisions apart, so \(T = (2)(1\ \text{ms}) = 2\ \text{ms}\) and \(f = 1/(0.002\ \text{s}) = 500\ \text{Hz}\).</p>
+  <div id="exScope1"></div>
+  <h3>Example 2: peak and peak-to-peak voltage</h3>
+  <p>With 5 V per division, the trace rises 1 division above the center line, so \(\mathcal{E}_0 = (1)(5\ \text{V}) = 5\ \text{V}\). From the top to the bottom of the trace is 2 divisions, so \(\mathcal{E}_{\text{pp}} = 10\ \text{V} = 2\,\mathcal{E}_0\).</p>
+  <div id="exScope2"></div>
+  <div class="note"><p style="margin:0">Measuring peak-to-peak is often easier on a real screen: use the vertical offset to put the bottom of the trace on a grid line, count up to the top, then divide by 2 to get the peak voltage.</p></div>
+</section>
+
+<!-- 5 CP1 -->
+<section class="page" data-key="checkpoint-1" data-title="Checkpoint 1: peak voltage" data-cp="cp1" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Checkpoint 1: peak voltage</h2>
+  <div class="cp" id="cp1"></div>
+</section>
+
+<!-- 6 CP2 -->
+<section class="page" data-key="checkpoint-2" data-title="Checkpoint 2: frequency" data-cp="cp2" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Checkpoint 2: frequency</h2>
+  <div class="cp" id="cp2"></div>
+</section>
+
+<!-- 7 Algebra -->
+<section class="page" data-key="equation" data-title="The emf as an equation" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Writing the emf as a function of time</h2>
+  <p>We write the time-dependent emf of an AC source as</p>
+  <div class="deriv">\[\mathcal{E}(t)=\mathcal{E}_0\cos(\omega t)\]</div>
+  <p>The constant \(\mathcal{E}_0\) is the maximum value, or peak voltage, and \(\omega\) is the angular frequency. The symbol for the peak voltage varies between authors, but its meaning is always clear from context.</p>
+  <h3>Why \(\omega = 2\pi/T\)</h3>
+  <div class="deriv">
+    <ol>
+      <li>The cosine repeats whenever its argument grows by \(2\pi\): \(\cos(x+2\pi)=\cos x\).</li>
+      <li>The emf repeats after one period, so the argument must grow by exactly \(2\pi\) between \(t\) and \(t+T\): \(\omega(t+T)-\omega t = 2\pi\).</li>
+      <li>That gives \(\omega T = 2\pi\), so \(\omega=\dfrac{2\pi}{T}\). With \(f = \dfrac{1}{T}\), this is also \(\omega = 2\pi f\).</li>
+    </ol>
+  </div>
+  <div class="table-scroll">
+  <table class="qty">
+    <caption>Quantities related to AC sources</caption>
+    <thead><tr><th scope="col">Name of the quantity</th><th scope="col">Symbol</th><th scope="col">Unit</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Peak voltage</th><td>\(\mathcal{E}_0\)</td><td>V (volts)</td></tr>
+      <tr><th scope="row">Angular frequency</th><td>\(\omega\)</td><td>rad/s (radians per second)</td></tr>
+      <tr><th scope="row">Frequency</th><td>\(f\)</td><td>Hz (hertz, 1/s)</td></tr>
+      <tr><th scope="row">Period</th><td>\(T\)</td><td>s (seconds)</td></tr>
+      <tr><th scope="row">Instantaneous emf</th><td>\(\mathcal{E}(t)\)</td><td>V (volts)</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <h3>Root-mean-square value</h3>
+  <p>The average of \(\mathcal{E}(t)\) over a period is zero, so we need a different measure of a “typical” size. The root-mean-square (rms) value is the square root of the average of \(\mathcal{E}^2\):</p>
+  <div class="deriv">
+    <ol>
+      <li>\(\mathcal{E}_{\text{rms}}=\sqrt{\langle \mathcal{E}^2\rangle}=\mathcal{E}_0\sqrt{\langle\cos^2(\omega t)\rangle}\)</li>
+      <li>Using \(\cos^2 x=\tfrac12\left(1+\cos 2x\right)\), the average of \(\cos 2x\) over a period is zero, so \(\langle\cos^2(\omega t)\rangle=\tfrac12\).</li>
+      <li>Therefore \(\mathcal{E}_{\text{rms}}=\dfrac{\mathcal{E}_0}{\sqrt2}\).</li>
+    </ol>
+  </div>
+  <p>In the United States, outlets provide \(\mathcal{E}_{\text{rms}}=120\ \text{V}\), which corresponds to a peak value \(\mathcal{E}_0=\sqrt2\,(120\ \text{V})\approx 170\ \text{V}\). The peak-to-peak voltage is \(\mathcal{E}_{\text{pp}}=2\,\mathcal{E}_0\).</p>
+</section>
+
+<!-- 8 CP3 -->
+<section class="page" data-key="checkpoint-3" data-title="Checkpoint 3: matching quantities" data-cp="cp3" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Checkpoint 3: matching quantities</h2>
+  <div class="cp" id="cp3"></div>
+</section>
+
+<!-- 9 Graph and phasor -->
+<section class="page" data-key="phasors" data-title="Graphs and phasors" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Two pictures of the same signal</h2>
+  <h3>Representation 1: the standard graph</h3>
+  <p>Plotting \(\mathcal{E}(t)=\mathcal{E}_0\cos(\omega t)\) against time gives a curve whose height above the axis at its top is \(\mathcal{E}_0\) and whose horizontal repeat distance is \(T\).</p>
+  <h3>Representation 2: the phasor</h3>
+  <p>A phasor represents a time-dependent quantity as a vector. Picture a vector of length \(\mathcal{E}_0\) that makes an angle \(\theta=\omega t\) with the horizontal axis. As time passes it rotates counterclockwise, completing one turn in each period \(T\). At every instant, the horizontal component of the vector is</p>
+  <div class="deriv">\[\mathcal{E}_0\cos(\omega t)=\mathcal{E}(t)\]</div>
+  <p>so the instantaneous emf is the projection of the phasor onto the horizontal axis. Technically the phasor keeps rotating, but for convenience diagrams are often drawn with it in the first quadrant.</p>
+  <div id="simSingle"></div>
+  <h3>Try this</h3>
+  <ul>
+    <li>Move the time slider to \(t=T/4\). The phasor points straight up, its horizontal projection is zero, and the graph crosses zero at the same moment.</li>
+    <li>Move to \(t=T/2\). The phasor points left and the emf equals \(-\mathcal{E}_0\).</li>
+    <li>Change the period and notice that one full turn of the phasor always matches one full cycle on the graph.</li>
+  </ul>
+  <p>The original Desmos version of this simulation is available too: <a class="ext" href="https://www.desmos.com/calculator/cca00113fe" target="_blank" rel="noopener">Single phasor on Desmos (opens in a new tab)</a>.</p>
+</section>
+
+<!-- 10 Resistor theory -->
+<section class="page" data-key="resistor" data-title="Resistor on an AC source" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">A resistor connected to an AC source</h2>
+  <p>Consider a circuit made of one AC source connected to one resistor.</p>
+  <figure class="box" style="text-align:center">
+    <div id="circR"></div>
+    <figcaption>Basic AC circuit: source \(\mathcal{E}\) driving resistor \(R\), with instantaneous current \(i_R\) and instantaneous voltage \(v_R\) across the resistor.</figcaption>
+  </figure>
+  <p>The task is to find the current at every instant. For reasons that become clear with the capacitor, we write the general current as</p>
+  <div class="deriv">\[i(t)=I\cos(\omega t\pm\varphi)\]</div>
+  <p>where \(I\) is the peak current and \(\varphi\ge 0\) is the phase angle, which measures the time shift between the moment the current peaks and the moment the voltage peaks.</p>
+  <div class="note"><p style="margin:0"><strong>Sign convention.</strong> We use \(+\varphi\) when the current is ahead of (leads) the voltage, and \(-\varphi\) when the current trails (lags) the voltage.</p></div>
+  <h3>Derivation</h3>
+  <div class="deriv">
+    <ol>
+      <li>Ohm’s law at every instant: \(v_R(t)=R\,i(t)=V_R\cos(\omega t\pm\varphi)\), with peak voltage \(V_R=RI\).</li>
+      <li>The resistor is connected directly across the source, so the loop rule gives \(\mathcal{E}(t)=v_R(t)\) at every instant.</li>
+      <li>So \(\mathcal{E}_0\cos(\omega t)=V_R\cos(\omega t\pm\varphi)\) for all \(t\). Two cosines can agree at all times only if their amplitudes and phases match: \(V_R=\mathcal{E}_0\) and \(\varphi=0\). With no shift, the current neither leads nor trails, and the sign does not matter.</li>
+      <li>The current is therefore \(i(t)=I\cos(\omega t)=\dfrac{V_R}{R}\cos(\omega t)\).</li>
+    </ol>
+  </div>
+  <div class="note"><p style="margin:0"><strong>Result.</strong> For a resistor, current and voltage are in phase: they peak at the same instant, and their phasors point in the same direction.</p></div>
+</section>
+
+<!-- 11 Resistor sim -->
+<section class="page" data-key="resistor-simulation" data-title="Resistor phasors" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Resistor phasors in action</h2>
+  <p>The simulation shows the voltage phasor and the current phasor next to their cosine graphs. Adjust the peak emf, the period and the resistance.</p>
+  <div id="simR"></div>
+  <h3>Try this</h3>
+  <ul>
+    <li>Double \(R\) and check that the peak current halves, as \(I=\mathcal{E}_0/R\) predicts.</li>
+    <li>Change the period. The current and voltage stay in step whatever the frequency.</li>
+    <li>Pause at any instant and confirm \(i = \mathcal{E}/R\) from the readouts.</li>
+  </ul>
+  <p>Original Desmos version: <a class="ext" href="https://www.desmos.com/calculator/0083743b70" target="_blank" rel="noopener">AC source and resistor on Desmos (opens in a new tab)</a>.</p>
+</section>
+
+<!-- 12 CP4 -->
+<section class="page" data-key="checkpoint-4" data-title="Checkpoint 4: voltage tiles" data-cp="cp4" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Checkpoint 4: match voltages to times</h2>
+  <div class="cp" id="cp4"></div>
+</section>
+
+<!-- 13 Capacitor theory -->
+<section class="page" data-key="capacitor" data-title="Capacitor on an AC source" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">A capacitor connected to an AC source</h2>
+  <figure class="box" style="text-align:center">
+    <div id="circC"></div>
+    <figcaption>AC source \(\mathcal{E}\) driving a capacitor \(C\), with current \(i\) in the wires and voltage \(v_C\) across the plates.</figcaption>
+  </figure>
+  <p>A capacitor connected to an AC source charges, discharges and charges again in the opposite direction, over and over. The current in the wires is the rate at which charge arrives on the plates.</p>
+  <h3>Derivation</h3>
+  <div class="deriv">
+    <ol>
+      <li>Loop rule: the capacitor is directly across the source, so \(v_C(t)=\mathcal{E}(t)=\mathcal{E}_0\cos(\omega t)\), and the peak capacitor voltage is \(V_C=\mathcal{E}_0\).</li>
+      <li>Charge on the plates: \(q(t)=C\,v_C(t)=C\,\mathcal{E}_0\cos(\omega t)\).</li>
+      <li>Current is the rate of change of charge: \(i(t)=\dfrac{dq}{dt}=-\omega C\,\mathcal{E}_0\sin(\omega t)\).</li>
+      <li>Use the identity \(-\sin x=\cos\!\left(x+\tfrac{\pi}{2}\right)\): \(i(t)=\omega C\,\mathcal{E}_0\cos\!\left(\omega t+\tfrac{\pi}{2}\right)\).</li>
+      <li>Define the capacitive reactance \(X_C=\dfrac{1}{\omega C}\). The peak current is then \(I=\omega C\,V_C=\dfrac{V_C}{X_C}\).</li>
+    </ol>
+  </div>
+  <div class="note"><p style="margin:0"><strong>Result.</strong> \(i(t)=I\cos\!\left(\omega t+\tfrac{\pi}{2}\right)\) with \(I=V_C/X_C\). Compared with \(i=I\cos(\omega t\pm\varphi)\), the \(+\) sign applies with \(\varphi=\pi/2\): the current leads the voltage by a quarter period, \(T/4\). In the phasor picture, the current phasor is \(90^\circ\) counterclockwise ahead of the voltage phasor.</p></div>
+  <h3>Making sense of \(X_C\)</h3>
+  <ul>
+    <li>Units: \(\dfrac{1}{\omega C}\) has units \(\dfrac{1}{(\text{s}^{-1})(\text{C/V})}=\dfrac{\text{V}\cdot\text{s}}{\text{C}}=\dfrac{\text{V}}{\text{A}}=\Omega\), the same as resistance.</li>
+    <li>Low frequency, \(\omega\to 0\): \(X_C\to\infty\). A capacitor blocks steady (DC) current.</li>
+    <li>High frequency, \(\omega\to\infty\): \(X_C\to 0\). The plates barely charge before the current reverses, so the capacitor behaves almost like a wire.</li>
+  </ul>
+</section>
+
+<!-- 14 CP5 -->
+<section class="page" data-key="checkpoint-5" data-title="Checkpoint 5: reactance" data-cp="cp5" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Checkpoint 5: capacitive reactance and peak current</h2>
+  <div class="cp" id="cp5"></div>
+</section>
+
+<!-- 15 Capacitor sim -->
+<section class="page" data-key="capacitor-simulation" data-title="Capacitor phasors" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Capacitor phasors in action</h2>
+  <p>Here the current phasor stays \(90^\circ\) ahead of the voltage phasor. On the graph, each current peak arrives a quarter period before the next voltage peak. You can use this simulation to answer checkpoint 6.</p>
+  <div id="simC"></div>
+  <h3>Try this</h3>
+  <ul>
+    <li>Raise the frequency and watch the peak current grow, since \(I=\omega C\,\mathcal{E}_0\).</li>
+    <li>Pause when the voltage is at its maximum. The current is zero at that instant: the capacitor is fully charged and momentarily stops charging.</li>
+    <li>Pause when the voltage crosses zero going down. The current is at its most negative value.</li>
+  </ul>
+  <p>Original Desmos version: <a class="ext" href="https://www.desmos.com/calculator/c16f3a33e3" target="_blank" rel="noopener">AC source and capacitor on Desmos (opens in a new tab)</a>.</p>
+</section>
+
+<!-- 16 CP6 -->
+<section class="page" data-key="checkpoint-6" data-title="Checkpoint 6: instantaneous current" data-cp="cp6" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Checkpoint 6: current at a given instant</h2>
+  <div class="cp" id="cp6"></div>
+</section>
+
+<!-- 18 What is an inductor -->
+<section class="page" data-key="inductor" data-title="What is an inductor?" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">What is an inductor?</h2>
+  <p>Inductors are devices that limit changes in the current in a circuit. They look like small coils of wire. A current in a wire produces a magnetic field, and that field stores energy as magnetic energy, much as a capacitor stores electric potential energy in the electric field between its plates. Magnetic fields come later in the course; for now, the essential point is that when an inductor is present, a voltage appears across its ends:</p>
+  <div class="deriv">\[v_L = L\,\frac{di}{dt}\]</div>
+  <p>Here \(L\) is the inductance, a property of the inductor in the same way capacitance is a property of a capacitor and resistance is a property of a resistor. Inductance is measured in henries (H). Its value depends on the geometry of the coil and the material it is made of, just as capacitance and resistance depend on geometry and material. You do not need those details here.</p>
+  <h3>What the equation tells you</h3>
+  <ul>
+    <li>If the current is constant, \(\dfrac{di}{dt}=0\) and the voltage across the inductor is zero. In steady DC circuits an inductor acts like a plain wire.</li>
+    <li>In DC circuits, inductors matter only when a switch opens or closes. Closing a switch makes the current rise briefly from zero to its final value; opening it makes the current drop to zero very quickly, and the large \(di/dt\) creates a voltage that can cause a small spark (arcing) at the switch.</li>
+    <li>In an AC circuit the current changes all the time, so an inductor always has a voltage across it. That is the case studied next.</li>
+  </ul>
+  <div class="note"><p style="margin:0">For more background, see the <a class="ext" href="https://en.wikipedia.org/wiki/Inductor" target="_blank" rel="noopener">Wikipedia article on inductors (opens in a new tab)</a>.</p></div>
+</section>
+
+<!-- 19 Inductor on AC: derivation -->
+<section class="page" data-key="inductor-ac" data-title="Inductor on an AC source" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">An inductor connected to an AC source</h2>
+  <figure class="box" style="text-align:center">
+    <div id="circL"></div>
+    <figcaption>AC source \(\mathcal{E}=\mathcal{E}_0\cos(\omega t)\) driving an inductor \(L\), drawn as a coil, with current \(i_L\) and voltage \(v_L\) across the inductor.</figcaption>
+  </figure>
+  <p>At every instant the voltage across the inductor equals the voltage of the source, so \(v_L(t)=\mathcal{E}(t)=\mathcal{E}_0\cos(\omega t)\). Calling the peak voltage \(V_L=\mathcal{E}_0\), we write \(v_L(t)=V_L\cos(\omega t)\). We look for a current of the form \(i(t)=I\cos(\omega t\pm\varphi)\), with \(+\) if the current leads the voltage and \(-\) if it trails, and need to find \(I\), \(\varphi\) and the sign.</p>
+  <h3>Derivation</h3>
+  <div class="deriv">
+    <ol>
+      <li>Combine the inductor equation with the source voltage: \(L\,\dfrac{di}{dt}=V_L\cos(\omega t)\), so \(\dfrac{di}{dt}=\left(\dfrac{V_L}{L}\right)\cos(\omega t)\).</li>
+      <li>Integrate with respect to time (an AC current has no constant offset, so the integration constant is zero): \(i(t)=\left(\dfrac{V_L}{\omega L}\right)\sin(\omega t)\).</li>
+      <li>Use the identity \(\sin x=\cos\!\left(x-\tfrac{\pi}{2}\right)\) to compare with the source: \(i(t)=\left(\dfrac{V_L}{\omega L}\right)\cos\!\left(\omega t-\tfrac{\pi}{2}\right)\).</li>
+      <li>Reading off the amplitude and phase: \(I=\dfrac{V_L}{\omega L}\) and \(\varphi=\dfrac{\pi}{2}\), with the \(-\) sign because the current trails the voltage.</li>
+      <li>Following the same pattern as for the capacitor, define the inductive reactance \(X_L=\omega L\). Then \(I=\dfrac{V_L}{X_L}\), or \(V_L=I X_L\), which looks like Ohm’s law.</li>
+    </ol>
+  </div>
+  <div class="note"><p style="margin:0"><strong>Result.</strong> \(i(t)=I\cos\!\left(\omega t-\tfrac{\pi}{2}\right)\) with \(I=V_L/X_L\) and \(X_L=\omega L\). The current lags the voltage by \(\pi/2\), a quarter period: it peaks \(T/4\) after the voltage does. This is the opposite of the capacitor, where the current leads.</p></div>
+  <h3>Making sense of \(X_L\)</h3>
+  <ul>
+    <li>\(X_L=\omega L\) grows linearly with the angular frequency and is measured in ohms, like a resistance or a capacitive reactance.</li>
+    <li>Low frequency, \(\omega\to 0\): \(X_L\to 0\). With slowly changing current, the inductor behaves like a wire.</li>
+    <li>High frequency, \(\omega\to\infty\): \(X_L\to\infty\). The inductor strongly opposes rapid changes in current.</li>
+  </ul>
+</section>
+
+<!-- 20 CP7 -->
+<section class="page" data-key="checkpoint-7" data-title="Checkpoint 7: inductive reactance" data-cp="cp7" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Checkpoint 7: inductive reactance</h2>
+  <div class="cp" id="cp7"></div>
+</section>
+
+<!-- 21 Inductor phasors -->
+<section class="page" data-key="inductor-phasors" data-title="Inductor phasors" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Phasor representation for the inductor</h2>
+  <p>When an inductor is connected alone to an AC source, the equations for the circuit are:</p>
+  <ul>
+    <li>Instantaneous voltage of the source: \(\mathcal{E}(t)=\mathcal{E}_0\cos(\omega t)\)</li>
+    <li>Instantaneous voltage across the inductor: \(v_L(t)=V_L\cos(\omega t)\), with peak value \(V_L=\mathcal{E}_0\)</li>
+    <li>Instantaneous current in the circuit: \(i(t)=I\cos\!\left(\omega t-\tfrac{\pi}{2}\right)\)</li>
+    <li>Peak current: \(I=\dfrac{V_L}{X_L}\), where \(X_L=\omega L\) is the inductive reactance</li>
+  </ul>
+  <p>The voltage phasor makes angle \(\omega t\) with the horizontal axis. The current phasor makes angle \(\omega t-\tfrac{\pi}{2}\), so it trails the voltage phasor by a right angle as both rotate counterclockwise.</p>
+  <figure class="box" style="text-align:center">
+    <div id="phasorL"></div>
+    <figcaption>Phasors for an AC source and an inductor. Left: early in the cycle, the voltage phasor \(V_L\) is in the first quadrant at angle \(\omega t\) and the current phasor \(I\) is \(90^\circ\) clockwise from it, below the axis. Right: a little later, the current phasor has reached the first quadrant and the voltage phasor, still \(90^\circ\) ahead, is in the second quadrant.</figcaption>
+  </figure>
+  <div class="note"><p style="margin:0">A way to remember the two reactive components: in a capacitor the current is \(90^\circ\) <strong>ahead</strong> of the voltage; in an inductor it is \(90^\circ\) <strong>behind</strong>.</p></div>
+</section>
+
+<!-- 22 CP8 -->
+<section class="page" data-key="checkpoint-8" data-title="Checkpoint 8: peak current" data-cp="cp8" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Checkpoint 8: peak current in an inductor circuit</h2>
+  <div class="cp" id="cp8"></div>
+</section>
+
+<!-- 23 Inductor sim -->
+<section class="page" data-key="inductor-simulation" data-title="Inductor phasors in action" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Inductor phasors in action</h2>
+  <p>Here is the animation of the phasors and the curves for the inductor. Notice the phase shift of \(\pi/2\) between the two curves: when one is at a maximum, the other is at zero.</p>
+  <div id="simL"></div>
+  <h3>Try this</h3>
+  <ul>
+    <li>Pause when the voltage is at its maximum. The current is zero and about to increase.</li>
+    <li>Raise the frequency and watch the peak current drop, since \(I=\mathcal{E}_0/(\omega L)\). This is the opposite of the capacitor.</li>
+    <li>Double \(L\) and check that the peak current halves.</li>
+  </ul>
+  <p>Original Desmos version: <a class="ext" href="https://www.desmos.com/calculator/ee9a275516" target="_blank" rel="noopener">AC source with inductor on Desmos (opens in a new tab)</a>.</p>
+</section>
+
+<!-- 24 CP9 -->
+<section class="page" data-key="checkpoint-9" data-title="Checkpoint 9: source frequency" data-cp="cp9" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Checkpoint 9: finding the source frequency</h2>
+  <div class="cp" id="cp9"></div>
+</section>
+
+<!-- Summary -->
+<section class="page" data-key="summary" data-title="Summary and completion" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Summary</h2>
+  <p>Each component connected alone across a source \(\mathcal{E}(t)=\mathcal{E}_0\cos(\omega t)\) has the full source voltage across it. What changes is the size of the current and its timing. Every current has the form \(i(t)=I\cos(\omega t\pm\varphi)\), using \(+\) when the current is ahead of the voltage and \(-\) when it trails the voltage.</p>
+  <div class="table-scroll">
+  <table class="qty">
+    <caption>One source, one component</caption>
+    <thead><tr><th scope="col">Component</th><th scope="col">Opposition to current</th><th scope="col">Voltage across it</th><th scope="col">Current</th><th scope="col">Timing of the current</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Resistor \(R\)</th><td>\(R\)</td><td>\(v_R(t)=V_R\cos(\omega t)\)</td><td>\(i(t)=I\cos(\omega t)\), \(I=\dfrac{V_R}{R}\)</td><td>In phase with the voltage</td></tr>
+      <tr><th scope="row">Capacitor \(C\)</th><td>\(X_C=\dfrac{1}{\omega C}\)</td><td>\(v_C(t)=V_C\cos(\omega t)\)</td><td>\(i(t)=I\cos\!\left(\omega t+\tfrac{\pi}{2}\right)\), \(I=\dfrac{V_C}{X_C}\)</td><td>Leads the voltage by \(90^\circ\)</td></tr>
+      <tr><th scope="row">Inductor \(L\)</th><td>\(X_L=\omega L\)</td><td>\(v_L(t)=V_L\cos(\omega t)\)</td><td>\(i(t)=I\cos\!\left(\omega t-\tfrac{\pi}{2}\right)\), \(I=\dfrac{V_L}{X_L}\)</td><td>Lags the voltage by \(90^\circ\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="note">
+    <h3 style="margin-top:0">Remembering who leads: “ELI the ICE man”</h3>
+    <p>The phrase gives the order of voltage and current for the two reactive components. Read each word from left to right; the first letter of the pair leads the second.</p>
+    <ul>
+      <li><strong>ELI</strong>: in an inductor (L), the voltage (E) comes before the current (I). The voltage leads the current, so the current trails it by \(90^\circ\): \(i(t)=I\cos\!\left(\omega t-\tfrac{\pi}{2}\right)\).</li>
+      <li><strong>ICE</strong>: in a capacitor (C), the current (I) comes before the voltage (E). The voltage trails the current, so the current leads by \(90^\circ\): \(i(t)=I\cos\!\left(\omega t+\tfrac{\pi}{2}\right)\).</li>
+    </ul>
+    <p style="margin-bottom:0">A resistor has no shift at all: voltage and current peak together.</p>
+  </div>
+  <div id="finish"></div>
+</section>
+
+<div class="pager" id="pager">
+  <button type="button" id="prevBtn">Previous</button>
+  <span class="pos" id="pagePos"></span>
+  <button type="button" class="primary" id="nextBtn" aria-describedby="nextHint">Next</button>
+</div>
+<p class="pager-hint" id="nextHint"></p>
+</main>
+</div>
+
+<div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+(function(){
+'use strict';
+/* ---------- utilities ---------- */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const randInt = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+const TAU = 2*Math.PI;
+const minus = s => String(s).replace(/-/g, '\u2212');
+function fix(x, d){ if (Math.abs(x) < 0.5*Math.pow(10,-d)) x = 0; return minus(x.toFixed(d)); }
+function sig(x, n){ if (x === 0) return '0'; const v = parseFloat(x.toPrecision(n)); return minus(String(v)); }
+function trim(x, d){ if (Math.abs(x) < 0.5*Math.pow(10,-d)) x = 0; return minus(String(parseFloat(x.toFixed(d)))); }
+function fmtTime(s){
+  if (s < 1e-3) return trim(s*1e6, 2) + ' \u00B5s';
+  if (s < 1) return trim(s*1e3, 3) + ' ms';
+  return trim(s, 3) + ' s';
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let uid = 0; const nid = p => (p||'id') + (++uid);
+
+function typeset(el){
+  const MJ = window.MathJax;
+  if (!MJ || !MJ.startup || !MJ.startup.promise) return; // initial page typeset will handle it
+  MJ.startup.promise = MJ.startup.promise
+    .then(() => { if (MJ.typesetClear) MJ.typesetClear([el]); return MJ.typesetPromise([el]); })
+    .catch(() => {});
+}
+const announcer = $('#announcer');
+function announce(msg){ announcer.textContent = ''; setTimeout(() => { announcer.textContent = msg; }, 60); }
+function debounce(fn, ms){ let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+/* ---------- state ---------- */
+const CPS = ['cp1','cp2','cp3','cp4','cp5','cp6','cp7','cp8','cp9'];
+const MAXPTS = CPS.length*5;
+const STORE = 'phy2049-ac-intro-v1';
+let state = { name:'', solved:{}, completedAt:null };
+try { const s = JSON.parse(localStorage.getItem(STORE) || 'null'); if (s && typeof s === 'object') state = Object.assign(state, s); } catch(e){}
+if (state.completedAt && !CPS.every(k => state.solved[k])) state.completedAt = null;
+function save(){ try { localStorage.setItem(STORE, JSON.stringify(state)); } catch(e){} }
+const points = () => CPS.filter(k => state.solved[k]).length * 5;
+function updateScore(){
+  const p = points();
+  $('#scoreText').textContent = 'Score ' + p + ' of ' + MAXPTS;
+  $('#scoreBar').style.width = (p/MAXPTS*100) + '%';
+}
+
+/* ---------- router ---------- */
+const pages = $$('section.page');
+const keys = pages.map(p => p.dataset.key);
+let current = null;
+
+function isUnlocked(i){
+  if (i === 0) return true;
+  if (!state.name) return false;
+  for (let j=0;j<i;j++){ const cp = pages[j].dataset.cp; if (cp && !state.solved[cp]) return false; }
+  return true;
+}
+function firstBlocker(i){
+  if (!state.name) return 0;
+  for (let j=0;j<i;j++){ const cp = pages[j].dataset.cp; if (cp && !state.solved[cp]) return j; }
+  return i;
+}
+function buildToc(){
+  const ol = $('#tocList'); ol.innerHTML = '';
+  pages.forEach((p,i) => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = '#' + p.dataset.key; a.dataset.idx = i;
+    if (p.dataset.cp) a.classList.add('is-cp');
+    li.appendChild(a); ol.appendChild(li);
+  });
+  refreshToc();
+}
+function refreshToc(){
+  $$('#tocList a').forEach(a => {
+    const i = +a.dataset.idx, p = pages[i];
+    const unlocked = isUnlocked(i);
+    const cp = p.dataset.cp;
+    let st = '', stCls = '', srSt = '';
+    if (!unlocked){ st = 'Locked'; stCls = 'st-lock'; srSt = ', locked'; }
+    else if (cp && state.solved[cp]){ st = '\u2713 Done'; stCls = 'st-done'; srSt = ', solved'; }
+    a.innerHTML = '<span class="num" aria-hidden="true">' + (i+1) + '</span><span class="lbl">' + esc(p.dataset.title) + '<span class="sr-only">' + srSt + '</span></span>' + (st ? '<span class="st ' + stCls + '" aria-hidden="true">' + st + '</span>' : '');
+    if (unlocked) a.removeAttribute('aria-disabled'); else a.setAttribute('aria-disabled','true');
+    if (i === current) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
+  });
+}
+function show(key, moveFocus){
+  let i = keys.indexOf(key); if (i < 0) i = 0;
+  if (!isUnlocked(i)){
+    const b = firstBlocker(i);
+    if (b !== i && i !== 0) announce(pages[b].dataset.cp ? 'That section is locked. Solve ' + pages[b].dataset.title + ' first.' : 'Enter your first name to start.');
+    i = b;
+    if (location.hash.slice(1) !== keys[i]) history.replaceState(null, '', '#' + keys[i]);
+  }
+  current = i;
+  pages.forEach((p,j) => { p.hidden = j !== i; });
+  sims.forEach(s => { if (!pages[i].contains(s.root)) s.pause(); });
+  $$('.kicker', pages[i]).forEach(k => k.textContent = 'Section ' + (i+1) + ' of ' + pages.length);
+  document.title = pages[i].dataset.title + ' | AC circuits | PHY2049';
+  refreshToc(); updatePager(); closeToc();
+  if (pages[i].dataset.key === 'summary') renderFinish();
+  if (moveFocus){ window.scrollTo(0,0); const h = $('h2.ptitle', pages[i]); if (h) h.focus({preventScroll:true}); }
+}
+function updatePager(){
+  const prev = $('#prevBtn'), next = $('#nextBtn'), hint = $('#nextHint');
+  prev.disabled = current === 0;
+  prev.textContent = current === 0 ? 'Previous' : 'Previous: ' + pages[current-1].dataset.title;
+  $('#pagePos').textContent = (current+1) + ' of ' + pages.length;
+  if (current === pages.length-1){ next.hidden = true; hint.textContent = ''; return; }
+  next.hidden = false;
+  next.textContent = 'Next: ' + pages[current+1].dataset.title;
+  const cp = pages[current].dataset.cp;
+  if (current === 0 && !state.name){ next.disabled = true; hint.textContent = 'Enter your first name above to start.'; }
+  else if (cp && !state.solved[cp]){ next.disabled = true; hint.textContent = 'Solve this checkpoint to unlock the next section.'; }
+  else { next.disabled = false; hint.textContent = ''; }
+}
+function go(delta){ const i = current + delta; if (i>=0 && i<pages.length) location.hash = '#' + keys[i]; }
+$('#prevBtn').addEventListener('click', () => go(-1));
+$('#nextBtn').addEventListener('click', () => go(1));
+window.addEventListener('hashchange', () => show(location.hash.slice(1), true));
+$('#tocList').addEventListener('click', e => {
+  const a = e.target.closest('a'); if (!a) return;
+  if (a.getAttribute('aria-disabled') === 'true'){ e.preventDefault(); const b = firstBlocker(+a.dataset.idx); announce(b===0 ? 'Enter your first name to start.' : 'Locked. Solve ' + pages[b].dataset.title + ' first.'); }
+});
+const tocBtn = $('#tocToggle');
+function closeToc(){ $('#toc').classList.remove('open'); tocBtn.setAttribute('aria-expanded','false'); }
+tocBtn.addEventListener('click', () => { const o = !$('#toc').classList.contains('open'); $('#toc').classList.toggle('open', o); tocBtn.setAttribute('aria-expanded', String(o)); if (o){ const a = $('#tocList a[aria-current]') || $('#tocList a'); a && a.focus(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#toc').classList.contains('open')){ closeToc(); tocBtn.focus(); } });
+
+/* ---------- welcome ---------- */
+const nameInput = $('#firstName');
+nameInput.value = state.name || '';
+const name2Input = $('#secondName');
+name2Input.value = state.name2 || '';
+$('#nameForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = nameInput.value.trim().split(/\s+/)[0] || '';
+  if (!v){ $('#nameErr').textContent = 'Please type your first name to start.'; nameInput.setAttribute('aria-invalid','true'); nameInput.focus(); return; }
+  nameInput.removeAttribute('aria-invalid'); $('#nameErr').textContent = '';
+  const v2 = name2Input.value.trim().split(/\s+/)[0] || '';
+  state.name = v; state.name2 = v2; nameInput.value = v; name2Input.value = v2; save(); refreshToc(); updatePager();
+  location.hash = '#' + keys[1];
+});
+$('#resetBtn').addEventListener('click', () => {
+  if (!window.confirm('Clear your name, score and progress in this browser?')) return;
+  state = { name:'', name2:'', solved:{}, completedAt:null }; save();
+  name2Input.value = '';
+  nameInput.value = ''; updateScore(); CPS.forEach(k => checkpoints[k] && checkpoints[k].mount());
+  refreshToc(); updatePager(); announce('Progress cleared.'); nameInput.focus();
+});
+
+/* ---------- oscilloscope ---------- */
+const WAVES = {
+  sine: x => Math.sin(x),
+  square: x => (Math.sin(x) >= 0 ? 1 : -1),
+  triangle: x => (2/Math.PI)*Math.asin(Math.sin(x))
+};
+const WAVE_NAMES = { sine:'sine wave', square:'square wave', triangle:'triangle wave' };
+function scopeSVG(o, id, title, desc){
+  // o: wave, f, amp, sdiv, vdiv, hoff, voff, t0, guides
+  const D = 50, W = 500, H = 400;
+  let g = '';
+  for (let i=0;i<=10;i++) g += '<line x1="'+i*D+'" y1="0" x2="'+i*D+'" y2="'+H+'"/>';
+  for (let j=0;j<=8;j++) g += '<line x1="0" y1="'+j*D+'" x2="'+W+'" y2="'+j*D+'"/>';
+  let ticks = '';
+  for (let x=0;x<=W;x+=10) ticks += '<line x1="'+x+'" y1="'+(H/2-5)+'" x2="'+x+'" y2="'+(H/2+5)+'"/>';
+  for (let y=0;y<=H;y+=10) ticks += '<line x1="'+(W/2-5)+'" y1="'+y+'" x2="'+(W/2+5)+'" y2="'+y+'"/>';
+  const fn = WAVES[o.wave||'sine'];
+  const tAt = px => ((px/D) - 5 - (o.hoff||0))*o.sdiv + (o.t0||0);
+  let d = '';
+  const N = 900;
+  for (let k=0;k<=N;k++){
+    const px = k*W/N, v = o.amp*fn(TAU*o.f*tAt(px));
+    const py = H/2 - (v/o.vdiv + (o.voff||0))*D;
+    d += (k?'L':'M') + px.toFixed(2) + ' ' + py.toFixed(2);
+  }
+  let guides = '';
+  if (o.guides){
+    // peaks where f t = 1/4 + k
+    const peaks = [];
+    const tMin = tAt(0), tMax = tAt(W);
+    let k0 = Math.ceil(tMin*o.f - 0.25);
+    for (let k=k0; ; k++){ const tp = (0.25+k)/o.f; if (tp > tMax) break; const px = D*(5 + (o.hoff||0) + (tp - (o.t0||0))/o.sdiv); peaks.push(px); if (peaks.length>3) break; }
+    const yTop = H/2 - (o.amp/o.vdiv + (o.voff||0))*D, yMid = H/2 - (o.voff||0)*D;
+    if (o.guides.period && peaks.length >= 2){
+      const y = yTop - 18;
+      guides += '<line x1="'+peaks[0]+'" y1="'+y+'" x2="'+peaks[1]+'" y2="'+y+'" stroke="var(--guide)" stroke-width="4" marker-start="url(#'+id+'a)" marker-end="url(#'+id+'a)"/>';
+      guides += '<text x="'+((peaks[0]+peaks[1])/2)+'" y="'+(y-12)+'" text-anchor="middle" class="gt">'+esc(o.guides.period)+'</text>';
+    }
+    if (o.guides.peak && peaks.length >= 1){
+      const x = peaks[peaks.length>1?1:0] + (peaks.length>1? 0:0);
+      guides += '<line x1="'+x+'" y1="'+yMid+'" x2="'+x+'" y2="'+yTop+'" stroke="var(--guide)" stroke-width="4" marker-end="url(#'+id+'a)"/>';
+      guides += '<text x="'+(x+10)+'" y="'+((yMid+yTop)/2)+'" class="gt">'+esc(o.guides.peak)+'</text>';
+    }
+    if (o.guides.pp && peaks.length >= 1){
+      const x = Math.max(peaks[0]-o.f*0 , 30) ;
+      const yBot = H/2 - (-o.amp/o.vdiv + (o.voff||0))*D;
+      const xx = peaks[0];
+      guides += '<line x1="'+xx+'" y1="'+(yTop)+'" x2="'+xx+'" y2="'+yBot+'" stroke="var(--guide)" stroke-width="4" stroke-dasharray="2 0" marker-start="url(#'+id+'a)" marker-end="url(#'+id+'a)"/>';
+      guides += '<text x="'+(xx+10)+'" y="'+(yBot-8)+'" class="gt">'+esc(o.guides.pp)+'</text>';
+    }
+  }
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-labelledby="'+id+'t '+id+'d" focusable="false">'
+   + '<title id="'+id+'t">'+esc(title)+'</title><desc id="'+id+'d">'+esc(desc)+'</desc>'
+   + '<defs><clipPath id="'+id+'c"><rect x="0" y="0" width="'+W+'" height="'+H+'"/></clipPath>'
+   + '<marker id="'+id+'a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--guide)"/></marker></defs>'
+   + '<style>.gt{fill:var(--guide);font:700 18px "Atkinson Hyperlegible",system-ui,sans-serif;paint-order:stroke;stroke:#0E3532;stroke-width:5px}</style>'
+   + '<rect width="'+W+'" height="'+H+'" fill="var(--scope-bg)"/>'
+   + '<g stroke="var(--scope-grid)" stroke-width="1.5">'+g+'</g>'
+   + '<g stroke="var(--scope-tick)" stroke-width="1.5">'+ticks+'</g>'
+   + '<g clip-path="url(#'+id+'c)"><path d="'+d+'" fill="none" stroke="var(--trace)" stroke-width="3.2" stroke-linejoin="round"/>'+guides+'</g>'
+   + '</svg>';
+}
+function divWord(x){ return trim(x,2) + (Math.abs(x)===1 ? ' division' : ' divisions'); }
+function describeScope(o){
+  const T = 1/o.f, pdiv = T/o.sdiv, adiv = o.amp/o.vdiv;
+  let s = 'Oscilloscope screen, 10 divisions wide and 8 divisions tall, showing a ' + WAVE_NAMES[o.wave] + '. ';
+  s += 'Settings: ' + fmtTime(o.sdiv) + ' per division, ' + o.vdiv + ' V per division. ';
+  if (pdiv > 10) s += 'Less than one full period fits on the screen (one period would span ' + divWord(pdiv) + '). ';
+  else if (pdiv < 0.4) s += 'The cycles are packed too tightly to count (one period spans ' + divWord(pdiv) + '). ';
+  else s += 'One period spans ' + divWord(pdiv) + '. ';
+  s += 'The trace rises ' + divWord(adiv) + ' above its center line and falls the same distance below it';
+  if (o.voff) s += '; the center line is shifted ' + divWord(Math.abs(o.voff)) + (o.voff>0?' up':' down');
+  s += '.';
+  if (adiv + Math.abs(o.voff||0) > 4) s += ' Part of the trace goes off the screen vertically.';
+  return s;
+}
+
+function makeScopeSim(root){
+  const id = nid('scope');
+  const o = { wave:'sine', f:250, gain:1, amp:5, sdiv:1e-3, vdiv:5, hoff:0, voff:0, t0:0, guides:null };
+  root.innerHTML = '<div class="scope-wrap">'
+   + '<div><div class="scope-screen" id="'+id+'scr"></div>'
+   + '<p class="readout" id="'+id+'ro" hidden></p></div>'
+   + '<div class="scope-panel" role="group" aria-label="Oscilloscope controls">'
+   +   '<div class="ctl"><label for="'+id+'w">Input</label><select id="'+id+'w"><option value="sine">Sine wave</option><option value="square">Square wave</option><option value="triangle">Triangle wave</option></select></div>'
+   +   '<div class="ctl"><label for="'+id+'f">Input frequency (Hz)</label><input type="number" id="'+id+'f" min="10" max="5000" step="10" value="250"><input type="range" id="'+id+'fr" min="10" max="2000" step="10" value="250" aria-label="Input frequency slider" aria-valuetext="250 hertz"></div>'
+   +   '<div class="ctl"><label for="'+id+'g">Oscilloscope gain <output id="'+id+'go" for="'+id+'g">1.0</output></label><input type="range" id="'+id+'g" min="0.2" max="4" step="0.1" value="1" aria-valuetext="gain 1.0"></div>'
+   +   '<div class="ctl"><label for="'+id+'s">Seconds / div</label><select id="'+id+'s">'
+   +     [100e-6,200e-6,500e-6,1e-3,2e-3,5e-3,10e-3].map(v => '<option value="'+v+'"'+(v===1e-3?' selected':'')+'>'+fmtTime(v)+'</option>').join('') + '</select></div>'
+   +   '<div class="ctl"><label for="'+id+'v">Volts / div</label><select id="'+id+'v">'
+   +     [1,2,5,10,20].map(v => '<option value="'+v+'"'+(v===5?' selected':'')+'>'+v+' V</option>').join('') + '</select></div>'
+   +   '<div class="ctl"><label for="'+id+'h">Horizontal offset <output id="'+id+'ho">0.0 div</output></label><input type="range" id="'+id+'h" min="-5" max="5" step="0.1" value="0" aria-valuetext="0 divisions"></div>'
+   +   '<div class="ctl"><label for="'+id+'vo">Vertical offset <output id="'+id+'voo">0.0 div</output></label><input type="range" id="'+id+'vo" min="-4" max="4" step="0.1" value="0" aria-valuetext="0 divisions"></div>'
+   +   '<div class="ctl"><label class="check"><input type="checkbox" id="'+id+'m"> Show measurements</label></div>'
+   + '</div></div>'
+   + '<p class="sr-only" aria-live="polite" id="'+id+'live"></p>';
+  const el = s => $('#'+id+s);
+  const live = debounce(() => { el('live').textContent = describeScope(o); }, 600);
+  function draw(){
+    o.amp = 5*o.gain;
+    const show = el('m').checked;
+    const T = 1/o.f, pdiv = T/o.sdiv, adiv = o.amp/o.vdiv;
+    o.guides = show ? { period: 'T = ' + trim(pdiv,2) + ' div', peak: '\u2130\u2080 = ' + trim(adiv,2) + ' div' } : null;
+    el('scr').innerHTML = scopeSVG(o, id+'svg', 'Simulated oscilloscope screen', describeScope(o));
+    const ro = el('ro');
+    if (show){
+      ro.hidden = false;
+      ro.innerHTML = 'Period: ' + trim(pdiv,2) + ' div \u00D7 ' + fmtTime(o.sdiv) + ' = ' + fmtTime(T) + ', so f = 1/T = ' + trim(o.f,1) + ' Hz.<br>Peak: ' + trim(adiv,2) + ' div \u00D7 ' + o.vdiv + ' V/div = ' + trim(o.amp,2) + ' V. Peak-to-peak: ' + trim(2*o.amp,2) + ' V.';
+    } else ro.hidden = true;
+    live();
+  }
+  el('w').addEventListener('change', e => { o.wave = e.target.value; draw(); });
+  const setF = v => { v = Math.min(5000, Math.max(10, +v || 10)); o.f = v; el('f').value = v; el('fr').value = Math.min(2000, v); el('fr').setAttribute('aria-valuetext', v + ' hertz'); draw(); };
+  el('f').addEventListener('change', e => setF(e.target.value));
+  el('fr').addEventListener('input', e => setF(e.target.value));
+  el('g').addEventListener('input', e => { o.gain = +e.target.value; el('go').textContent = o.gain.toFixed(1); e.target.setAttribute('aria-valuetext','gain ' + o.gain.toFixed(1) + ', peak ' + trim(5*o.gain,1) + ' volts'); draw(); });
+  el('s').addEventListener('change', e => { o.sdiv = +e.target.value; draw(); });
+  el('v').addEventListener('change', e => { o.vdiv = +e.target.value; draw(); });
+  el('h').addEventListener('input', e => { o.hoff = +e.target.value; el('ho').textContent = (+o.hoff).toFixed(1) + ' div'; e.target.setAttribute('aria-valuetext', o.hoff + ' divisions'); draw(); });
+  el('vo').addEventListener('input', e => { o.voff = +e.target.value; el('voo').textContent = (+o.voff).toFixed(1) + ' div'; e.target.setAttribute('aria-valuetext', o.voff + ' divisions'); draw(); });
+  el('m').addEventListener('change', draw);
+  draw();
+}
+
+function staticScope(root, o, settingsHtml, title){
+  const id = nid('ss');
+  const desc = o.desc || describeScope(o);
+  root.innerHTML = '<div class="scope-wrap"><div class="scope-screen">' + scopeSVG(o, id, title, desc) + '</div>'
+    + '<div class="scope-panel settings"><dl>' + settingsHtml + '</dl></div></div>'
+    + '<details><summary>Text description of the screen</summary><p>' + esc(desc) + '</p></details>';
+}
+function settingsDL(o){
+  return '<dt>Input</dt><dd>' + (o.wave==='sine'?'Sine wave':o.wave) + '</dd><dt>Seconds / div</dt><dd>' + fmtTime(o.sdiv) + '</dd><dt>Volts / div</dt><dd>' + o.vdiv + ' V</dd>';
+}
+
+/* ---------- circuit diagrams ---------- */
+function circuitSVG(kind){
+  const tilde = '<path d="M-15 0 C -10 -11, -4 -11, 0 0 S 10 11, 15 0" fill="none" stroke="currentColor" stroke-width="3"/>';
+  const wire = 'stroke="currentColor" stroke-width="3.5" fill="none" stroke-linecap="round"';
+  const it = 'font-family="STIX Two Math,Cambria Math,Times New Roman,serif" font-style="italic"';
+  let comp = '', labels = '', title = '';
+  if (kind === 'R'){
+    comp = '<path d="M260 40 V78 l-14 6 l28 10 l-28 10 l28 10 l-28 10 l28 10 l-14 6 V180" '+wire+'/>';
+    labels = '<text x="290" y="122" font-size="28" '+it+' fill="currentColor">R</text>';
+    title = 'Circuit diagram: an AC source on the left side of a rectangular loop and a resistor R on the right side. A purple arrow beside the resistor shows the instantaneous current i sub R flowing down through it; a green double arrow shows the instantaneous voltage v sub R across the resistor.';
+  } else if (kind === 'L'){
+    let coil = 'M260 40 V66'; for (let k=0;k<5;k++) coil += ' a9 9 0 1 1 0 18';
+    comp = '<path d="'+coil+' V180" '+wire+'/>';
+    labels = '<text x="290" y="118" font-size="28" '+it+' fill="currentColor">L</text>';
+    title = 'Circuit diagram: an AC source on the left side of a rectangular loop and an inductor L, drawn as a coil of five loops, on the right side. A purple arrow beside the coil shows the current i sub L flowing down through it; a green double arrow shows the voltage v sub L across the inductor.';
+  } else {
+    comp = '<path d="M260 40 V98 M260 122 V180" '+wire+'/><line x1="232" y1="98" x2="288" y2="98" stroke="currentColor" stroke-width="5"/><line x1="232" y1="122" x2="288" y2="122" stroke="currentColor" stroke-width="5"/>';
+    labels = '<text x="298" y="118" font-size="28" '+it+' fill="currentColor">C</text>';
+    title = 'Circuit diagram: an AC source on the left side of a rectangular loop and a capacitor C, drawn as two parallel plates, on the right side. A purple arrow shows the current i in the wire; a green double arrow shows the voltage v sub C across the capacitor.';
+  }
+  const sub = kind;
+  return '<svg viewBox="0 0 420 220" width="100%" style="max-width:420px" role="img" aria-label="'+esc(title)+'" focusable="false">'
+    + '<path d="M60 84 V40 H260 M260 180 H60 V136" '+wire+'/>' + comp
+    + '<circle cx="60" cy="110" r="26" fill="none" stroke="currentColor" stroke-width="3.5"/><g transform="translate(60 110)">'+tilde+'</g>'
+    + '<text x="8" y="118" font-size="28" fill="currentColor" font-family="STIX Two Math,Cambria Math,serif">\u2130</text>'
+    + (kind!=='C'
+        ? '<g stroke="var(--curr)" stroke-width="3.5" fill="var(--curr)"><line x1="222" y1="72" x2="222" y2="140"/><path d="M213 136 L222 152 L231 136 z"/></g><text x="176" y="104" font-size="24" '+it+' fill="var(--curr)">i<tspan font-size="16" dy="6">'+kind+'</tspan></text>'
+        : '<g stroke="var(--curr)" stroke-width="3.5" fill="var(--curr)"><line x1="130" y1="26" x2="190" y2="26"/><path d="M186 17 L202 26 L186 35 z"/></g><text x="150" y="20" font-size="24" '+it+' fill="var(--curr)">i</text>')
+    + '<g stroke="var(--ok)" stroke-width="3.5" fill="var(--ok)"><line x1="350" y1="70" x2="350" y2="150"/><path d="M341 76 L350 60 L359 76 z M341 144 L350 160 L359 144 z"/></g>'
+    + '<text x="364" y="118" font-size="24" '+it+' fill="var(--ok)">v<tspan font-size="16" dy="6">'+sub+'</tspan></text>'
+    + labels + '</svg>';
+}
+
+/* ---------- phasor simulations ---------- */
+const sims = [];
+function niceCeil(x){
+  if (x <= 0) return 1;
+  const e = Math.pow(10, Math.floor(Math.log10(x)));
+  for (const m of [1,1.2,1.5,2,2.5,3,4,5,6,8,10]) if (m*e >= x*1.05) return m*e;
+  return 10*e;
+}
+function makePhasorSim(root, mode){
+  const id = nid('ph');
+  const fmode = mode==='C' || mode==='L';
+  const p = mode==='C' ? { E0:7.5, f:0.3, C:100, t:0 } : mode==='L' ? { E0:10, f:0.3, L:1, t:0 } : { E0:5, T:4, R:5, t:0 };
+  let playing = false, raf = 0, last = 0;
+  const showI = mode !== 'single';
+  const ctl = (k, label, min, max, step, unit) =>
+    '<div class="ctl"><label for="'+id+k+'">'+label+' <output id="'+id+k+'o"></output></label><input type="range" id="'+id+k+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+p[k]+'" data-unit="'+unit+'"></div>';
+  let controls = ctl('E0','Peak emf',1,10,0.5,'V');
+  if (mode==='C'){ controls += ctl('f','Frequency',0.05,1,0.05,'Hz') + ctl('C','Capacitance (mF)',10,500,5,'mF'); }
+  else if (mode==='L'){ controls += ctl('f','Frequency',0.05,1,0.05,'Hz') + ctl('L','Inductance',0.2,5,0.1,'H'); }
+  else { controls += ctl('T','Period',0.5,10,0.5,'s'); if (mode==='R') controls += ctl('R','Resistance',1,20,0.5,'\u03A9'); }
+  controls += '<div class="ctl"><label for="'+id+'t">Time <output id="'+id+'to"></output></label><input type="range" id="'+id+'t" min="0" max="1" step="0.01" value="0"></div>';
+  const legend = '<div class="legend" aria-hidden="true"><span><svg width="34" height="10"><line x1="0" y1="5" x2="34" y2="5" stroke="var(--volt)" stroke-width="3.5"/></svg>Voltage \u2130(t), solid</span>'
+    + (showI ? '<span><svg width="34" height="10"><line x1="0" y1="5" x2="34" y2="5" stroke="var(--curr)" stroke-width="3.5" stroke-dasharray="7 4"/></svg>Current i(t), dashed</span>' : '') + '</div>';
+  root.innerHTML = '<div class="sim" role="group" aria-labelledby="'+id+'h"><h3 id="'+id+'h" style="margin:0 0 8px">'
+    + (mode==='single' ? 'Simulation: rotating phasor and graph' : mode==='R' ? 'Simulation: AC source and resistor' : mode==='L' ? 'Simulation: AC source and inductor' : 'Simulation: AC source and capacitor') + '</h3>'
+    + legend + '<div class="svgwrap" tabindex="0" role="region" aria-label="Simulation picture. On small screens, scroll sideways to see all of it."><svg class="phasor" viewBox="0 0 740 330" role="img" aria-labelledby="'+id+'st" focusable="false"><title id="'+id+'st"></title><g id="'+id+'g"></g></svg></div>'
+    + '<div class="bar"><button type="button" class="primary" id="'+id+'play" aria-pressed="false">Play</button><button type="button" id="'+id+'reset">Reset time to 0</button></div>'
+    + '<div class="controls">' + controls + '</div>'
+    + '<dl class="ro" id="'+id+'ro"></dl>'
+    + '<p class="sr-only" aria-live="polite" id="'+id+'live"></p></div>';
+  const el = s => $('#'+id+s);
+  const omega = () => fmode ? TAU*p.f : TAU/p.T;
+  const period = () => fmode ? 1/p.f : p.T;
+  const tmax = () => 3*period();
+  function I(){ if (mode==='R') return p.E0/p.R; if (mode==='C') return omega()*(p.C/1000)*p.E0; if (mode==='L') return p.E0/(omega()*p.L); return 0; }
+  function Xc(){ return 1/(omega()*(p.C/1000)); }
+  const phi = mode==='C' ? Math.PI/2 : mode==='L' ? -Math.PI/2 : 0;
+  const iAt = t => I()*Math.cos(omega()*t + phi);
+  function describe(){
+    const w = omega(), th = w*p.t, deg = ((th*180/Math.PI)%360+360)%360;
+    let s = 'At time ' + trim(p.t,2) + ' seconds, the voltage phasor of length ' + trim(p.E0,2) + ' volts points at ' + Math.round(deg) + ' degrees, so the emf is ' + fix(p.E0*Math.cos(th),2) + ' volts. ';
+    if (mode==='R') s += 'The current phasor points in the same direction; the current is ' + fix(iAt(p.t),3) + ' amperes, peak ' + sig(I(),3) + ' amperes. Current and voltage are in phase.';
+    if (mode==='L') s += 'The current phasor points 90 degrees behind, at ' + Math.round((deg+270)%360) + ' degrees; the current is ' + fix(iAt(p.t),3) + ' amperes, peak ' + sig(I(),3) + ' amperes. Current lags voltage by a quarter period.';
+    if (mode==='C') s += 'The current phasor points 90 degrees ahead, at ' + Math.round((deg+90)%360) + ' degrees; the current is ' + fix(iAt(p.t),3) + ' amperes, peak ' + sig(I(),3) + ' amperes. Current leads voltage by a quarter period.';
+    s += ' The graph shows ' + (showI ? 'both curves' : 'the emf') + ' over three periods with a cursor at the current time.';
+    return s;
+  }
+  const liveUpdate = debounce(() => { if (!playing) el('live').textContent = describe(); }, 700);
+  function draw(){
+    const w = omega(), th = w*p.t, cx = 160, cy = 165, Rm = 125;
+    const Vax = 10, Iv = I(), Iax = niceCeil(Iv || 1);
+    const rV = Rm*p.E0/Vax, rI = Rm*Iv/Iax;
+    const thI = th + phi;
+    const vx = cx + rV*Math.cos(th), vy = cy - rV*Math.sin(th);
+    const ix = cx + rI*Math.cos(thI), iy = cy - rI*Math.sin(thI);
+    const x0 = 360, x1 = showI ? 664 : 720, T3 = tmax();
+    const X = t => x0 + (t/T3)*(x1-x0);
+    const YV = v => cy - v/Vax*Rm, YI = i => cy - i/Iax*Rm;
+    let s = '';
+    // phasor axes
+    s += '<g stroke="var(--line)" stroke-width="1.5"><line x1="'+(cx-Rm-12)+'" y1="'+cy+'" x2="'+(cx+Rm+12)+'" y2="'+cy+'"/><line x1="'+cx+'" y1="'+(cy-Rm-12)+'" x2="'+cx+'" y2="'+(cy+Rm+12)+'"/></g>';
+    s += '<circle cx="'+cx+'" cy="'+cy+'" r="'+rV+'" fill="none" stroke="var(--volt)" stroke-opacity=".45" stroke-width="1.5" stroke-dasharray="4 5"/>';
+    if (showI) s += '<circle cx="'+cx+'" cy="'+cy+'" r="'+rI+'" fill="none" stroke="var(--curr)" stroke-opacity=".45" stroke-width="1.5" stroke-dasharray="4 5"/>';
+    // angle arc
+    const ar = 30, a = ((th%TAU)+TAU)%TAU;
+    s += '<path d="M'+(cx+ar)+' '+cy+' A '+ar+' '+ar+' 0 '+(a>Math.PI?1:0)+' 0 '+(cx+ar*Math.cos(a))+' '+(cy-ar*Math.sin(a))+'" fill="none" stroke="var(--muted)" stroke-width="2"/>';
+    s += '<text x="'+(cx+ar*Math.cos(a/2)+8)+'" y="'+(cy-ar*Math.sin(a/2)-6)+'" font-size="17" font-style="italic" fill="var(--muted)" font-family="STIX Two Math,Cambria Math,Times New Roman,serif">\u03C9t</text>';
+    // projections
+    s += '<line x1="'+vx+'" y1="'+vy+'" x2="'+vx+'" y2="'+cy+'" stroke="var(--volt)" stroke-width="1.5" stroke-dasharray="3 4"/>';
+    s += '<line x1="'+cx+'" y1="'+(cy-3)+'" x2="'+vx+'" y2="'+(cy-3)+'" stroke="var(--volt)" stroke-width="6" stroke-opacity=".7"/>';
+    if (showI){
+      s += '<line x1="'+ix+'" y1="'+iy+'" x2="'+ix+'" y2="'+cy+'" stroke="var(--curr)" stroke-width="1.5" stroke-dasharray="3 4"/>';
+      s += '<line x1="'+cx+'" y1="'+(cy+4)+'" x2="'+ix+'" y2="'+(cy+4)+'" stroke="var(--curr)" stroke-width="6" stroke-opacity=".7"/>';
+    }
+    // phasor arrows
+    s += '<line x1="'+cx+'" y1="'+cy+'" x2="'+vx+'" y2="'+vy+'" stroke="var(--volt)" stroke-width="4" marker-end="url(#'+id+'av)"/>';
+    if (showI) s += '<line x1="'+cx+'" y1="'+cy+'" x2="'+ix+'" y2="'+iy+'" stroke="var(--curr)" stroke-width="4" stroke-dasharray="9 5" marker-end="url(#'+id+'ai)"/>';
+    s += '<text x="'+(cx-Rm)+'" y="22" font-size="15" fill="var(--muted)">Phasors (rotate counterclockwise)</text>';
+    // graph axes
+    s += '<g stroke="var(--line)" stroke-width="1.5"><line x1="'+x0+'" y1="'+cy+'" x2="'+x1+'" y2="'+cy+'"/><line x1="'+x0+'" y1="'+(cy-Rm-8)+'" x2="'+x0+'" y2="'+(cy+Rm+8)+'"/>' + (showI ? '<line x1="'+x1+'" y1="'+(cy-Rm-8)+'" x2="'+x1+'" y2="'+(cy+Rm+8)+'"/>' : '') + '</g>';
+    let tk = '';
+    [-10,-5,5,10].forEach(v => { tk += '<line x1="'+(x0-5)+'" y1="'+YV(v)+'" x2="'+x0+'" y2="'+YV(v)+'" stroke="var(--volt)" stroke-width="2"/><text x="'+(x0-8)+'" y="'+(YV(v)+5)+'" text-anchor="end" font-size="13" fill="var(--volt)">'+minus(v)+' V</text>'; });
+    if (showI) [-1,-0.5,0.5,1].forEach(m => { const v = m*Iax; tk += '<line x1="'+x1+'" y1="'+YI(v)+'" x2="'+(x1+5)+'" y2="'+YI(v)+'" stroke="var(--curr)" stroke-width="2"/><text x="'+(x1+9)+'" y="'+(YI(v)+5)+'" text-anchor="start" font-size="13" fill="var(--curr)">'+minus(sig(v,3))+' A</text>'; });
+    for (let k=1;k<=3;k++){ const x = X(k*period()); tk += '<line x1="'+x+'" y1="'+(cy-5)+'" x2="'+x+'" y2="'+(cy+5)+'" stroke="var(--muted)" stroke-width="2"/><text x="'+x+'" y="'+(cy+22)+'" text-anchor="middle" font-size="14" fill="var(--muted)">'+(k===1?'T':k+'T')+'</text>'; }
+    tk += '<text x="'+(x1)+'" y="'+(cy+Rm+28)+'" text-anchor="end" font-size="14" fill="var(--muted)">time, T = '+trim(period(),3)+' s</text>';
+    s += tk;
+    let dv = '', di = '';
+    for (let k=0;k<=360;k++){ const t = k/360*T3; dv += (k?'L':'M')+X(t).toFixed(1)+' '+YV(p.E0*Math.cos(w*t)).toFixed(1); if (showI) di += (k?'L':'M')+X(t).toFixed(1)+' '+YI(iAt(t)).toFixed(1); }
+    s += '<path d="'+dv+'" fill="none" stroke="var(--volt)" stroke-width="3"/>';
+    if (showI) s += '<path d="'+di+'" fill="none" stroke="var(--curr)" stroke-width="3" stroke-dasharray="8 5"/>';
+    const xc = X(p.t);
+    s += '<line x1="'+xc+'" y1="'+(cy-Rm-8)+'" x2="'+xc+'" y2="'+(cy+Rm+8)+'" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="2 4"/>';
+    s += '<circle cx="'+xc+'" cy="'+YV(p.E0*Math.cos(th))+'" r="7" fill="var(--volt)" stroke="var(--surface)" stroke-width="2"/>';
+    if (showI) s += '<rect x="'+(xc-6)+'" y="'+(YI(iAt(p.t))-6)+'" width="12" height="12" fill="var(--curr)" stroke="var(--surface)" stroke-width="2"/>';
+    s += '<text x="'+x0+'" y="22" font-size="15" fill="var(--muted)">Graph against time</text>';
+    s = '<defs><marker id="'+id+'av" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--volt)"/></marker><marker id="'+id+'ai" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--curr)"/></marker></defs>' + s;
+    el('g').innerHTML = s;
+    el('st').textContent = describe();
+    // readouts
+    const deg = ((th*180/Math.PI)%360+360)%360;
+    let ro = '<div><dt>t</dt><dd>' + trim(p.t,2) + ' s</dd></div><div><dt>\u03C9</dt><dd>' + sig(w,3) + ' rad/s</dd></div><div><dt>\u03C9t</dt><dd>' + trim(th,2) + ' rad (' + Math.round(deg) + '\u00B0)</dd></div><div><dt>\u2130(t)</dt><dd>' + fix(p.E0*Math.cos(th),2) + ' V</dd></div>';
+    if (mode==='R') ro += '<div><dt>I = \u2130\u2080/R</dt><dd>' + sig(Iv,3) + ' A</dd></div><div><dt>i(t)</dt><dd>' + fix(iAt(p.t),3) + ' A</dd></div>';
+    if (mode==='L') ro += '<div><dt>X<sub>L</sub></dt><dd>' + sig(omega()*p.L,3) + ' \u03A9</dd></div><div><dt>I = \u2130\u2080/X<sub>L</sub></dt><dd>' + sig(Iv,3) + ' A</dd></div><div><dt>i(t)</dt><dd>' + fix(iAt(p.t),3) + ' A</dd></div>';
+    if (mode==='C') ro += '<div><dt>X<sub>C</sub></dt><dd>' + sig(Xc(),3) + ' \u03A9</dd></div><div><dt>I = \u2130\u2080/X<sub>C</sub></dt><dd>' + sig(Iv,3) + ' A</dd></div><div><dt>i(t)</dt><dd>' + fix(iAt(p.t),3) + ' A</dd></div>';
+    el('ro').innerHTML = ro;
+    // sync controls
+    const tr = el('t'); tr.max = T3.toFixed(3); tr.step = (T3/300).toFixed(4); tr.value = p.t;
+    tr.setAttribute('aria-valuetext', trim(p.t,2) + ' seconds');
+    el('to').textContent = trim(p.t,2) + ' s';
+  }
+  ['E0','T','R','f','C','L'].forEach(k => {
+    const inp = el(k); if (!inp) return;
+    const upd = () => { el(k+'o').textContent = trim(+inp.value,2) + ' ' + inp.dataset.unit; inp.setAttribute('aria-valuetext', trim(+inp.value,2) + ' ' + ({V:'volts',s:'seconds','\u03A9':'ohms',Hz:'hertz',mF:'millifarads',H:'henries'}[inp.dataset.unit])); };
+    upd();
+    inp.addEventListener('input', () => { p[k] = +inp.value; upd(); if (p.t > tmax()) p.t = 0; draw(); liveUpdate(); });
+  });
+  el('t').addEventListener('input', e => { p.t = +e.target.value; draw(); liveUpdate(); });
+  function frame(ts){
+    if (!playing) return;
+    const dt = last ? (ts-last)/1000 : 0; last = ts;
+    p.t += dt; if (p.t > tmax()) p.t = 0;
+    draw(); raf = requestAnimationFrame(frame);
+  }
+  function setPlay(on){
+    playing = on; const b = el('play');
+    b.textContent = on ? 'Pause' : 'Play'; b.setAttribute('aria-pressed', String(on));
+    cancelAnimationFrame(raf); last = 0;
+    if (on) raf = requestAnimationFrame(frame); else { el('live').textContent = describe(); }
+  }
+  el('play').addEventListener('click', () => setPlay(!playing));
+  el('reset').addEventListener('click', () => { p.t = 0; draw(); liveUpdate(); });
+  draw();
+  const api = { root, pause: () => { if (playing) setPlay(false); } };
+  sims.push(api);
+  return api;
+}
+
+/* ---------- checkpoint framework ---------- */
+const checkpoints = {};
+function registerCP(key, title, build){
+  const host = $('#' + key);
+  const cp = { key, mount(){
+    const practice = !!state.solved[key];
+    host.innerHTML = '<div class="cp-head"><h3 style="margin:0">' + esc(title) + '</h3><span class="pts">5 points</span></div>'
+      + (practice ? '<p class="practice">\u2713 You already earned these 5 points. The new numbers below are for practice only.</p>' : '')
+      + '<div class="cp-body"></div>'
+      + '<div class="actions"><button type="button" class="primary cp-check">Check answer</button><span class="attempts" aria-live="off"></span><button type="button" class="cp-new"' + (practice?'':' hidden') + '>New numbers</button></div>'
+      + '<div class="feedback" role="status" aria-live="polite"></div>'
+      + '<div class="solution" hidden></div>';
+    const body = $('.cp-body', host), fb = $('.feedback', host), sol = $('.solution', host);
+    const btn = $('.cp-check', host), att = $('.attempts', host), newBtn = $('.cp-new', host);
+    let attempts = 0, done = false;
+    const ctx = {
+      body, practice,
+      feedback(ok, html){
+        fb.className = 'feedback ' + (ok ? 'ok' : 'bad');
+        fb.innerHTML = '<span class="tag">' + (ok ? '\u2713 Correct.' : '\u2717 Not yet.') + '</span> ' + html;
+        typeset(fb);
+      },
+      solved(solutionHtml){
+        if (done) return; done = true;
+        btn.disabled = true;
+        $$('input,select,button.tile,button.empty', body).forEach(x => x.disabled = true);
+        sol.hidden = false; sol.innerHTML = '<h4 style="margin:8px 0">Worked solution</h4>' + solutionHtml; typeset(sol);
+        newBtn.hidden = false;
+        if (!state.solved[key]){
+          state.solved[key] = true;
+          if (CPS.every(k => state.solved[k]) && !state.completedAt) state.completedAt = new Date().toISOString();
+          save(); updateScore(); refreshToc(); updatePager();
+          setTimeout(() => announce('5 points earned. Score ' + points() + ' of ' + MAXPTS + '. The next section is unlocked.'), 900);
+        }
+      }
+    };
+    const checker = build(ctx);
+    btn.addEventListener('click', () => {
+      if (done) return;
+      const r = checker();
+      if (r === null) return; // incomplete input, message shown
+      attempts++;
+      att.textContent = 'Attempts: ' + attempts;
+    });
+    newBtn.addEventListener('click', () => { cp.mount(); const h = $('h3', host); if (h){ h.setAttribute('tabindex','-1'); h.focus(); } });
+    typeset(host);
+  }};
+  checkpoints[key] = cp;
+  cp.mount();
+}
+function mcq(ctx, name, legend, options, fmt){
+  // options: array of numeric values; returns fieldset html and getter
+  const gid = nid(name);
+  const letters = 'abcdefg';
+  let html = '<fieldset><legend>' + legend + '</legend>';
+  options.forEach((v,i) => { html += '<div class="opt"><input type="radio" name="'+gid+'" id="'+gid+i+'" value="'+i+'"><label for="'+gid+i+'">'+letters[i]+'. '+fmt(v)+'</label></div>'; });
+  html += '</fieldset>';
+  return { html, get(){ const c = $('input[name="'+gid+'"]:checked', ctx.body); return c ? +c.value : -1; } };
+}
+function makeOptions(correct, cands, n){
+  const key = v => Number(v).toPrecision(4);
+  const seen = new Set([key(correct)]); const out = [correct];
+  for (const c of shuffle(cands)){ if (out.length >= n) break; if (!(c > 0) || seen.has(key(c))) continue; seen.add(key(c)); out.push(c); }
+  return out.sort((a,b) => a-b);
+}
+const near = (a,b,tol) => Math.abs(a-b) <= tol*Math.abs(b);
+
+/* CP1: peak voltage */
+registerCP('cp1', 'What is the peak voltage?', ctx => {
+  const vdiv = pick([2,5,10,20]), blocks = pick([1,1.5,2,2.5,3]), peak = blocks*vdiv;
+  const sdiv = pick([200e-6,500e-6,1e-3]), pd = pick([3,4,5,6]), f = 1/(pd*sdiv);
+  const o = { wave:'sine', f, amp:peak, sdiv, vdiv, hoff:0, voff:0, t0: Math.random()/f };
+  o.desc = 'Oscilloscope screen, 10 divisions wide and 8 divisions tall, showing a sine wave centered on the middle horizontal line. Minor tick marks divide each division into fifths. The highest points of the trace are ' + divWord(blocks) + ' above the center line and the lowest points are ' + divWord(blocks) + ' below it. Settings: ' + fmtTime(sdiv) + ' per division, ' + vdiv + ' V per division.';
+  const opts = makeOptions(peak, [2*peak, peak/2, blocks, vdiv, peak+vdiv, peak-vdiv, 3*peak, 4*vdiv], 5);
+  const q = mcq(ctx, 'cp1', 'Choose the peak voltage', opts, v => trim(v,2) + ' V');
+  ctx.body.innerHTML = '<p>What is the peak voltage \\(\\mathcal{E}_0\\) of the AC signal shown below? Use the oscilloscope settings to find it.</p><div class="cp1scope"></div>' + q.html;
+  staticScope($('.cp1scope', ctx.body), o, settingsDL(o), 'Oscilloscope screen for checkpoint 1');
+  return () => {
+    const i = q.get(); if (i < 0){ ctx.feedback(false, 'Choose one of the answers first.'); return null; }
+    const v = opts[i];
+    if (near(v, peak, 1e-6)){
+      ctx.feedback(true, 'The peak voltage is ' + trim(peak,2) + ' V.');
+      ctx.solved('\\[\\mathcal{E}_0 = (' + trim(blocks,2) + '\\ \\text{div})(' + vdiv + '\\ \\text{V/div}) = ' + trim(peak,2) + '\\ \\text{V}\\]<p>Count from the center line to the top of the trace, then multiply by the volts per division. The seconds per division setting is not needed here.</p>');
+    } else if (near(v, 2*peak, 1e-6)) ctx.feedback(false, 'That is the peak-to-peak voltage, measured from the bottom of the trace to the top. The peak is measured from the center line.');
+    else if (near(v, blocks, 1e-6)) ctx.feedback(false, 'That is the number of divisions. Multiply it by the volts per division.');
+    else if (near(v, peak/2, 1e-6)) ctx.feedback(false, 'Check your count: measure from the center line all the way to the top of the trace.');
+    else ctx.feedback(false, 'Count the divisions from the center line to the top of the trace, then multiply by the volts per division.');
+  };
+});
+
+/* CP2: frequency */
+registerCP('cp2', 'What is the frequency?', ctx => {
+  let sdiv, P, f;
+  do { sdiv = pick([100e-6,200e-6,500e-6,1e-3,2e-3]); P = pick([2,2.5,4,5,8]); f = 1/(P*sdiv); } while (f < 50 || f > 5000);
+  const vdiv = pick([2,5]), adiv = pick([1,1.5,2]);
+  const o = { wave:'sine', f, amp:adiv*vdiv, sdiv, vdiv, hoff:0, voff:0, t0: 1/(4*f) + 4*sdiv };
+  const nVisible = Math.floor(10/P);
+  o.desc = 'Oscilloscope screen, 10 divisions wide and 8 divisions tall, showing a sine wave. A peak of the trace sits on the first vertical grid line from the left' + (P <= 9 ? ', and the next peak is ' + divWord(P) + ' to the right of it' : '') + '. ' + (nVisible >= 2 ? 'The peaks repeat every ' + divWord(P) + ' across the screen. ' : '') + 'Minor tick marks divide each division into fifths. Settings: ' + fmtTime(sdiv) + ' per division, ' + vdiv + ' V per division.';
+  const opts = makeOptions(f, [2*f, f/2, 4*f, f/4, 1/sdiv, f*1.25, f*0.8], 5);
+  const q = mcq(ctx, 'cp2', 'Choose the frequency', opts, v => trim(v,1) + ' Hz');
+  ctx.body.innerHTML = '<p>What is the frequency \\(f\\) of the AC voltage shown below? Use the oscilloscope settings to find it.</p><div class="cp2scope"></div>' + q.html;
+  staticScope($('.cp2scope', ctx.body), o, settingsDL(o), 'Oscilloscope screen for checkpoint 2');
+  return () => {
+    const i = q.get(); if (i < 0){ ctx.feedback(false, 'Choose one of the answers first.'); return null; }
+    const v = opts[i], T = P*sdiv;
+    if (near(v, f, 1e-6)){
+      ctx.feedback(true, 'The frequency is ' + trim(f,1) + ' Hz.');
+      ctx.solved('\\[T = (' + trim(P,2) + '\\ \\text{div})(' + trim(sdiv*1e3,3) + '\\ \\text{ms/div}) = ' + trim(T*1e3,3) + '\\ \\text{ms}\\]\\[f = \\frac{1}{T} = \\frac{1}{' + trim(T,6) + '\\ \\text{s}} = ' + trim(f,1) + '\\ \\text{Hz}\\]');
+    } else if (near(v, 2*f, 1e-6)) ctx.feedback(false, 'You may have measured from a peak to the next trough, which is only half a period. Measure peak to peak.');
+    else if (near(v, f/2, 1e-6)) ctx.feedback(false, 'It looks like you counted two periods. Measure from one peak to the very next peak.');
+    else if (near(v, 1/sdiv, 1e-6)) ctx.feedback(false, 'That is one over the seconds per division. First find the period: count the divisions in one cycle and multiply by the seconds per division.');
+    else ctx.feedback(false, 'Find the period first: divisions in one cycle times seconds per division. Then use \\(f = 1/T\\).');
+  };
+});
+
+/* CP3: matching */
+registerCP('cp3', 'Match each quantity to its value', ctx => {
+  const E0 = pick([2,2.5,3,4,4.5,5,6,7.5,8,9,10,12]);
+  const Tms = pick([0.5,1,2,2.5,4,5]);
+  const fr = pick([[1,4],[3,4],[1,2],[1,6],[1,3],[1,8]]);
+  const n = randInt(0,2);
+  const tms = (n + fr[0]/fr[1])*Tms;
+  const Et = E0*Math.cos(TAU*fr[0]/fr[1]);
+  const T = Tms/1000, f = 1/T, w = TAU/T;
+  const vals = shuffle([
+    { q:'peak', text: trim(E0,2).replace(/^(\d+)$/,'$1.0') + ' V' },
+    { q:'period', text: trim(T,6) + ' s' },
+    { q:'freq', text: trim(f,2) + ' Hz' },
+    { q:'omega', text: sig(w,5) + ' rad/s' },
+    { q:'inst', text: fix(Et,2) + ' V' }
+  ]);
+  const L = 'abcde';
+  const rows = [
+    ['peak','Peak voltage','Peak voltage'],
+    ['period','Period','Period'],
+    ['freq','Frequency','Frequency'],
+    ['omega','Angular frequency','Angular frequency'],
+    ['inst','Instantaneous emf at \\(t = ' + trim(tms,4) + '\\ \\text{ms}\\)', 'Instantaneous emf at t = ' + trim(tms,4) + ' milliseconds']
+  ];
+  const gid = nid('m');
+  let html = '<p>An AC source has a peak voltage of \\(\\mathcal{E}_0 = ' + trim(E0,2) + '\\ \\text{V}\\) and a period of \\(T = ' + trim(Tms,3) + '\\ \\text{ms}\\). Its emf is \\(\\mathcal{E}(t)=\\mathcal{E}_0\\cos(\\omega t)\\), with the calculator in radians. Choose the value that matches each quantity.</p>';
+  html += '<p><strong>Values:</strong> ' + vals.map((v,i) => L[i] + '. ' + esc(v.text)).join('; ') + '</p>';
+  rows.forEach((r,i) => {
+    html += '<div class="match-row"><label for="'+gid+i+'" aria-hidden="true">' + r[1] + '</label><select id="'+gid+i+'" aria-label="'+esc(r[2])+'" data-q="'+r[0]+'"><option value="">Choose a value</option>'
+      + vals.map((v,j) => '<option value="'+v.q+'">'+L[j]+'. '+esc(v.text)+'</option>').join('') + '</select><span class="mark" aria-hidden="true"></span></div>';
+  });
+  ctx.body.innerHTML = html;
+  return () => {
+    const sels = $$('select', ctx.body);
+    if (sels.some(s => !s.value)){ ctx.feedback(false, 'Choose a value for every quantity before checking.'); return null; }
+    let good = 0; const wrong = [];
+    sels.forEach((s,i) => {
+      const ok = s.value === s.dataset.q; if (ok) good++; else wrong.push(rows[i][2]);
+      const m = s.parentElement.querySelector('.mark'); m.textContent = ok ? '\u2713' : '\u2717'; m.className = 'mark ' + (ok?'ok':'bad');
+      s.setAttribute('aria-invalid', ok ? 'false' : 'true');
+    });
+    if (good === 5){
+      ctx.feedback(true, 'All five quantities match.');
+      const kfrac = fr[0]===1 && fr[1]===1 ? '' : '\\tfrac{' + fr[0] + '}{' + fr[1] + '}';
+      ctx.solved('\\[f=\\frac1T=\\frac{1}{' + trim(T,6) + '\\ \\text{s}}=' + trim(f,2) + '\\ \\text{Hz},\\qquad \\omega=\\frac{2\\pi}{T}=' + sig(w,5) + '\\ \\text{rad/s}\\]'
+        + '\\[t=' + trim(tms,4) + '\\ \\text{ms}=\\left(' + n + '+' + kfrac + '\\right)T\\ \\Rightarrow\\ \\omega t = 2\\pi\\left(' + n + '+' + kfrac + '\\right)\\]'
+        + '\\[\\mathcal{E}(t)=(' + trim(E0,2) + '\\ \\text{V})\\cos\\!\\left(2\\pi\\cdot' + kfrac + '\\right)=' + fix(Et,2).replace('\u2212','-') + '\\ \\text{V}\\]'
+        + '<p>Whole periods do not change the cosine, so only the fraction of a period after \\(nT\\) matters.</p>');
+    } else ctx.feedback(false, good + ' of 5 are correct. Check: ' + wrong.join(', ') + '.');
+  };
+});
+
+/* CP4: tile matching */
+registerCP('cp4', 'Drag the voltage tiles onto the matching times', ctx => {
+  const Ipk = pick([0.2,0.25,0.3,0.4,0.5,0.6]);
+  const R = pick([10,12,15,20,25,30,40]);
+  const V = Ipk*R;
+  const Tms = pick([1.2,2.4,4.8,12]);
+  const fracs = [[0,1],[1,8],[1,6],[1,4],[1,3],[3,8],[1,2]];
+  const chosen = shuffle(fracs).slice(0,5).sort((a,b) => a[0]/a[1] - b[0]/b[1]);
+  const slots = chosen.map((fr,i) => { const k = fr[0]/fr[1]; return { i, t: k*Tms, v: V*Math.cos(TAU*k), fr }; });
+  const tiles = shuffle(slots.map(s => ({ id: 'T' + s.i, v: s.v, label: fix(s.v,2) + ' V' })));
+  const place = {}; // slotIndex -> tileId
+  let selected = null;
+  const tileById = id => tiles.find(t => t.id === id);
+  const slotOf = id => { for (const k in place) if (place[k] === id) return +k; return -1; };
+  const gid = nid('tb');
+  ctx.body.innerHTML = '<p>A resistor of resistance \\(R = ' + R + '\\ \\Omega\\) is connected to an AC source with period \\(T = ' + trim(Tms,2) + '\\ \\text{ms}\\). The current is \\(i(t) = I\\cos(\\omega t)\\) with peak current \\(I = ' + trim(Ipk,2) + '\\ \\text{A}\\). Place each value of the voltage \\(v_R(t)\\) across the resistor next to the time it occurs.</p>'
+    + '<p class="attempts" id="'+gid+'help">Select a tile by clicking, tapping or pressing Enter, then select a time slot to place it. You can also drag tiles with a mouse or finger. Selecting a tile that is already in a slot while another tile is selected swaps them.</p>'
+    + '<div class="tiles-board"><div><h4 style="margin:0 0 6px" id="'+gid+'trayh">Voltage tiles</h4><div class="tray" role="group" aria-labelledby="'+gid+'trayh"></div><button type="button" class="to-tray" style="margin-top:8px" hidden>Return selected tile to the tray</button></div>'
+    + '<div><h4 style="margin:0 0 6px">Times</h4><div class="slots"></div></div></div>';
+  const tray = $('.tray', ctx.body), slotsEl = $('.slots', ctx.body), toTray = $('.to-tray', ctx.body);
+  function tileBtn(t){
+    const inSlot = slotOf(t.id);
+    const where = inSlot >= 0 ? ', placed at t = ' + trim(slots[inSlot].t,3) + ' milliseconds' : ', in the tray';
+    return '<button type="button" class="tile" data-id="'+t.id+'" aria-pressed="'+(selected===t.id)+'" aria-describedby="'+gid+'help" aria-label="Voltage tile ' + esc(t.label.replace('\u2212','minus ')) + where + '">' + esc(t.label) + '</button>';
+  }
+  function render(focusSel){
+    tray.innerHTML = tiles.filter(t => slotOf(t.id) < 0).map(tileBtn).join('') || '<span class="attempts">All tiles placed.</span>';
+    slotsEl.innerHTML = slots.map(s => {
+      const tid = place[s.i];
+      const res = s.result ? ' data-result="'+s.result+'"' : '';
+      const mark = s.result === 'ok' ? '<span class="mark ok" aria-hidden="true">\u2713</span>' : s.result === 'bad' ? '<span class="mark bad" aria-hidden="true">\u2717</span>' : '<span></span>';
+      const inner = tid ? tileBtn(tileById(tid)) : '<button type="button" class="empty" data-slot="'+s.i+'" aria-label="Empty slot for t = ' + trim(s.t,3) + ' milliseconds. Place the selected tile here.">Empty: place here</button>';
+      return '<div class="slot-row"><span class="slot-time">\\(t = ' + trim(s.t,3) + '\\ \\text{ms}\\)</span><div class="slot" data-slot="'+s.i+'"'+res+'>' + inner + '</div>' + mark + '</div>';
+    }).join('');
+    toTray.hidden = !(selected && slotOf(selected) >= 0);
+    typeset(slotsEl);
+    if (focusSel){ const f = $(focusSel, ctx.body); if (f) f.focus(); }
+  }
+  function clearResults(){ slots.forEach(s => delete s.result); }
+  function moveTo(id, slotIdx){
+    const from = slotOf(id);
+    if (slotIdx === -1){ if (from >= 0) delete place[from]; }
+    else {
+      const occupant = place[slotIdx];
+      if (occupant && occupant !== id){ if (from >= 0) place[from] = occupant; else delete place[slotIdx]; }
+      if (from >= 0 && place[from] === id) delete place[from];
+      place[slotIdx] = id;
+    }
+    clearResults(); selected = null;
+    const t = tileById(id);
+    announce(slotIdx === -1 ? 'Returned ' + t.label + ' to the tray.' : 'Placed ' + t.label + ' at t = ' + trim(slots[slotIdx].t,3) + ' milliseconds.');
+    render('.tile[data-id="'+id+'"]');
+  }
+  let suppressClick = false;
+  ctx.body.addEventListener('click', e => {
+    if (suppressClick){ suppressClick = false; return; }
+    const tb = e.target.closest('.tile'), eb = e.target.closest('.empty');
+    if (tb && !tb.disabled){
+      const id = tb.dataset.id;
+      if (selected && selected !== id && slotOf(id) >= 0){ moveTo(selected, slotOf(id)); return; }
+      selected = selected === id ? null : id;
+      announce(selected ? 'Selected ' + tileById(id).label + '. Now choose a time slot.' : 'Selection cleared.');
+      render('.tile[data-id="'+id+'"]'); return;
+    }
+    if (eb && !eb.disabled){
+      if (!selected){ announce('Select a voltage tile first.'); return; }
+      moveTo(selected, +eb.dataset.slot); return;
+    }
+  });
+  toTray.addEventListener('click', () => { if (selected) moveTo(selected, -1); });
+  // pointer dragging
+  let drag = null;
+  ctx.body.addEventListener('pointerdown', e => {
+    const tb = e.target.closest('.tile'); if (!tb || tb.disabled || e.button > 0) return;
+    drag = { id: tb.dataset.id, x: e.clientX, y: e.clientY, el: tb, ghost: null, pid: e.pointerId };
+  });
+  window.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.pid) return;
+    if (!drag.ghost){
+      if (Math.hypot(e.clientX-drag.x, e.clientY-drag.y) < 8) return;
+      drag.ghost = drag.el.cloneNode(true); drag.ghost.classList.add('ghost'); drag.ghost.setAttribute('aria-hidden','true');
+      document.body.appendChild(drag.ghost); drag.el.classList.add('dragging');
+    }
+    drag.ghost.style.left = e.clientX + 'px'; drag.ghost.style.top = e.clientY + 'px';
+    $$('.drop-hover', ctx.body).forEach(x => x.classList.remove('drop-hover'));
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    const tgt = under && (under.closest('.slot') || under.closest('.tray'));
+    if (tgt && ctx.body.contains(tgt)) tgt.classList.add('drop-hover');
+    e.preventDefault();
+  }, { passive:false });
+  window.addEventListener('pointerup', e => {
+    if (!drag || e.pointerId !== drag.pid) return;
+    const d = drag; drag = null;
+    if (!d.ghost) return; // treated as click
+    d.ghost.remove(); d.el.classList.remove('dragging');
+    $$('.drop-hover', ctx.body).forEach(x => x.classList.remove('drop-hover'));
+    suppressClick = true; setTimeout(() => { suppressClick = false; }, 50);
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    const slot = under && under.closest('.slot'), trayHit = under && under.closest('.tray');
+    if (slot && ctx.body.contains(slot)) moveTo(d.id, +slot.dataset.slot);
+    else if (trayHit && ctx.body.contains(trayHit)) moveTo(d.id, -1);
+    else render();
+  });
+  window.addEventListener('pointercancel', () => { if (drag && drag.ghost){ drag.ghost.remove(); drag.el.classList.remove('dragging'); } drag = null; });
+  render();
+  return () => {
+    if (Object.keys(place).length < 5){ ctx.feedback(false, 'Place all five tiles before checking.'); return null; }
+    let good = 0;
+    slots.forEach(s => { const ok = place[s.i] === 'T' + s.i; s.result = ok ? 'ok' : 'bad'; if (ok) good++; });
+    render();
+    if (good === 5){
+      ctx.feedback(true, 'Every voltage is at the right time.');
+      const lines = slots.map(s => {
+        const k = s.fr[0]/s.fr[1];
+        const frac = s.fr[0]===0 ? '0' : '\\tfrac{' + s.fr[0] + '}{' + s.fr[1] + '}';
+        return 't=' + trim(s.t,3) + '\\ \\text{ms}=' + (s.fr[0]===0 ? '0' : frac + 'T') + ':\\quad v_R=(' + trim(V,2) + '\\ \\text{V})\\cos(2\\pi\\cdot ' + frac + ')=' + fix(s.v,2).replace('\u2212','-') + '\\ \\text{V}';
+      });
+      ctx.solved('\\[V_R = RI = (' + R + '\\ \\Omega)(' + trim(Ipk,2) + '\\ \\text{A}) = ' + trim(V,2) + '\\ \\text{V},\\qquad v_R(t)=V_R\\cos\\!\\left(\\frac{2\\pi t}{T}\\right)\\]'
+        + '\\[\\begin{aligned}' + lines.join('\\\\') + '\\end{aligned}\\]'
+        + '<p>For a resistor the voltage follows the current exactly, so it peaks at \\(t=0\\) along with the current.</p>');
+      $$('.tile,.empty', ctx.body).forEach(b => b.disabled = true); toTray.hidden = true;
+    } else ctx.feedback(false, good + ' of 5 tiles are in the right place. Tiles in slots marked \u2717 need to move. Start from \\(V_R = RI\\) and evaluate \\(v_R = V_R\\cos(2\\pi t/T)\\) at each time.');
+  };
+});
+
+/* CP5: reactance and peak current */
+registerCP('cp5', 'Reactance and peak current', ctx => {
+  const E0 = pick([3,4,5,6,8,10,12]);
+  const f = pick([50,60,100,120,250,400,500,1000]);
+  const CuF = pick([1,2.2,4.7,5,8,10,22,47]);
+  const C = CuF*1e-6, w = TAU*f, X = 1/(w*C), I = E0/X;
+  const gid = nid('n');
+  ctx.body.innerHTML = '<p>An AC source of peak voltage \\(\\mathcal{E}_0 = ' + E0 + '\\ \\text{V}\\) and frequency \\(f = ' + f + '\\ \\text{Hz}\\) is connected in series to a capacitor of capacitance \\(C = ' + CuF + '\\ \\mu\\text{F}\\).</p>'
+    + '<p class="attempts">Enter numbers only. Answers within 2% are accepted. You may use scientific notation such as 3.3e-2.</p>'
+    + '<div class="numrow"><label for="'+gid+'x">Capacitive reactance \\(X_C\\)</label><input type="text" inputmode="decimal" id="'+gid+'x" autocomplete="off" aria-label="Capacitive reactance X sub C in ohms"><span class="unit">\\(\\Omega\\)</span><span class="mark" id="'+gid+'xm" aria-hidden="true"></span></div>'
+    + '<div class="numrow"><label for="'+gid+'i">Peak current \\(I\\)</label><input type="text" inputmode="decimal" id="'+gid+'i" autocomplete="off" aria-label="Peak current I in amperes"><span class="unit">\\(\\text{A}\\)</span><span class="mark" id="'+gid+'im" aria-hidden="true"></span></div>';
+  const parse = s => { s = String(s).trim().replace(',', '.').replace(/[\u2212]/g,'-').replace(/\s/g,''); if (!s) return NaN; return Number(s); };
+  return () => {
+    const xi = $('#'+gid+'x'), ii = $('#'+gid+'i');
+    const xv = parse(xi.value), iv = parse(ii.value);
+    if (isNaN(xv) || isNaN(iv)){ ctx.feedback(false, 'Enter a number in both boxes before checking.'); return null; }
+    const okX = near(xv, X, 0.02), okI = near(iv, I, 0.02);
+    const setM = (el, inp, ok) => { el.textContent = ok ? '\u2713' : '\u2717'; el.className = 'mark ' + (ok?'ok':'bad'); inp.setAttribute('aria-invalid', ok?'false':'true'); };
+    setM($('#'+gid+'xm'), xi, okX); setM($('#'+gid+'im'), ii, okI);
+    if (okX && okI){
+      ctx.feedback(true, '\\(X_C \\approx ' + sig(X,3) + '\\ \\Omega\\) and \\(I \\approx ' + sig(I,3) + '\\ \\text{A}\\).');
+      ctx.solved('\\[\\omega = 2\\pi f = 2\\pi(' + f + '\\ \\text{Hz}) = ' + sig(w,4) + '\\ \\text{rad/s}\\]\\[X_C=\\frac{1}{\\omega C}=\\frac{1}{(' + sig(w,4) + '\\ \\text{s}^{-1})(' + CuF + '\\times10^{-6}\\ \\text{F})}=' + sig(X,4) + '\\ \\Omega\\]\\[I=\\frac{\\mathcal{E}_0}{X_C}=\\frac{' + E0 + '\\ \\text{V}}{' + sig(X,4) + '\\ \\Omega}=' + sig(I,3) + '\\ \\text{A}\\]');
+      return true;
+    }
+    const tips = [];
+    if (!okX){
+      if (near(xv, 1/(f*C), 0.02)) tips.push('For the reactance, use the angular frequency \\(\\omega = 2\\pi f\\), not \\(f\\).');
+      else if (near(xv, w*C, 0.05)) tips.push('Reactance is the reciprocal: \\(X_C = 1/(\\omega C)\\).');
+      else if (near(xv*1e3, X, 0.02) || near(xv/1e3, X, 0.02) || near(xv*1e6, X, 0.02) || near(xv/1e6, X, 0.02)) tips.push('Check the unit conversion: \\(1\\ \\mu\\text{F} = 10^{-6}\\ \\text{F}\\).');
+      else tips.push('Recompute \\(X_C = \\dfrac{1}{2\\pi f C}\\) with \\(C\\) in farads.');
+    }
+    if (!okI){
+      if (near(iv, E0*X, 0.02)) tips.push('The peak current is voltage divided by reactance, \\(I = \\mathcal{E}_0/X_C\\).');
+      else if (!okX && near(iv, E0/xv, 0.02)) tips.push('Your current is consistent with your reactance, so fixing \\(X_C\\) will fix \\(I\\) too.');
+      else tips.push('Use \\(I = \\mathcal{E}_0 / X_C\\).');
+    }
+    ctx.feedback(false, tips.join(' '));
+  };
+});
+
+/* CP6: instantaneous current */
+registerCP('cp6', 'Current in the capacitor circuit at a given time', ctx => {
+  let f, E0, CmF, t, w, I, iC, opts;
+  for (let tries=0; tries<200; tries++){
+    f = pick([0.1,0.2,0.25,0.4,0.5]); E0 = randInt(4,10); CmF = 5*randInt(10,40); t = randInt(20,160)/10;
+    w = TAU*f; I = w*(CmF/1000)*E0; iC = -I*Math.sin(w*t);
+    const c1 = I*Math.cos(w*t), c2 = I*Math.sin(w*t), c3 = I;
+    const all = [iC, c1, c2, c3].map(v => Math.round(v*100)/100);
+    const distinct = all.every((a,i) => all.every((b,j) => i===j || Math.abs(a-b) >= 0.06));
+    if (Math.abs(Math.sin(w*t)) > 0.25 && Math.abs(Math.cos(w*t)) > 0.25 && distinct && I < 20){ opts = shuffle([{v:iC,k:'ok'},{v:c1,k:'cos'},{v:c2,k:'sign'},{v:c3,k:'peak'}]); break; }
+  }
+  const gid = nid('c6'), L = 'abcd';
+  let html = '<p>Use the capacitor simulation in the previous section, or your equations, to find the current in the circuit under these conditions:</p>'
+    + '<ul><li>Frequency of the source: \\(f = ' + trim(f,2) + '\\ \\text{Hz}\\)</li><li>Peak emf: \\(\\mathcal{E}_0 = ' + E0 + '\\ \\text{V}\\)</li><li>Capacitance: \\(C = ' + CmF + '\\ \\text{mF}\\)</li><li>Time: \\(t = ' + trim(t,1) + '\\ \\text{s}\\)</li></ul>'
+    + '<p class="attempts">The source emf is \\(\\mathcal{E}(t)=\\mathcal{E}_0\\cos(\\omega t)\\). Use radians.</p>'
+    + '<fieldset><legend>Choose the current \\(i(t)\\)</legend>';
+  opts.forEach((o,i) => { html += '<div class="opt"><input type="radio" name="'+gid+'" id="'+gid+i+'" value="'+i+'"><label for="'+gid+i+'">'+L[i]+'. '+fix(o.v,2)+' A</label></div>'; });
+  html += '</fieldset>';
+  ctx.body.innerHTML = html;
+  return () => {
+    const c = $('input[name="'+gid+'"]:checked', ctx.body);
+    if (!c){ ctx.feedback(false, 'Choose one of the answers first.'); return null; }
+    const o = opts[+c.value];
+    if (o.k === 'ok'){
+      ctx.feedback(true, 'The current is ' + fix(iC,2) + ' A.');
+      const Xc = 1/(w*CmF/1000);
+      ctx.solved('\\[\\omega = 2\\pi f = ' + sig(w,4) + '\\ \\text{rad/s},\\qquad X_C=\\frac{1}{\\omega C}=' + sig(Xc,4) + '\\ \\Omega,\\qquad I=\\frac{\\mathcal{E}_0}{X_C}=' + sig(I,4) + '\\ \\text{A}\\]'
+        + '\\[i(t)=I\\cos\\!\\left(\\omega t+\\tfrac{\\pi}{2}\\right)=-I\\sin(\\omega t)\\]'
+        + '\\[\\omega t = (' + sig(w,4) + ')(' + trim(t,1) + ') = ' + sig(w*t,4) + '\\ \\text{rad}\\ \\Rightarrow\\ i = -(' + sig(I,4) + '\\ \\text{A})\\sin(' + sig(w*t,4) + ') = ' + fix(iC,2).replace('\u2212','-') + '\\ \\text{A}\\]');
+    } else if (o.k === 'cos') ctx.feedback(false, 'This value ignores the phase shift. The capacitor current leads the voltage: \\(i(t) = I\\cos(\\omega t + \\pi/2)\\).');
+    else if (o.k === 'sign') ctx.feedback(false, 'Check the sign: \\(\\cos(x + \\pi/2) = -\\sin x\\).');
+    else ctx.feedback(false, 'That is the peak current \\(I\\). The question asks for the value at the given instant.');
+  };
+});
+
+/* shared helper for multiple choice with labelled options */
+function mcqText(ctx, legendTex, opts){
+  const gid = nid('mc'), L = 'abcdef';
+  let html = '<fieldset><legend>' + legendTex + '</legend>';
+  opts.forEach((o,i) => { html += '<div class="opt"><input type="radio" name="'+gid+'" id="'+gid+i+'" value="'+i+'"><label for="'+gid+i+'">'+L[i]+'. '+esc(o.text)+'</label></div>'; });
+  return { html: html + '</fieldset>', get(){ const c = $('input[name="'+gid+'"]:checked', ctx.body); return c ? opts[+c.value] : null; } };
+}
+function distinctOpts(list, sigs){
+  // list: [{v, unit, k}] -> keep first occurrence of each displayed text
+  const seen = new Set(), out = [];
+  for (const o of list){ o.text = sig(o.v, sigs) + ' ' + o.unit; if (seen.has(o.text)) continue; seen.add(o.text); out.push(o); }
+  return out;
+}
+
+/* CP7: inductive reactance */
+registerCP('cp7', 'Inductive reactance', ctx => {
+  let LmH, f, E0, XL, opts;
+  do {
+    LmH = pick([0.2,0.5,0.8,1,1.5,2,2.5,4,5]); f = pick([100,200,250,400,500,1000,2000]); E0 = pick([1.5,2,3,4,5,6]);
+    XL = TAU*f*LmH/1000;
+    opts = distinctOpts([{v:XL,unit:'\u03A9',k:'ok'},{v:f*LmH/1000,unit:'\u03A9',k:'f'},{v:Math.PI*f*LmH/1000,unit:'\u03A9',k:'pi'},{v:XL,unit:'rad/s',k:'unit'},{v:1/XL,unit:'\u03A9',k:'inv'}], 3);
+  } while (opts.length < 5 || XL < 0.05 || XL > 500);
+  const four = shuffle([opts[0]].concat(shuffle(opts.slice(1)).slice(0,3)));
+  const q = mcqText(ctx, 'Choose the inductive reactance', four);
+  ctx.body.innerHTML = '<p>What is the inductive reactance of an inductor of inductance \\(L = ' + LmH + '\\ \\text{mH}\\) when it is connected to an AC source of frequency \\(f = ' + f + '\\ \\text{Hz}\\) and peak voltage \\(' + trim(E0,1) + '\\ \\text{V}\\)?</p>' + q.html;
+  return () => {
+    const o = q.get(); if (!o){ ctx.feedback(false, 'Choose one of the answers first.'); return null; }
+    if (o.k === 'ok'){
+      ctx.feedback(true, '\\(X_L \\approx ' + sig(XL,3) + '\\ \\Omega\\).');
+      ctx.solved('\\[X_L=\\omega L=2\\pi f L=2\\pi(' + f + '\\ \\text{Hz})(' + LmH + '\\times10^{-3}\\ \\text{H})=' + sig(XL,3) + '\\ \\Omega\\]<p>The peak voltage is not needed: the reactance depends only on the frequency and the inductance.</p>');
+    } else if (o.k === 'f') ctx.feedback(false, 'Use the angular frequency \\(\\omega = 2\\pi f\\), not \\(f\\).');
+    else if (o.k === 'pi') ctx.feedback(false, 'Check the factor: \\(\\omega = 2\\pi f\\), not \\(\\pi f\\).');
+    else if (o.k === 'unit') ctx.feedback(false, 'The number is right but the unit is not. A reactance is measured in ohms, like a resistance.');
+    else ctx.feedback(false, 'For an inductor the reactance is \\(X_L = \\omega L\\), not its reciprocal. The reciprocal form belongs to the capacitor.');
+  };
+});
+
+/* CP8: peak current */
+registerCP('cp8', 'Peak current in an inductor circuit', ctx => {
+  let E0, fk, LmH, XL, I, opts;
+  do {
+    E0 = pick([2,2.5,3,4,5,6,8,9,10]); fk = pick([0.5,1,1.5,2,2.5,5]); LmH = pick([0.5,0.8,1,1.2,1.6,2,2.5,3.2,5]);
+    XL = TAU*fk*1000*LmH/1000; I = E0/XL;
+    opts = distinctOpts([{v:I*1000,unit:'mA',k:'ok'},{v:E0/(fk*LmH)*1000,unit:'mA',k:'f'},{v:E0*XL*1000,unit:'mA',k:'times'},{v:2*I*1000,unit:'mA',k:'pp'},{v:I/Math.SQRT2*1000,unit:'mA',k:'rms'}], 3);
+  } while (opts.length < 5 || I < 0.02 || I > 2);
+  const four = shuffle([opts[0]].concat(shuffle(opts.slice(1)).slice(0,3)));
+  const q = mcqText(ctx, 'Choose the peak current', four);
+  ctx.body.innerHTML = '<p>An AC source has a peak voltage of \\(' + trim(E0,1) + '\\ \\text{V}\\) and a frequency of \\(' + trim(fk,1) + '\\ \\text{kHz}\\). An inductor of inductance \\(L = ' + LmH + '\\ \\text{mH}\\) is connected to the source. What is the peak current in the circuit?</p>' + q.html;
+  return () => {
+    const o = q.get(); if (!o){ ctx.feedback(false, 'Choose one of the answers first.'); return null; }
+    if (o.k === 'ok'){
+      ctx.feedback(true, 'The peak current is about ' + sig(I*1000,3) + ' mA.');
+      ctx.solved('\\[X_L=2\\pi f L=2\\pi(' + trim(fk*1000,0) + '\\ \\text{Hz})(' + LmH + '\\times10^{-3}\\ \\text{H})=' + sig(XL,4) + '\\ \\Omega\\]\\[I=\\frac{V_L}{X_L}=\\frac{' + trim(E0,1) + '\\ \\text{V}}{' + sig(XL,4) + '\\ \\Omega}=' + sig(I,3) + '\\ \\text{A}=' + sig(I*1000,3) + '\\ \\text{mA}\\]');
+    } else if (o.k === 'f') ctx.feedback(false, 'Compute the reactance with \\(\\omega = 2\\pi f\\), not with \\(f\\) alone.');
+    else if (o.k === 'times') ctx.feedback(false, 'The current is the voltage divided by the reactance: \\(I = V_L / X_L\\).');
+    else if (o.k === 'pp') ctx.feedback(false, 'That is twice the peak current. Use \\(I = V_L/X_L\\) directly with the peak voltage.');
+    else ctx.feedback(false, 'That is the rms current. The question asks for the peak value, \\(I = V_L/X_L\\).');
+  };
+});
+
+/* CP9: source frequency */
+registerCP('cp9', 'Finding the frequency of the source', ctx => {
+  let E0, LmH, ImA, f, opts;
+  do {
+    E0 = pick([2,3,4,5,6,8,10,12]); LmH = pick([0.5,1,1.5,2,2.5,4,5]); ImA = 50*randInt(2,18);
+    f = E0/(TAU*(LmH/1000)*(ImA/1000));
+    opts = distinctOpts([{v:f,unit:'Hz',k:'ok'},{v:TAU*f,unit:'Hz',k:'omega'},{v:f/2,unit:'Hz',k:'half'},{v:E0/((LmH/1000)*(ImA/1000))/2,unit:'Hz',k:'pi'},{v:2*f,unit:'Hz',k:'other'}], 3);
+  } while (opts.length < 5 || f < 50 || f > 20000);
+  const four = [opts[0]].concat(shuffle(opts.slice(1)).slice(0,3)).sort((a,b) => a.v - b.v);
+  const q = mcqText(ctx, 'Choose the frequency', four);
+  ctx.body.innerHTML = '<p>An AC source with a peak voltage of \\(' + trim(E0,1) + '\\ \\text{V}\\) is connected to a \\(' + LmH + '\\ \\text{mH}\\) inductor. A peak current of \\(' + ImA + '\\ \\text{mA}\\) is measured in the circuit. What is the frequency of the source, in hertz?</p>' + q.html;
+  return () => {
+    const o = q.get(); if (!o){ ctx.feedback(false, 'Choose one of the answers first.'); return null; }
+    const XL = E0/(ImA/1000);
+    if (o.k === 'ok'){
+      ctx.feedback(true, 'The frequency is about ' + sig(f,3) + ' Hz.');
+      ctx.solved('\\[X_L=\\frac{V_L}{I}=\\frac{' + trim(E0,1) + '\\ \\text{V}}{' + trim(ImA/1000,3) + '\\ \\text{A}}=' + sig(XL,4) + '\\ \\Omega\\]\\[X_L=2\\pi f L\\ \\Rightarrow\\ f=\\frac{X_L}{2\\pi L}=\\frac{' + sig(XL,4) + '\\ \\Omega}{2\\pi(' + LmH + '\\times10^{-3}\\ \\text{H})}=' + sig(f,3) + '\\ \\text{Hz}\\]');
+    } else if (o.k === 'omega') ctx.feedback(false, 'That is the angular frequency \\(\\omega\\) in rad/s. Divide by \\(2\\pi\\) to get \\(f\\).');
+    else if (o.k === 'pi') ctx.feedback(false, 'Check the factor in \\(\\omega = 2\\pi f\\): divide by \\(2\\pi\\), not by 2.');
+    else ctx.feedback(false, 'Start from \\(X_L = V_L/I\\), then solve \\(X_L = 2\\pi f L\\) for \\(f\\).');
+  };
+});
+
+/* ---------- completion ---------- */
+function renderFinish(){
+  const host = $('#finish');
+  const missing = CPS.filter(k => !state.solved[k]);
+  if (missing.length){
+    host.innerHTML = '<div class="box"><p style="margin:0">Solve all nine checkpoints to receive your completion card. Remaining: ' + missing.map(k => 'checkpoint ' + k.slice(2)).join(', ') + '.</p></div>';
+    return;
+  }
+  const when = new Date(state.completedAt || Date.now());
+  const whenTxt = when.toLocaleString(undefined, { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'numeric', minute:'2-digit' });
+  const nm = esc(state.name || 'Student') + (state.name2 ? ' and ' + esc(state.name2) : '');
+  host.innerHTML = '<div class="cert" id="cert">'
+    + '<svg viewBox="0 0 420 200" role="img" aria-label="Celebration picture: an oscilloscope screen with a bright waveform that grows into a burst of stars." focusable="false">'
+    + '<rect x="40" y="18" width="340" height="164" rx="16" fill="var(--scope-frame)"/><rect x="56" y="32" width="308" height="136" rx="6" fill="var(--scope-bg)"/>'
+    + '<g stroke="var(--scope-grid)" stroke-width="1">' + [1,2,3,4,5].map(i => '<line x1="'+(56+i*51.3)+'" y1="32" x2="'+(56+i*51.3)+'" y2="168"/>').join('') + [1,2,3].map(j => '<line x1="56" y1="'+(32+j*34)+'" x2="364" y2="'+(32+j*34)+'"/>').join('') + '</g>'
+    + '<path d="' + (() => { let d=''; for (let k=0;k<=200;k++){ const x = 60 + k*1.5, a = 6 + k*0.27; d += (k?'L':'M') + x.toFixed(1) + ' ' + (100 - a*Math.sin(k/7)).toFixed(1); } return d; })() + '" fill="none" stroke="var(--trace)" stroke-width="3"/>'
+    + '<g fill="var(--guide)">' + [[330,52,12],[352,84,7],[312,130,9],[340,150,6],[290,58,6]].map(s => '<path transform="translate('+s[0]+' '+s[1]+') scale('+(s[2]/10)+')" d="M0 -10 L2.6 -3.4 L9.5 -3.1 L4.1 1.3 L5.9 8.1 L0 4.2 L-5.9 8.1 L-4.1 1.3 L-9.5 -3.1 L-2.6 -3.4 z"/>').join('') + '</g></svg>'
+    + '<h3>Well done, ' + nm + '!</h3>'
+    + '<p class="when">You completed <strong>AC circuits: an introduction</strong> with a score of <strong>' + points() + ' out of ' + MAXPTS + '</strong>.</p>'
+    + '<p class="when">Completed on ' + esc(whenTxt) + ' (your local time).</p>'
+    + '<div class="actions" style="justify-content:center"><button type="button" class="primary" id="printCert">Print or save this card</button></div>'
+    + '</div>';
+  $('#printCert').addEventListener('click', () => window.print());
+  typeset(host);
+  if (!reduceMotion && !renderFinish.done){
+    renderFinish.done = true;
+    const cols = ['#0B6B60','#FFD15C','#3343A8','#B3261E','#5FD3C1'];
+    for (let i=0;i<46;i++){
+      const c = document.createElement('span'); c.className = 'confetti'; c.setAttribute('aria-hidden','true');
+      c.style.left = (Math.random()*100) + 'vw'; c.style.background = cols[i%cols.length];
+      c.style.animationDelay = (Math.random()*0.6) + 's'; document.body.appendChild(c);
+      setTimeout(() => c.remove(), 3600);
+    }
+  }
+  announce('Congratulations ' + (state.name || '') + (state.name2 ? ' and ' + state.name2 : '') + '. You completed the lesson with ' + points() + ' out of ' + MAXPTS + ' points.');
+}
+
+/* ---------- mount content ---------- */
+makeScopeSim($('#scopeSim'));
+staticScope($('#exScope1'), { wave:'sine', f:500, amp:5, sdiv:1e-3, vdiv:5, hoff:0, voff:-1, t0:1/(4*500)+4e-3, guides:{ period:'T = 2 div = 2 ms' } }, '<dt>Frequency</dt><dd>500 Hz</dd><dt>Seconds / div</dt><dd>1 ms</dd><dt>Volts / div</dt><dd>5 V</dd>', 'Example: measuring the period');
+(function(){ const o = { wave:'sine', f:250, amp:5, sdiv:1e-3, vdiv:5, hoff:0, voff:0, t0:1/(4*250)+4e-3, guides:{ peak:'\u2130\u2080 = 1 div = 5 V', pp:'\u2130pp = 2 div = 10 V' } };
+  staticScope($('#exScope2'), o, '<dt>Frequency</dt><dd>250 Hz</dd><dt>Seconds / div</dt><dd>1 ms</dd><dt>Volts / div</dt><dd>5 V</dd>', 'Example: measuring peak and peak-to-peak voltage'); })();
+makePhasorSim($('#simSingle'), 'single');
+makePhasorSim($('#simR'), 'R');
+makePhasorSim($('#simC'), 'C');
+$('#circR').innerHTML = circuitSVG('R');
+$('#circC').innerHTML = circuitSVG('C');
+$('#circL').innerHTML = circuitSVG('L');
+$('#phasorL').innerHTML = (function(){
+  const panel = (ox, thDeg, tag) => {
+    const r = 110, th = thDeg*Math.PI/180, ti = th - Math.PI/2, cx = ox+130, cy = 150;
+    const vx = cx + r*Math.cos(th), vy = cy - r*Math.sin(th), ix = cx + 0.75*r*Math.cos(ti), iy = cy - 0.75*r*Math.sin(ti);
+    const m = 14, ux = Math.cos(th), uy = -Math.sin(th), wx = Math.cos(ti), wy = -Math.sin(ti);
+    const sq = 'M'+(cx+m*ux)+' '+(cy+m*uy)+' L'+(cx+m*ux+m*wx)+' '+(cy+m*uy+m*wy)+' L'+(cx+m*wx)+' '+(cy+m*wy);
+    const it = 'font-family="STIX Two Math,Cambria Math,Times New Roman,serif" font-style="italic"';
+    return '<g><line x1="'+(cx-125)+'" y1="'+cy+'" x2="'+(cx+125)+'" y2="'+cy+'" stroke="var(--muted)" stroke-width="2"/><line x1="'+cx+'" y1="'+(cy-125)+'" x2="'+cx+'" y2="'+(cy+125)+'" stroke="var(--muted)" stroke-width="2"/>'
+      + '<path d="'+sq+'" fill="none" stroke="var(--ink)" stroke-width="1.5"/>'
+      + '<line x1="'+cx+'" y1="'+cy+'" x2="'+vx+'" y2="'+vy+'" stroke="var(--volt)" stroke-width="4" marker-end="url(#phLv)"/>'
+      + '<line x1="'+cx+'" y1="'+cy+'" x2="'+ix+'" y2="'+iy+'" stroke="var(--curr)" stroke-width="4" stroke-dasharray="9 5" marker-end="url(#phLi)"/>'
+      + '<text x="'+(vx+(ux>0?6:-30))+'" y="'+(vy-6)+'" font-size="22" '+it+' fill="var(--volt)">V<tspan font-size="15" dy="5">L</tspan></text>'
+      + '<text x="'+(ix+8)+'" y="'+(iy+(wy>0?18:-6))+'" font-size="22" '+it+' fill="var(--curr)">I</text>'
+      + '<text x="'+cx+'" y="'+(cy+150)+'" text-anchor="middle" font-size="16" fill="var(--muted)">'+tag+'</text></g>';
+  };
+  return '<svg viewBox="0 0 560 320" width="100%" style="max-width:560px" role="img" aria-label="Two phasor diagrams for an inductor. In both, the solid voltage phasor V sub L and the dashed current phasor I are at right angles, with the current 90 degrees clockwise behind the voltage. Left: voltage at 40 degrees, current at minus 50 degrees. Right: voltage at 130 degrees, current at 40 degrees." focusable="false">'
+    + '<defs><marker id="phLv" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--volt)"/></marker><marker id="phLi" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--curr)"/></marker></defs>'
+    + panel(0, 40, 'Early in the cycle') + panel(290, 130, 'A little later') + '</svg>';
+})();
+makePhasorSim($('#simL'), 'L');
+
+buildToc(); updateScore();
+show(location.hash.slice(1) || 'welcome', false);
+})();
+</script>
+</body>
+</html>
