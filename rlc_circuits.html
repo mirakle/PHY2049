@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The series RLC circuit | PHY2049</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' },
+  options: { menuOptions: { settings: { assistiveMml: true } } }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+<style>
+:root{
+  --bg:#EEF2F5; --surface:#FFFFFF; --surface-2:#F6F8FA; --ink:#14233A; --muted:#4A5868;
+  --line:#C5D0DA; --accent:#0B6B60; --accent-ink:#FFFFFF; --accent-soft:#DDF1EE;
+  --volt:#B3261E; --curr:#3343A8; --ok:#1A6B2C; --ok-soft:#E3F3E6; --bad:#A3231B; --bad-soft:#FBE8E6;
+  --focus:#1F4FD1; --lock:#565F6B;
+  --scope-frame:#26323E; --scope-bg:#0E3532; --scope-grid:#2E6C64; --scope-tick:#4F978C; --trace:#A8F7E1; --guide:#FFD15C;
+  --radius:10px;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E151D; --surface:#16202B; --surface-2:#1C2834; --ink:#E7EDF3; --muted:#AAB7C4;
+    --line:#2F3D4C; --accent:#5FD3C1; --accent-ink:#04201C; --accent-soft:#163B37;
+    --volt:#FF8C82; --curr:#A3B0FF; --ok:#86DE98; --ok-soft:#173222; --bad:#FF8C82; --bad-soft:#3A1C1A;
+    --focus:#8FB0FF; --lock:#8994A0; --scope-frame:#0A0F14;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E151D; --surface:#16202B; --surface-2:#1C2834; --ink:#E7EDF3; --muted:#AAB7C4;
+  --line:#2F3D4C; --accent:#5FD3C1; --accent-ink:#04201C; --accent-soft:#163B37;
+  --volt:#FF8C82; --curr:#A3B0FF; --ok:#86DE98; --ok-soft:#173222; --bad:#FF8C82; --bad-soft:#3A1C1A;
+  --focus:#8FB0FF; --lock:#8994A0; --scope-frame:#0A0F14;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 80px)}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size:1.0625rem; line-height:1.6;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+a{color:var(--accent)}
+a:hover{text-decoration-thickness:2px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:4px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip{position:absolute;left:12px;top:-60px;background:var(--accent);color:var(--accent-ink);padding:10px 14px;border-radius:8px;z-index:50;font-weight:700}
+.skip:focus{top:calc(env(safe-area-inset-top,0px) + 10px)}
+
+/* Header */
+.topbar{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:5;
+  background:var(--surface); border-bottom:1px solid var(--line);
+  display:flex; align-items:center; gap:14px; padding:10px 20px;
+}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand svg{flex:none}
+.brand-text{min-width:0}
+.brand-text .course{font-size:.85rem;color:var(--muted);display:block}
+.brand-text .title{font-weight:700;font-size:1.05rem;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .spacer{flex:1}
+.score{display:flex;align-items:center;gap:8px;font-weight:700;white-space:nowrap}
+.score-meter{width:110px;height:10px;border-radius:5px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.score-meter span{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+.toc-toggle{display:none}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:0;max-width:1240px;margin:0 auto}
+nav.toc{border-right:1px solid var(--line);padding:18px 12px 30px 16px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 62px);align-self:start;max-height:calc(100vh - 62px);overflow:auto}
+nav.toc h2{font-size:.95rem;color:var(--muted);margin:4px 8px 10px;font-weight:700}
+nav.toc ol{list-style:none;margin:0;padding:0;counter-reset:sec}
+nav.toc li{margin:2px 0}
+nav.toc a{display:flex;align-items:flex-start;gap:10px;padding:7px 10px;border-radius:8px;text-decoration:none;color:var(--ink);min-height:36px;line-height:1.35}
+nav.toc a .num{flex:none;width:1.7em;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+nav.toc a .lbl{flex:1}
+nav.toc a .st{flex:none;font-size:.85rem}
+nav.toc a:hover{background:var(--surface-2)}
+nav.toc a[aria-current="page"]{background:var(--accent-soft);font-weight:700}
+nav.toc a[aria-disabled="true"]{color:var(--lock)}
+nav.toc a.is-cp .lbl{font-weight:700}
+.st-done{color:var(--ok)}
+.st-lock{color:var(--lock)}
+
+main{padding:26px 28px 60px;min-width:0}
+main:focus{outline:none}
+section.page{max-width:820px}
+section.page[hidden]{display:none}
+.kicker{color:var(--muted);font-size:.92rem;margin:0 0 2px}
+h2.ptitle{font-size:clamp(1.55rem,2.6vw,2.05rem);line-height:1.2;margin:0 0 14px;letter-spacing:-.01em}
+h2.ptitle:focus{outline:none}
+h3{font-size:1.2rem;margin:26px 0 8px}
+p,li{max-width:72ch}
+.lead{font-size:1.12rem}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin:18px 0}
+.note{background:var(--accent-soft);border-left:5px solid var(--accent);border-radius:6px;padding:12px 16px;margin:16px 0}
+.deriv{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:6px 20px 10px;margin:16px 0}
+.deriv ol{padding-left:1.3em}
+.deriv li{margin:10px 0}
+.mjx-wrap{overflow-x:auto;overflow-y:hidden;max-width:100%}
+mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%;padding:4px 0}
+table.qty{border-collapse:collapse;width:100%;margin:12px 0;background:var(--surface)}
+.table-scroll{overflow-x:auto;max-width:100%}
+table.qty caption{text-align:left;font-weight:700;padding:6px 0}
+table.qty th,table.qty td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:middle}
+table.qty thead th{background:var(--surface-2)}
+
+/* Buttons and controls */
+button,.btn{font:inherit;cursor:pointer;border-radius:8px;border:2px solid var(--accent);background:var(--surface);color:var(--accent);padding:8px 16px;min-height:44px;font-weight:700}
+button.primary{background:var(--accent);color:var(--accent-ink)}
+button:disabled{cursor:not-allowed;opacity:.55}
+button:hover:not(:disabled){filter:brightness(1.05)}
+input[type="text"],input[type="number"],select{font:inherit;color:var(--ink);background:var(--surface);border:2px solid var(--muted);border-radius:8px;padding:8px 10px;min-height:44px}
+input[type="range"]{width:100%;accent-color:var(--accent);min-height:28px}
+label{font-weight:700}
+
+/* Pager */
+.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:36px;padding-top:18px;border-top:1px solid var(--line);flex-wrap:wrap;max-width:820px}
+.pager .pos{color:var(--muted)}
+.pager-hint{color:var(--muted);font-size:.95rem;max-width:820px;margin:8px 0 0;text-align:right}
+
+/* Oscilloscope */
+.scope-wrap{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:16px;align-items:start;margin:14px 0}
+.scope-screen{background:var(--scope-frame);padding:12px;border-radius:14px}
+.scope-screen svg{display:block;width:100%;height:auto;border-radius:6px}
+.scope-panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.scope-panel .ctl{margin:0 0 12px}
+.scope-panel .ctl label{display:block;font-size:.95rem;margin-bottom:3px}
+.scope-panel .ctl output{font-weight:400;color:var(--muted)}
+.scope-panel select,.scope-panel input[type="number"]{width:100%}
+.settings dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px}
+.settings dt{font-weight:700}
+.settings dd{margin:0}
+.check{display:flex;align-items:center;gap:8px;font-weight:700}
+.check input{width:22px;height:22px;accent-color:var(--accent)}
+.readout{margin:10px 0 0;padding:10px 12px;background:var(--surface-2);border-radius:8px;font-size:.98rem}
+details{margin:10px 0}
+details summary{cursor:pointer;font-weight:700;color:var(--accent);min-height:32px;display:list-item}
+
+/* Phasor sim */
+.sim{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:16px 0}
+.sim .svgwrap{overflow-x:auto;border-radius:8px}
+.sim svg.phasor{min-width:600px;display:block;width:100%;height:auto;background:var(--surface-2);border-radius:8px}
+.sim .legend{display:flex;gap:20px;flex-wrap:wrap;margin:8px 4px;font-size:.95rem}
+.sim .legend span{display:inline-flex;align-items:center;gap:8px}
+.sim .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px 18px;margin-top:12px}
+.sim .controls .ctl label{display:block;font-size:.95rem}
+.sim .controls output{font-weight:400;color:var(--muted)}
+.sim .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.sim dl.ro{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px 16px;margin:12px 0 0;padding:10px 12px;background:var(--surface-2);border-radius:8px}
+.sim dl.ro div{display:flex;gap:6px;flex-wrap:wrap}
+.sim dl.ro dt{font-weight:700}
+.sim dl.ro dd{margin:0;font-variant-numeric:tabular-nums}
+.ext{display:inline-flex;align-items:center;gap:6px}
+
+/* Checkpoints */
+.cp{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:var(--radius);padding:18px 20px;margin:16px 0}
+.cp-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cp-head .pts{color:var(--muted);font-weight:700}
+.practice{background:var(--surface-2);border:1px dashed var(--line);border-radius:8px;padding:8px 12px;margin:6px 0 12px;font-size:.95rem}
+fieldset{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:14px 0}
+legend{font-weight:700;padding:0 6px}
+.opt{display:flex;align-items:center;gap:12px;padding:6px 8px;border-radius:6px;min-height:44px}
+.opt input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+.opt label{font-weight:400;cursor:pointer;flex:1}
+.opt:hover{background:var(--surface-2)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.attempts{color:var(--muted);font-size:.95rem}
+.feedback{margin:12px 0 0;padding:0;border-radius:8px}
+.feedback:not(:empty){padding:10px 14px}
+.feedback.ok{background:var(--ok-soft);color:var(--ink);border:2px solid var(--ok)}
+.feedback.bad{background:var(--bad-soft);color:var(--ink);border:2px solid var(--bad)}
+.feedback .tag{font-weight:700}
+.feedback.ok .tag{color:var(--ok)}
+.feedback.bad .tag{color:var(--bad)}
+.solution{margin-top:14px;border-top:1px solid var(--line);padding-top:8px}
+.match-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,260px) 2.2em;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.match-row:last-child{border-bottom:none}
+.match-row .mark{font-weight:700;font-size:1.1rem;text-align:center}
+.mark.ok{color:var(--ok)} .mark.bad{color:var(--bad)}
+.numrow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:10px 0}
+.numrow input{width:11em}
+.numrow .unit{font-weight:700}
+
+/* Tiles */
+.tiles-board{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:12px}
+.tray{border:2px dashed var(--line);border-radius:10px;padding:10px;min-height:120px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:10px;background:var(--surface-2)}
+.tray.drop-hover,.slot.drop-hover{border-color:var(--accent);background:var(--accent-soft)}
+.tile{border:2px solid var(--curr);color:var(--ink);background:var(--surface);border-radius:8px;padding:8px 14px;min-height:44px;min-width:7.5em;font-weight:700;font-variant-numeric:tabular-nums;touch-action:none;user-select:none;-webkit-user-select:none}
+.tile[aria-pressed="true"]{background:var(--curr);color:var(--surface);box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--curr)}
+.tile.dragging{opacity:.35}
+.ghost{position:fixed;pointer-events:none;z-index:100;transform:translate(-50%,-50%) rotate(-3deg);box-shadow:0 8px 18px rgba(0,0,0,.25)}
+.slots{display:flex;flex-direction:column;gap:8px}
+.slot-row{display:grid;grid-template-columns:8.5em minmax(0,1fr) 1.8em;gap:10px;align-items:center}
+.slot-time{font-weight:700}
+.slot{border:2px dashed var(--muted);border-radius:8px;min-height:52px;padding:3px;display:flex;align-items:center}
+.slot .empty{border:none;background:transparent;color:var(--muted);font-weight:400;width:100%;text-align:left;min-height:42px}
+.slot .tile{width:100%}
+.slot[data-result="ok"]{border-style:solid;border-color:var(--ok)}
+.slot[data-result="bad"]{border-style:solid;border-color:var(--bad)}
+
+/* Welcome and completion */
+.name-form{display:flex;gap:10px 16px;flex-wrap:wrap;align-items:flex-start;margin-top:8px}
+.name-form button{margin-top:1.75em}
+.name-form .field{display:flex;flex-direction:column;gap:4px;flex:1 1 220px;max-width:320px}
+.name-form .field input{width:100%}
+.cert{background:var(--surface);border:2px solid var(--accent);border-radius:16px;padding:20px;margin:18px 0;text-align:center;position:relative;overflow:hidden}
+.cert h3{font-size:1.7rem;margin:10px 0 4px}
+.cert .when{font-size:1.1rem}
+.cert svg{max-width:420px;width:100%;height:auto}
+.confetti{position:fixed;top:-20px;width:10px;height:16px;z-index:90;pointer-events:none;border-radius:2px;animation:fall 2.8s linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg)}}
+.err{color:var(--bad);font-weight:700;margin:6px 0 0}
+
+@media (max-width: 900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:fixed;top:calc(env(safe-area-inset-top,0px) + 60px);left:0;bottom:0;width:min(320px,88vw);background:var(--surface);z-index:20;border-right:1px solid var(--line);box-shadow:4px 0 18px rgba(0,0,0,.18);max-height:none;display:none}
+  nav.toc.open{display:block}
+  .toc-toggle{display:inline-flex;align-items:center}
+  main{padding:20px 16px 50px}
+  .scope-wrap{grid-template-columns:1fr}
+  .tiles-board{grid-template-columns:1fr}
+  .score-meter{display:none}
+}
+@media (max-width: 560px){
+  .brand-text .course{display:none}
+  .match-row{grid-template-columns:1fr 2em}
+  .match-row select{grid-column:1/2}
+  .slot-row{grid-template-columns:6.5em minmax(0,1fr) 1.6em}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+@media print{
+  body *{visibility:hidden}
+  .cert,.cert *{visibility:visible}
+  .cert{position:absolute;left:0;top:0;width:100%}
+  .cert button{display:none}
+}
+
+:root{--vres:#1A6B2C;--vreac:#7B2FA8}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--vres:#86DE98;--vreac:#D7A8FF}}
+:root[data-theme="dark"]{--vres:#86DE98;--vreac:#D7A8FF}
+.slot-row.wide{grid-template-columns:minmax(0,1fr) minmax(150px,1fr) 1.8em}
+.slot-row.wide .slot-time{font-weight:700}
+.tile.pic{min-width:0;padding:4px;line-height:0}
+.tile.pic[aria-pressed="true"],.tile.math[aria-pressed="true"]{background:var(--accent-soft);color:var(--ink)}
+.tile.math{font-weight:400;min-width:8em}
+.slot .tile.pic{width:auto;margin:auto}
+.slot{min-height:58px}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:12px 18px;border-radius:10px;font-weight:700;max-width:min(560px,92vw);z-index:200;box-shadow:0 6px 18px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:1}
+.tiles-board.wide{grid-template-columns:minmax(0,150px) minmax(0,1fr)}
+@media (max-width: 900px){.tiles-board.wide{grid-template-columns:1fr}}
+
+:root{--vcap:#B35300}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--vcap:#FFB070}}
+:root[data-theme="dark"]{--vcap:#FFB070}
+.builder{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+.builder svg.phasor{min-width:0!important}
+.stepnum{font-weight:700;color:var(--accent);margin:4px 0}
+.caption{background:var(--surface-2);border-radius:8px;padding:4px 14px;min-height:7em}
+.q{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:var(--radius);padding:16px 20px;margin:18px 0}
+.q-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.q-head h3{margin:0}
+.q-head h3:focus{outline:none}
+.q-head .pts{color:var(--muted);font-weight:700}
+.qfig{text-align:center;margin:8px 0}
+.given{background:var(--surface-2);border-radius:8px;padding:8px 12px}
+.hint{margin-top:12px;border:2px dashed var(--vcap);border-radius:8px;padding:6px 14px}
+.hint h4,.solution h4{margin:8px 0 4px}
+.concept{background:var(--accent-soft);border-radius:6px;padding:2px 12px;margin:8px 0}
+.concept h4{margin:8px 0 0}
+.anglebox{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:16px;align-items:center}
+.anglebox input[type=number]{width:7em}
+.setintro{color:var(--muted)}
+.donebox{border-color:var(--ok);background:var(--ok-soft)}
+.certkick{font-size:1.2rem;font-weight:700;color:var(--accent);margin:8px 0 0;letter-spacing:.02em}
+.certlist{list-style:none;padding:0;margin:8px auto;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center}
+@media (max-width: 900px){.builder,.anglebox{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" id="skiplink">Skip to lesson content</a>
+
+<header class="topbar">
+  <button class="toc-toggle" id="tocToggle" aria-expanded="false" aria-controls="toc">Contents</button>
+  <div class="brand">
+    <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true" focusable="false"><circle cx="19" cy="19" r="16" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M8 19 C 11 10, 15 10, 19 19 S 27 28, 30 19" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <div class="brand-text"><span class="course">PHY2049 Physics 2</span><span class="title">The series RLC circuit</span></div>
+  </div>
+  <span class="spacer"></span>
+  <div class="score" aria-label="Score">
+    <span id="scoreText">Score 0 of 58</span>
+    <div class="score-meter" aria-hidden="true"><span id="scoreBar"></span></div>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" id="toc" aria-label="Lesson sections">
+  <h2>Sections</h2>
+  <ol id="tocList"></ol>
+</nav>
+
+<main id="main" tabindex="-1">
+<noscript><p class="box">This lesson needs JavaScript for its simulations and quiz questions. Please open it in a browser with JavaScript turned on.</p></noscript>
+<!-- 1 Welcome -->
+<section class="page" data-key="welcome" data-title="Welcome" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">The series RLC circuit</h2>
+  <p class="lead">You have met each component alone, then in pairs. Now all three share one loop: a resistor, an inductor and a capacitor in series with an AC source. This is the circuit behind radio tuners, wireless chargers and the capacitor banks that power companies bolt onto factories.</p>
+  <div class="box">
+    <h3 style="margin-top:0">What you will do</h3>
+    <ol>
+      <li>Build the phasor diagram step by step and find how the current relates to the source voltage, in size and in timing.</li>
+      <li>Define the impedance and work through a full numerical example, then solve one yourself.</li>
+      <li>Discover resonance: why the current suddenly peaks at one special frequency.</li>
+      <li>Follow where the energy goes: power in each component, the power factor, and how engineers correct it.</li>
+    </ol>
+  </div>
+  <div class="box">
+    <h3 style="margin-top:0">How the questions work</h3>
+    <ul>
+      <li>Each question gives you <strong>2 attempts</strong>. A correct first attempt earns 2 points; a correct second attempt earns 1 point.</li>
+      <li>After a wrong first attempt you get a hint and a reminder of the key idea.</li>
+      <li>After you answer correctly, or after your second attempt, a detailed explanation appears. Read it even when you are right: the next question builds on it.</li>
+      <li>Later questions use the correct values from the explanations, so one slip does not ruin the rest of a set.</li>
+      <li>The next section opens once every question in the current set is finished.</li>
+      <li>Numbers are random, so your values differ from a classmate’s. You enter your name at the very end, on your results card.</li>
+      <li>Everything works with a keyboard, and animations never start on their own.</li>
+    </ul>
+  </div>
+  <div class="actions"><button type="button" id="resetBtn">Start over and clear my progress</button></div>
+</section>
+
+<!-- 2 Circuit -->
+<section class="page" data-key="rlc-circuit" data-title="The circuit" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">One loop, three components</h2>
+  <figure class="box" style="text-align:center">
+    <div id="circRLC"></div>
+    <figcaption>An AC source \(\mathcal{E}(t)=\mathcal{E}_0\cos(\omega t)\) in series with a resistor \(R\), an inductor \(L\) and a capacitor \(C\).</figcaption>
+  </figure>
+  <p>Two facts organize everything that follows:</p>
+  <ul>
+    <li><strong>One current.</strong> The components are in series, so the same current \(i(t)\) flows through all three at every instant.</li>
+    <li><strong>Voltages add.</strong> The loop rule gives \(v_R(t)+v_L(t)+v_C(t)=\mathcal{E}(t)\) at every instant.</li>
+  </ul>
+  <p>Each component treats that common current its own way, exactly as when it was alone:</p>
+  <div class="table-scroll">
+  <table class="qty">
+    <caption>Each component in the loop</caption>
+    <thead><tr><th scope="col">Component</th><th scope="col">Peak voltage</th><th scope="col">Phasor relative to the current</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Resistor</th><td>\(V_R=RI\)</td><td>Parallel to \(I\): in phase</td></tr>
+      <tr><th scope="row">Inductor</th><td>\(V_L=X_L I\), \(X_L=\omega L\)</td><td>\(90^\circ\) counterclockwise from \(I\): voltage leads (ELI)</td></tr>
+      <tr><th scope="row">Capacitor</th><td>\(V_C=X_C I\), \(X_C=\dfrac{1}{\omega C}\)</td><td>\(90^\circ\) clockwise from \(I\): voltage trails (ICE)</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Notice that \(V_L\) and \(V_C\) point in <em>opposite</em> directions. That single fact is the source of everything interesting about this circuit.</p>
+</section>
+
+<!-- 3 Phasor diagram -->
+<section class="page" data-key="phasor-diagram" data-title="Building the phasor diagram" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Building the phasor diagram</h2>
+  <p>Because the current is common to all three components, it is the natural reference. The recipe:</p>
+  <div class="deriv">
+    <ol>
+      <li><strong>Current first.</strong> Draw the current phasor \(I\) at a convenient low angle, about \(30^\circ\). Its actual angle does not matter; only relative angles do.</li>
+      <li><strong>Resistor.</strong> Draw \(V_R=RI\) along \(I\).</li>
+      <li><strong>Inductor.</strong> Draw \(V_L=X_L I\) at \(90^\circ\) counterclockwise from \(I\).</li>
+      <li><strong>Capacitor.</strong> Draw \(V_C=X_C I\) at \(90^\circ\) clockwise from \(I\).</li>
+      <li><strong>Combine the reactive voltages.</strong> \(V_L\) and \(V_C\) lie on the same line in opposite directions, so they reduce to a single phasor of length \(|V_L-V_C|\), pointing toward the larger one.</li>
+      <li><strong>Add.</strong> \(V_R\) and \(V_L-V_C\) are perpendicular. Their vector sum is the source phasor, of length \(\mathcal{E}_0\). The angle from \(I\) to \(\mathcal{E}_0\) is the phase angle \(\varphi\).</li>
+    </ol>
+  </div>
+  <p>Watch the recipe run below. Step through it with the buttons, or press Play to animate the build-up. Then change the components and see the diagram reshape.</p>
+  <div id="builderMain"></div>
+</section>
+
+<!-- 4 Magnitude and phase -->
+<section class="page" data-key="current-and-voltage" data-title="Current versus source voltage" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">How the current relates to the source voltage</h2>
+  <p>The finished diagram is a right triangle: one leg \(V_R\), the other leg \(V_L-V_C\), hypotenuse \(\mathcal{E}_0\).</p>
+  <h3>Magnitude</h3>
+  <div class="deriv">
+    <ol>
+      <li>Pythagoras: \(\mathcal{E}_0^2=V_R^2+(V_L-V_C)^2\).</li>
+      <li>Substitute \(V_R=RI\), \(V_L=X_LI\), \(V_C=X_CI\): \(\mathcal{E}_0^2=I^2\left[R^2+(X_L-X_C)^2\right]\).</li>
+      <li>Take the square root: \[I=\frac{\mathcal{E}_0}{\sqrt{R^2+(X_L-X_C)^2}}=\frac{\mathcal{E}_0}{\sqrt{R^2+\left(\omega L-\dfrac{1}{\omega C}\right)^2}}\]</li>
+    </ol>
+  </div>
+  <h3>Phase</h3>
+  <div class="deriv">
+    <ol>
+      <li>In the triangle, \(\tan\varphi=\dfrac{|V_L-V_C|}{V_R}=\dfrac{|X_L-X_C|}{R}\), so \(\varphi=\tan^{-1}\!\left(\dfrac{|X_L-X_C|}{R}\right)\), with \(0\le\varphi<90^\circ\).</li>
+      <li>Which way? Look at where \(\mathcal{E}_0\) sits relative to \(I\):
+        <ul>
+          <li>If \(X_L>X_C\), the reactive leg points up (counterclockwise from \(I\)). The source voltage is ahead, so <strong>the current trails</strong>: \(i(t)=I\cos(\omega t-\varphi)\). The circuit behaves inductively.</li>
+          <li>If \(X_L<X_C\), the reactive leg points down. <strong>The current leads</strong>: \(i(t)=I\cos(\omega t+\varphi)\). The circuit behaves capacitively.</li>
+          <li>If \(X_L=X_C\), \(\varphi=0\): current and voltage are in phase. Keep this case in mind; it gets its own section.</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+  <div class="note"><p style="margin:0">Same convention as before: \(\varphi\) is a positive angle, and the sign in \(i(t)=I\cos(\omega t\pm\varphi)\) is \(+\) when the current is ahead of the source voltage and \(-\) when it trails. Some books instead write \(\varphi=\tan^{-1}\!\big((X_L-X_C)/R\big)\) with a sign and always use \(\cos(\omega t-\varphi)\); both describe the same current.</p></div>
+</section>
+
+<!-- 5 Impedance -->
+<section class="page" data-key="impedance" data-title="Impedance" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Impedance: the circuit’s total opposition</h2>
+  <p>The peak current has the form of Ohm’s law, \(I=\mathcal{E}_0/Z\), with</p>
+  <div class="deriv">\[Z=\sqrt{R^2+(X_L-X_C)^2}=\sqrt{R^2+\left(\omega L-\frac{1}{\omega C}\right)^2}\]</div>
+  <p>\(Z\) is the <strong>impedance</strong>, measured in ohms. Divide every side of the voltage triangle by \(I\) and you get the <em>impedance triangle</em>: legs \(R\) and \(X_L-X_C\), hypotenuse \(Z\), and the same angle \(\varphi\). So also</p>
+  <div class="deriv">\[\cos\varphi=\frac{R}{Z},\qquad \sin\varphi=\frac{|X_L-X_C|}{Z}\]</div>
+  <figure class="box" style="text-align:center"><div id="impTriangle"></div><figcaption>The impedance triangle, drawn here for \(X_L&gt;X_C\).</figcaption></figure>
+  <h3>Things to notice</h3>
+  <ul>
+    <li>Resistance and reactance do not simply add; they combine at right angles.</li>
+    <li>The two reactances partly cancel each other because they enter as a difference. Adding a capacitor to an inductive circuit can <em>lower</em> the impedance.</li>
+    <li>\(Z\ge R\) always, with equality only when \(X_L=X_C\).</li>
+    <li>Special cases recover earlier results. With no capacitor effect (\(X_C=0\)), \(Z=\sqrt{R^2+X_L^2}\): the RL circuit. With no inductor (\(X_L=0\)), \(Z=\sqrt{R^2+X_C^2}\): the RC circuit.</li>
+  </ul>
+</section>
+
+<!-- 6 Worked example -->
+<section class="page" data-key="worked-example" data-title="Worked example" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Worked example: a complete RLC calculation</h2>
+  <div class="box"><p style="margin:0"><strong>The circuit.</strong> Frequency \(f=500\ \text{Hz}\), peak source voltage \(\mathcal{E}_0=10\ \text{V}\), \(R=8\ \Omega\), \(L=5\ \text{mH}\), \(C=30\ \mu\text{F}\). Find the angular frequency, both reactances, the impedance, the peak current and the phase.</p></div>
+  <div class="deriv">
+    <ol>
+      <li><strong>Angular frequency.</strong> \(\omega=2\pi f=2\pi(500\ \text{Hz})=3141.59\ \text{rad/s}\).</li>
+      <li><strong>Inductive reactance.</strong> \(X_L=\omega L=(3141.59\ \text{s}^{-1})(5\times10^{-3}\ \text{H})=15.71\ \Omega\).</li>
+      <li><strong>Capacitive reactance.</strong> \(X_C=\dfrac{1}{\omega C}=\dfrac{1}{(3141.59\ \text{s}^{-1})(30\times10^{-6}\ \text{F})}=10.61\ \Omega\).</li>
+      <li><strong>Impedance.</strong> \(X_L-X_C=5.10\ \Omega\), so \(Z=\sqrt{8^2+5.10^2}\ \Omega=\sqrt{90.0}\ \Omega=9.49\ \Omega\).</li>
+      <li><strong>Peak current.</strong> \(I=\dfrac{\mathcal{E}_0}{Z}=\dfrac{10\ \text{V}}{9.49\ \Omega}=1.05\ \text{A}\).</li>
+      <li><strong>Phase.</strong> \(\varphi=\tan^{-1}\!\left(\dfrac{5.10}{8}\right)=0.57\ \text{rad}=32.5^\circ\). Since \(X_L&gt;X_C\), the current trails: \(i(t)=(1.05\ \text{A})\cos(\omega t-0.57)\).</li>
+    </ol>
+  </div>
+  <p><strong>Check with the voltages.</strong> \(V_R=8.43\ \text{V}\), \(V_L=16.56\ \text{V}\), \(V_C=11.19\ \text{V}\). The inductor alone carries more than the source’s 10 V peak, yet \(\sqrt{8.43^2+(16.56-11.19)^2}=10.0\ \text{V}\). Peak voltages never add like ordinary numbers, because they peak at different times.</p>
+  <p>Now watch these exact numbers build the phasor diagram. After the last step, press <strong>Rotate</strong> to see the whole diagram spin as time runs.</p>
+  <div id="builderExample"></div>
+</section>
+
+<!-- 7 Practice 1 -->
+<section class="page" data-key="your-turn-rlc" data-title="Your turn: an RLC circuit" data-set="set1" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Your turn: an RLC circuit</h2>
+  <div id="set1"></div>
+</section>
+
+<!-- 8 Resonance -->
+<section class="page" data-key="resonance" data-title="Resonance: why it happens" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Resonance: why it happens</h2>
+  <p>The reactances pull in opposite directions as the frequency changes:</p>
+  <ul>
+    <li>\(X_L=\omega L\) <strong>grows</strong> with \(\omega\): an inductor fights fast changes of current.</li>
+    <li>\(X_C=\dfrac{1}{\omega C}\) <strong>shrinks</strong> with \(\omega\): a capacitor barely charges before the current reverses.</li>
+  </ul>
+  <p>One rising curve and one falling curve must cross. At the crossing, \(X_L=X_C\), the reactive term in the impedance vanishes, and \(Z\) drops to its smallest possible value, \(R\).</p>
+  <h3>Finding the resonance frequency</h3>
+  <div class="deriv">
+    <ol>
+      <li>Set the reactances equal: \(\omega_0 L=\dfrac{1}{\omega_0 C}\).</li>
+      <li>Solve: \(\omega_0^2=\dfrac{1}{LC}\), so \[\omega_0=\frac{1}{\sqrt{LC}},\qquad f_0=\frac{\omega_0}{2\pi}=\frac{1}{2\pi\sqrt{LC}}\]</li>
+      <li>Calculus check: \(Z(\omega)^2=R^2+\left(\omega L-\dfrac{1}{\omega C}\right)^2\). The first term is fixed and the second is a square, never negative, so \(Z\) is smallest exactly when \(\omega L-1/(\omega C)=0\). Equivalently, \(\dfrac{d}{d\omega}Z^2=2\left(\omega L-\dfrac{1}{\omega C}\right)\left(L+\dfrac{1}{\omega^2C}\right)=0\) only at \(\omega_0\), since the second factor is always positive.</li>
+    </ol>
+  </div>
+  <h3>What happens at \(\omega_0\)</h3>
+  <ul>
+    <li>\(Z=R\), so the peak current reaches its maximum, \(I_{\max}=\mathcal{E}_0/R\).</li>
+    <li>\(\varphi=0\): current and source voltage are in phase, and \(\mathcal{E}_0\) lies along \(I\).</li>
+    <li>\(V_L\) and \(V_C\) are equal and opposite, so they cancel in the sum. Individually, though, each can be <em>much larger</em> than \(\mathcal{E}_0\).</li>
+    <li>\(\omega_0\) depends only on \(L\) and \(C\). The resistance sets how tall and how sharp the current peak is, not where it is.</li>
+  </ul>
+  <div class="note">
+    <h3 style="margin-top:0">The deeper reason: a natural oscillation</h3>
+    <p>Remove the source and the resistor and you have an LC circuit: charge sloshes back and forth, energy trading between the capacitor’s electric field and the inductor’s magnetic field, at exactly \(\omega_0=1/\sqrt{LC}\). (This is the electrical twin of a mass on a spring, \(\omega_0=\sqrt{k/m}\).) Driving an RLC circuit at \(\omega_0\) is like pushing a child on a swing at the swing’s own rhythm: each push adds energy in step with the motion, and the response is largest. The resistor plays the role of friction.</p>
+  </div>
+  <div id="xlxcChart"></div>
+</section>
+
+<!-- 9 Resonance graphs -->
+<section class="page" data-key="resonance-curves" data-title="Impedance and current versus ω" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Impedance and current versus angular frequency</h2>
+  <p>The top graph shows \(Z(\omega)\) with the two reactances; the bottom graph shows the peak current \(I(\omega)=\mathcal{E}_0/Z(\omega)\). Use the probe to read values, and change the components.</p>
+  <div id="resChart"></div>
+  <h3>Try this</h3>
+  <ul>
+    <li>Change \(R\) only. The peak stays at the same \(\omega_0\), but a small \(R\) makes it higher (\(I_{\max}=\mathcal{E}_0/R\); watch the axis labels, which rescale so the peak always fits) and narrower, while a large \(R\) flattens it.</li>
+    <li>Change \(L\) or \(C\). The peak slides left when either grows, as \(\omega_0=1/\sqrt{LC}\) predicts.</li>
+    <li>Move the probe away from \(\omega_0\) on either side and watch the phase: current leads below resonance, trails above.</li>
+  </ul>
+  <div class="note"><p style="margin:0"><strong>Sharpness.</strong> The narrowness of the peak is measured by the quality factor \(Q=\dfrac{\omega_0 L}{R}\). A radio needs a high \(Q\) so that it responds to one station and ignores its neighbors on the dial.</p></div>
+</section>
+
+<!-- 10 Resonance example -->
+<section class="page" data-key="resonance-example" data-title="Resonance worked example" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Worked example: the same circuit at resonance</h2>
+  <div class="box"><p style="margin:0">Take the earlier circuit (\(\mathcal{E}_0=10\ \text{V}\), \(R=8\ \Omega\), \(L=5\ \text{mH}\), \(C=30\ \mu\text{F}\)) and tune the source to its resonance frequency.</p></div>
+  <div class="deriv">
+    <ol>
+      <li><strong>Resonance angular frequency.</strong> \(\omega_0=\dfrac{1}{\sqrt{LC}}=\dfrac{1}{\sqrt{(5\times10^{-3})(30\times10^{-6})}}=2582\ \text{rad/s}\), so \(f_0=\dfrac{\omega_0}{2\pi}=410.9\ \text{Hz}\).</li>
+      <li><strong>Reactances.</strong> \(X_L=\omega_0 L=12.91\ \Omega\) and \(X_C=\dfrac{1}{\omega_0 C}=12.91\ \Omega\). Equal, as they must be.</li>
+      <li><strong>Impedance.</strong> \(Z=\sqrt{8^2+0^2}=8.00\ \Omega=R\).</li>
+      <li><strong>Peak current.</strong> \(I=\dfrac{10\ \text{V}}{8\ \Omega}=1.25\ \text{A}\), up from 1.05 A at 500 Hz.</li>
+      <li><strong>Phase.</strong> \(\varphi=\tan^{-1}(0/8)=0\): current in phase with the source.</li>
+      <li><strong>The surprise.</strong> \(V_L=V_C=(1.25\ \text{A})(12.91\ \Omega)=16.1\ \text{V}\), more than one and a half times the source’s 10 V peak. In high-\(Q\) circuits this voltage magnification can reach hundreds of times the source voltage, which is why components in resonant circuits need high voltage ratings.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 11 Practice 2 -->
+<section class="page" data-key="your-turn-resonance" data-title="Your turn: resonance" data-set="set2" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Your turn: a circuit at resonance</h2>
+  <div id="set2"></div>
+</section>
+
+<!-- 12 Practice 3 -->
+<section class="page" data-key="phasors-at-resonance" data-title="Phasors at resonance" data-set="set3" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Your turn: phasors at and near resonance</h2>
+  <div id="set3"></div>
+</section>
+
+<!-- 13 Power -->
+<section class="page" data-key="power" data-title="Power in each component" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Where does the energy go?</h2>
+  <p>The instantaneous power delivered to a component is \(p(t)=v(t)\,i(t)\). What matters for heating, bills and batteries is the average over one period, \(\langle p\rangle=\dfrac1T\displaystyle\int_0^T p(t)\,dt\). Write the current as \(i=I\cos\theta\) with \(\theta=\omega t\mp\varphi\).</p>
+  <h3>Resistor</h3>
+  <div class="deriv">
+    <p>\(v_R=RI\cos\theta\), so \(p_R=I^2R\cos^2\theta\). This is never negative: a resistor only takes energy. Using \(\cos^2\theta=\tfrac12(1+\cos2\theta)\) and the fact that \(\cos2\theta\) averages to zero, \[\langle p_R\rangle=\tfrac12 I^2R=I_{\text{rms}}^2R\]</p>
+  </div>
+  <h3>Inductor and capacitor</h3>
+  <div class="deriv">
+    <p>\(v_L=X_LI\cos(\theta+\tfrac{\pi}{2})=-X_LI\sin\theta\), so \(p_L=-I^2X_L\sin\theta\cos\theta=-\tfrac12I^2X_L\sin2\theta\). Similarly \(p_C=+\tfrac12I^2X_C\sin2\theta\). A full period of \(\sin2\theta\) averages to zero: \[\langle p_L\rangle=\langle p_C\rangle=0\]</p>
+    <p>Inductors and capacitors store energy for a quarter cycle (in the magnetic field \(\tfrac12Li^2\), in the electric field \(\tfrac12Cv^2\)) and hand it back the next quarter cycle. They borrow; they never consume.</p>
+  </div>
+  <h3>The source</h3>
+  <div class="deriv">
+    <p>Energy is conserved, so the source’s average output equals what the resistor dissipates: \(\langle p\rangle=\tfrac12I^2R\). Using \(I=\mathcal{E}_0/Z\) and \(R/Z=\cos\varphi\): \[\langle p\rangle=\tfrac12\,\mathcal{E}_0\,I\cos\varphi=\mathcal{E}_{\text{rms}}\,I_{\text{rms}}\cos\varphi\]</p>
+  </div>
+  <div id="powerChart"></div>
+</section>
+
+<!-- 14 Power factor -->
+<section class="page" data-key="power-factor" data-title="The power factor" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">The power factor</h2>
+  <p>The product \(\mathcal{E}_{\text{rms}}I_{\text{rms}}\) is called the <em>apparent power</em>. Only the fraction \(\cos\varphi\) of it is actually delivered on average. That fraction is the <strong>power factor</strong>:</p>
+  <div class="deriv">\[\text{power factor}=\cos\varphi=\frac{R}{Z},\qquad 0&lt;\cos\varphi\le1\]</div>
+  <ul>
+    <li>\(\cos\varphi=1\) (purely resistive, or at resonance): every bit of current does useful work.</li>
+    <li>\(\cos\varphi\) small (strongly reactive): a large current flows back and forth, mostly ferrying energy into and out of fields, while little is delivered.</li>
+  </ul>
+  <h3>Why anyone cares</h3>
+  <p>The power company must deliver a given power \(P\) at a fixed voltage. The current it must push is \(I_{\text{rms}}=\dfrac{P}{\mathcal{E}_{\text{rms}}\cos\varphi}\). A power factor of 0.7 means about 43% more current than necessary. The transmission lines have resistance, and their losses go as \(I^2\), so that extra current roughly doubles the line losses, and every wire and transformer must be oversized to carry it.</p>
+  <div class="note">
+    <h3 style="margin-top:0">In the real world</h3>
+    <ul style="margin-bottom:0">
+      <li><strong>Factories.</strong> Electric motors, compressors and welders are coils: highly inductive loads with lagging power factors, often 0.7 to 0.85. Utilities charge industrial customers penalty fees when the power factor drops below a threshold, commonly around 0.9 to 0.95.</li>
+      <li><strong>Your laptop charger.</strong> Many countries require power-factor-correction circuits in power supplies above roughly 75 W, so millions of chargers do not each draw wasteful current.</li>
+      <li><strong>Substations.</strong> Utilities install large capacitor banks to cancel the inductive load of entire neighborhoods.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 15 Correction -->
+<section class="page" data-key="power-factor-correction" data-title="Correcting the power factor" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Correcting the power factor with a capacitor</h2>
+  <p>Most real loads are inductive (\(X_L&gt;X_C\)). Since capacitive and inductive effects cancel, the fix is to add capacitance. There are two ways to connect it.</p>
+  <h3>Option 1: a capacitor in series</h3>
+  <div class="deriv">
+    <ol>
+      <li>Goal: \(\cos\varphi=1\), which needs \(X_L=X_{C,\text{total}}\), i.e. resonance at the operating frequency.</li>
+      <li>Required total capacitance: \(\dfrac{1}{\omega C_{\text{tot}}}=X_L\Rightarrow C_{\text{tot}}=\dfrac{1}{\omega X_L}=\dfrac{1}{\omega^2L}\).</li>
+      <li>Capacitors in series combine as \(\dfrac{1}{C_{\text{tot}}}=\dfrac{1}{C}+\dfrac{1}{C'}\), so the added capacitor is \[C'=\left(\frac{1}{C_{\text{tot}}}-\frac{1}{C}\right)^{-1}\]</li>
+      <li>This only works when \(X_L&gt;X_C\): a series capacitor lowers the total capacitance and raises \(X_C\). If the circuit is already capacitive, you would need more inductance instead.</li>
+    </ol>
+  </div>
+  <p>Series correction changes the current through the load, so it suits small circuits and tuned systems. It is rarely used on power grids.</p>
+  <h3>Option 2: a capacitor in parallel (what industry does)</h3>
+  <div class="deriv">
+    <ol>
+      <li>A capacitor \(C'\) placed directly across the source sees the full source voltage, and the RLC branch keeps exactly the same voltage, current and power as before. Nothing about the load changes.</li>
+      <li>Load branch: peak current \(I=\mathcal{E}_0/Z\), trailing the voltage by \(\varphi\). Split its phasor into a part along \(\mathcal{E}_0\), \(I\cos\varphi\), and a part \(90^\circ\) behind it, \(I\sin\varphi\).</li>
+      <li>Capacitor branch: peak current \(I'=\omega C'\mathcal{E}_0\), \(90^\circ\) <em>ahead</em> of the voltage (ICE).</li>
+      <li>The source supplies the sum. Choose \(C'\) so the capacitor cancels the out-of-phase part: \(\omega C'\mathcal{E}_0=I\sin\varphi\).</li>
+      <li>With \(I=\mathcal{E}_0/Z\) and \(\sin\varphi=(X_L-X_C)/Z\): \[C'=\frac{X_L-X_C}{\omega Z^2}\]</li>
+      <li>The source current drops to \(I\cos\varphi\), now in phase with the voltage. Same power delivered, less current in the supply lines.</li>
+    </ol>
+  </div>
+  <div class="note"><p style="margin:0"><strong>Analogy.</strong> Think of the reactive current as a delivery truck driving loaded boxes out and empty boxes back all day. The parallel capacitor is a local warehouse next to the load: the boxes now shuttle between warehouse and load, and the long road from the power plant only carries what is actually used.</p></div>
+</section>
+
+<!-- 16 Power example -->
+<section class="page" data-key="power-example" data-title="Power worked example" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Worked example: power and its correction</h2>
+  <div class="box"><p style="margin:0">Back to the circuit at \(f=500\ \text{Hz}\): \(\mathcal{E}_0=10\ \text{V}\), \(R=8\ \Omega\), \(L=5\ \text{mH}\), \(C=30\ \mu\text{F}\). From before: \(\omega=3141.59\ \text{rad/s}\), \(X_L=15.71\ \Omega\), \(X_C=10.61\ \Omega\), \(Z=9.49\ \Omega\), \(I=1.054\ \text{A}\).</p></div>
+  <div class="deriv">
+    <ol>
+      <li><strong>Power factor.</strong> \(\cos\varphi=\dfrac{R}{Z}=\dfrac{8}{9.49}=0.843\).</li>
+      <li><strong>Average power from the source.</strong> \(P=\tfrac12\mathcal{E}_0I\cos\varphi=\tfrac12(10)(1.054)(0.843)=4.44\ \text{W}\).</li>
+      <li><strong>Check in the resistor.</strong> \(\tfrac12I^2R=\tfrac12(1.054)^2(8)=4.44\ \text{W}\). The inductor and capacitor average 0 W.</li>
+      <li><strong>Series correction.</strong> \(C_{\text{tot}}=\dfrac{1}{\omega X_L}=\dfrac{1}{(3141.59)(15.71)}=20.26\ \mu\text{F}\), then \(C'=\left(\dfrac{1}{20.26}-\dfrac{1}{30}\right)^{-1}\mu\text{F}=62.4\ \mu\text{F}\).</li>
+      <li><strong>Parallel correction.</strong> \(C'=\dfrac{X_L-X_C}{\omega Z^2}=\dfrac{5.10}{(3141.59)(90.0)}=18.0\ \mu\text{F}\). The source current drops from 1.054 A to \(I\cos\varphi=0.889\ \text{A}\) while the power stays 4.44 W.</li>
+    </ol>
+  </div>
+  <div id="pfChart"></div>
+</section>
+
+<!-- 17 Practice 4 -->
+<section class="page" data-key="your-turn-power" data-title="Your turn: power" data-set="set4" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Your turn: power and power factor</h2>
+  <div id="set4"></div>
+</section>
+
+<!-- 18 Finish -->
+<section class="page" data-key="results" data-title="Your results" hidden>
+  <p class="kicker"></p>
+  <h2 class="ptitle" tabindex="-1">Your results</h2>
+  <div id="scoreTable"></div>
+  <div class="box" id="nameForm" role="group" aria-label="Your name">
+    <h3 style="margin-top:0">Put your name on your card</h3>
+    <div class="name-form">
+      <div class="field">
+        <label for="firstName">Your first name</label>
+        <input type="text" id="firstName" autocomplete="given-name" maxlength="40" aria-describedby="nameHelp nameErr" required>
+        <span id="nameHelp" class="attempts">First name only.</span>
+      </div>
+      <div class="field">
+        <label for="secondName">Partner’s first name</label>
+        <input type="text" id="secondName" autocomplete="off" maxlength="40" aria-describedby="name2Help">
+        <span id="name2Help" class="attempts">Optional. Fill in only if you work with a partner.</span>
+      </div>
+      <button type="button" class="primary" id="nameSubmit">Show my card</button>
+    </div>
+    <p class="err" id="nameErr" role="alert"></p>
+  </div>
+  <div id="finish"></div>
+</section>
+
+<div class="pager" id="pager">
+  <button type="button" id="prevBtn">Previous</button>
+  <span class="pos" id="pagePos"></span>
+  <button type="button" class="primary" id="nextBtn" aria-describedby="nextHint">Next</button>
+</div>
+<p class="pager-hint" id="nextHint"></p>
+</main>
+</div>
+
+<div id="announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+(function(){
+'use strict';
+/* ================= utilities ================= */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const randInt = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const TAU = 2*Math.PI, DEG = 180/Math.PI;
+const minus = s => String(s).replace(/-/g, '\u2212');
+function fix(x, d){ if (Math.abs(x) < 0.5*Math.pow(10,-d)) x = 0; return minus(x.toFixed(d)); }
+function sig(x, n){ if (x === 0) return '0'; return minus(String(parseFloat(x.toPrecision(n)))); }
+function trim(x, d){ if (Math.abs(x) < 0.5*Math.pow(10,-d)) x = 0; return minus(String(parseFloat(x.toFixed(d)))); }
+const tex = s => String(s).replace(/\u2212/g, '-');           // numbers inside LaTeX
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let uid = 0; const nid = p => (p||'id') + (++uid);
+function typeset(el){
+  const MJ = window.MathJax;
+  if (!MJ || !MJ.startup || !MJ.startup.promise) return;
+  MJ.startup.promise = MJ.startup.promise.then(() => { if (MJ.typesetClear) MJ.typesetClear([el]); return MJ.typesetPromise([el]); }).catch(() => {});
+}
+const announcer = $('#announcer');
+function announce(msg){ announcer.textContent = ''; setTimeout(() => { announcer.textContent = msg; }, 60); }
+function toast(msg){
+  let t = document.getElementById('toast');
+  if (!t){ t = document.createElement('div'); t.id = 'toast'; t.setAttribute('aria-hidden','true'); document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add('show'); clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove('show'), 4000);
+}
+function debounce(fn, ms){ let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+function niceCeil(x){ if (x <= 0) return 1; const e = Math.pow(10, Math.floor(Math.log10(x))); for (const m of [1,1.2,1.5,2,2.5,3,4,5,6,8,10]) if (m*e >= x*1.02) return m*e; return 10*e; }
+const MATHFONT = 'font-family="STIX Two Math,Cambria Math,Times New Roman,serif" font-style="italic"';
+
+/* ================= physics ================= */
+function rlc(p){ // p: f (Hz) or w, E0, R, L (H), C (F)
+  const w = p.w || TAU*p.f, XL = w*p.L, XC = 1/(w*p.C), d = XL - XC, Z = Math.hypot(p.R, d), I = p.E0/Z, phi = Math.atan(Math.abs(d)/p.R);
+  return { w, f: w/TAU, XL, XC, d, Z, I, phi, VR: I*p.R, VL: I*XL, VC: I*XC, pf: p.R/Z, P: 0.5*p.E0*I*p.R/Z };
+}
+
+/* ================= state ================= */
+const SETS = ['set1','set2','set3','set4'];
+const SETNAMES = { set1:'An RLC circuit', set2:'Resonance numbers', set3:'Phasors at resonance', set4:'Power and power factor' };
+const STORE = 'phy2049-rlc-v1';
+let state = { sets:{}, name:'', name2:'', completedAt:null };
+try { const s = JSON.parse(localStorage.getItem(STORE) || 'null'); if (s && typeof s === 'object') state = Object.assign(state, s); } catch(e){}
+function save(){ try { localStorage.setItem(STORE, JSON.stringify(state)); } catch(e){} }
+const setDefs = {};  // filled by registerSet
+function setStats(k){
+  const d = setDefs[k], s = state.sets[k]; if (!d) return { pts:0, max:0, done:false, n:0 };
+  const n = d.count; const res = (s && s.res) || [];
+  const pts = res.reduce((a,r) => a + (r && r.pts || 0), 0);
+  const done = res.filter(r => r && r.done).length === n;
+  return { pts, max: 2*n, done, n };
+}
+const totals = () => SETS.reduce((a,k) => { const s = setStats(k); a.pts += s.pts; a.max += s.max; return a; }, { pts:0, max:0 });
+function updateScore(){
+  const t = totals();
+  $('#scoreText').textContent = 'Score ' + t.pts + ' of ' + t.max;
+  $('#scoreBar').style.width = (t.max ? t.pts/t.max*100 : 0) + '%';
+}
+
+/* ================= router ================= */
+const pages = $$('section.page');
+const keys = pages.map(p => p.dataset.key);
+let current = null;
+const setDone = k => setStats(k).done;
+function firstBlocker(i){ for (let j=0;j<i;j++){ const k = pages[j].dataset.set; if (k && !setDone(k)) return j; } return i; }
+const isUnlocked = i => firstBlocker(i) === i;
+function buildToc(){
+  const ol = $('#tocList'); ol.innerHTML = '';
+  pages.forEach((p,i) => { const li = document.createElement('li'), a = document.createElement('a'); a.href = '#' + p.dataset.key; a.dataset.idx = i; if (p.dataset.set) a.classList.add('is-cp'); li.appendChild(a); ol.appendChild(li); });
+  refreshToc();
+}
+function refreshToc(){
+  $$('#tocList a').forEach(a => {
+    const i = +a.dataset.idx, p = pages[i], unlocked = isUnlocked(i), k = p.dataset.set;
+    let st = '', cls = '', sr = '';
+    if (!unlocked){ st = 'Locked'; cls = 'st-lock'; sr = ', locked'; }
+    else if (k && setDone(k)){ const s = setStats(k); st = '\u2713 ' + s.pts + '/' + s.max; cls = 'st-done'; sr = ', finished, ' + s.pts + ' of ' + s.max + ' points'; }
+    a.innerHTML = '<span class="num" aria-hidden="true">' + (i+1) + '</span><span class="lbl">' + esc(p.dataset.title) + '<span class="sr-only">' + sr + '</span></span>' + (st ? '<span class="st ' + cls + '" aria-hidden="true">' + st + '</span>' : '');
+    if (unlocked) a.removeAttribute('aria-disabled'); else a.setAttribute('aria-disabled','true');
+    if (i === current) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
+  });
+}
+const sims = [];
+function show(key, moveFocus){
+  let i = keys.indexOf(key); if (i < 0) i = 0;
+  if (!isUnlocked(i)){
+    const b = firstBlocker(i);
+    const msg = 'That section is locked. Finish ' + pages[b].dataset.title + ' first.'; announce(msg); toast(msg);
+    i = b; history.replaceState(null, '', '#' + keys[i]);
+  }
+  current = i;
+  pages.forEach((p,j) => { p.hidden = j !== i; });
+  sims.forEach(s => { if (!pages[i].contains(s.root)) s.pause(); });
+  $$('.kicker', pages[i]).forEach(k => k.textContent = 'Section ' + (i+1) + ' of ' + pages.length);
+  document.title = pages[i].dataset.title + ' | RLC circuits | PHY2049';
+  refreshToc(); updatePager(); closeToc();
+  if (pages[i].dataset.key === 'results') renderResults();
+  if (moveFocus){ window.scrollTo(0,0); const h = $('h2.ptitle', pages[i]); if (h) h.focus({ preventScroll:true }); }
+}
+function updatePager(){
+  if (current === null) return;
+  const prev = $('#prevBtn'), next = $('#nextBtn'), hint = $('#nextHint');
+  prev.disabled = current === 0; prev.textContent = current === 0 ? 'Previous' : 'Previous: ' + pages[current-1].dataset.title;
+  $('#pagePos').textContent = (current+1) + ' of ' + pages.length;
+  if (current === pages.length-1){ next.hidden = true; hint.textContent = ''; return; }
+  next.hidden = false; next.textContent = 'Next: ' + pages[current+1].dataset.title;
+  const k = pages[current].dataset.set;
+  if (k && !setDone(k)){ next.disabled = true; hint.textContent = 'Finish every question in this set to unlock the next section.'; }
+  else { next.disabled = false; hint.textContent = ''; }
+}
+function navigate(key){ if (location.hash.slice(1) !== key){ try { history.pushState(null, '', '#' + key); } catch(err){} } show(key, true); }
+window.addEventListener('popstate', () => show(location.hash.slice(1), true));
+const go = d => { const i = current + d; if (i >= 0 && i < pages.length) navigate(keys[i]); };
+$('#prevBtn').addEventListener('click', () => go(-1));
+$('#nextBtn').addEventListener('click', () => go(1));
+window.addEventListener('hashchange', () => show(location.hash.slice(1), true));
+$('#tocList').addEventListener('click', e => {
+  const a = e.target.closest('a'); if (!a) return;
+  if (a.getAttribute('aria-disabled') !== 'true'){ e.preventDefault(); navigate(pages[+a.dataset.idx].dataset.key); return; }
+  if (a.getAttribute('aria-disabled') === 'true'){ e.preventDefault(); const b = firstBlocker(+a.dataset.idx); const msg = 'Locked. Finish ' + pages[b].dataset.title + ' first.'; announce(msg); toast(msg); }
+});
+const tocBtn = $('#tocToggle');
+function closeToc(){ $('#toc').classList.remove('open'); tocBtn.setAttribute('aria-expanded','false'); }
+tocBtn.addEventListener('click', () => { const o = !$('#toc').classList.contains('open'); $('#toc').classList.toggle('open', o); tocBtn.setAttribute('aria-expanded', String(o)); if (o){ const a = $('#tocList a[aria-current]') || $('#tocList a'); a && a.focus(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#toc').classList.contains('open')){ closeToc(); tocBtn.focus(); } });
+$('#resetBtn').addEventListener('click', () => {
+  const rb = $('#resetBtn'); if (!rb.dataset.armed){ rb.dataset.armed = '1'; rb.textContent = 'Click again to confirm: this erases your progress'; announce('Click the button again to confirm. This erases your progress.'); setTimeout(() => { delete rb.dataset.armed; rb.textContent = 'Start over and clear my progress'; }, 6000); return; } delete rb.dataset.armed; rb.textContent = 'Start over and clear my progress';
+  state = { sets:{}, name:'', name2:'', completedAt:null }; save();
+  location.hash = '#welcome'; location.reload();
+});
+
+/* ================= diagrams ================= */
+function arrowDefs(id){
+  return '<defs>' + [['v','var(--volt)'],['i','var(--curr)'],['r','var(--vres)'],['l','var(--vreac)'],['c','var(--vcap)'],['k','var(--ink)']].map(a =>
+    '<marker id="'+id+a[0]+'" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="'+a[1]+'"/></marker>').join('') + '</defs>';
+}
+const TILDE = '<path d="M-15 0 C -10 -11, -4 -11, 0 0 S 10 11, 15 0" fill="none" stroke="currentColor" stroke-width="3"/>';
+function circuitRLC(){
+  const wire = 'stroke="currentColor" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"';
+  let zig = 'M60 109 V40 H150 l6 -12'; for (let k=0;k<6;k++) zig += (k%2 ? ' l10 -24' : ' l10 24'); zig += ' l6 12 H380 V80';
+  let coil = 'M380 80'; for (let k=0;k<5;k++) coil += ' a9 9 0 1 1 0 18'; coil += ' V230 H250';
+  const title = 'Circuit diagram: an AC source on the left side of a rectangular loop. Going clockwise from the source: a resistor R on the top wire, an inductor L drawn as a coil on the right side, and a capacitor C drawn as two parallel plates on the bottom wire, all in series. An arrow on the top wire marks the current i.';
+  return '<svg viewBox="0 0 440 290" width="100%" style="max-width:440px" role="img" aria-label="'+esc(title)+'" focusable="false">'
+    + '<path d="'+zig+'" '+wire+'/><path d="'+coil+'" '+wire+'/>'
+    + '<line x1="250" y1="208" x2="250" y2="252" stroke="currentColor" stroke-width="5"/><line x1="232" y1="208" x2="232" y2="252" stroke="currentColor" stroke-width="5"/>'
+    + '<path d="M232 230 H60 V161" '+wire+'/>'
+    + '<circle cx="60" cy="135" r="26" fill="none" stroke="currentColor" stroke-width="3.5"/><g transform="translate(60 135)">'+TILDE+'</g>'
+    + '<text x="8" y="143" font-size="28" fill="currentColor" font-family="STIX Two Math,Cambria Math,serif">\u2130</text>'
+    + '<text x="178" y="80" font-size="28" '+MATHFONT+' fill="currentColor">R</text>'
+    + '<text x="404" y="140" font-size="28" '+MATHFONT+' fill="currentColor">L</text>'
+    + '<text x="232" y="282" font-size="28" '+MATHFONT+' fill="currentColor">C</text>'
+    + '<g stroke="var(--curr)" stroke-width="3.5" fill="var(--curr)"><line x1="280" y1="24" x2="330" y2="24"/><path d="M326 15 L342 24 L326 33 z"/></g><text x="298" y="16" font-size="22" '+MATHFONT+' fill="var(--curr)">i</text>'
+    + '</svg>';
+}
+function impedanceTriangle(){
+  const id = nid('it');
+  return '<svg viewBox="0 0 400 230" width="100%" style="max-width:400px" role="img" aria-label="Impedance triangle: a horizontal leg of length R, a vertical leg of length X sub L minus X sub C rising from its right end, and the hypotenuse Z from the origin to the top. The angle phi is at the origin between R and Z." focusable="false">' + arrowDefs(id)
+    + '<line x1="40" y1="190" x2="300" y2="190" stroke="var(--vres)" stroke-width="4" marker-end="url(#'+id+'r)"/>'
+    + '<line x1="300" y1="190" x2="300" y2="40" stroke="var(--vreac)" stroke-width="4" marker-end="url(#'+id+'l)"/>'
+    + '<line x1="40" y1="190" x2="298" y2="42" stroke="var(--volt)" stroke-width="4" marker-end="url(#'+id+'v)"/>'
+    + '<path d="M286 190 V176 H300" fill="none" stroke="var(--ink)" stroke-width="1.5"/>'
+    + '<path d="M100 190 A 60 60 0 0 0 92 160" fill="none" stroke="var(--ink)" stroke-width="2"/>'
+    + '<text x="106" y="178" font-size="20" '+MATHFONT+' fill="var(--ink)">\u03C6</text>'
+    + '<text x="160" y="216" font-size="22" '+MATHFONT+' fill="var(--vres)">R</text>'
+    + '<text x="310" y="122" font-size="20" '+MATHFONT+' fill="var(--vreac)">X<tspan font-size="14" dy="5">L</tspan><tspan dy="-5"> \u2212 X</tspan><tspan font-size="14" dy="5">C</tspan></text>'
+    + '<text x="140" y="106" font-size="22" '+MATHFONT+' fill="var(--volt)">Z</text></svg>';
+}
+function polarGrid(cx, cy, r, labels){
+  let g = '<g stroke="var(--line)" stroke-width="1">';
+  for (let a=0;a<360;a+=10){ const t = a/DEG; g += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r*Math.cos(t)).toFixed(1)+'" y2="'+(cy-r*Math.sin(t)).toFixed(1)+'"' + (a%90===0 ? ' stroke="var(--muted)" stroke-width="1.6"' : '') + '/>'; }
+  [r/3, 2*r/3, r].forEach(rr => { g += '<circle cx="'+cx+'" cy="'+cy+'" r="'+rr.toFixed(1)+'" fill="none"/>'; });
+  g += '</g>';
+  if (labels) for (let a=0;a<360;a+=30){ const t = a/DEG; g += '<text x="'+(cx+(r+16)*Math.cos(t)).toFixed(1)+'" y="'+(cy-(r+16)*Math.sin(t)+5).toFixed(1)+'" text-anchor="middle" font-size="12" fill="var(--muted)">'+a+'\u00B0</text>'; }
+  return g;
+}
+function arrowAt(cx, cy, len, deg, color, marker, dash, w){
+  const t = deg/DEG;
+  return '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+len*Math.cos(t)).toFixed(1)+'" y2="'+(cy-len*Math.sin(t)).toFixed(1)+'" stroke="'+color+'" stroke-width="'+(w||4)+'"' + (dash ? ' stroke-dasharray="'+dash+'"' : '') + ' marker-end="url(#'+marker+')"/>';
+}
+function labelAt(cx, cy, len, deg, txt, color, sub){
+  const t = deg/DEG;
+  return '<text x="'+(cx+len*Math.cos(t)-7).toFixed(1)+'" y="'+(cy-len*Math.sin(t)+7).toFixed(1)+'" font-size="18" font-weight="700" '+(sub===false?'':MATHFONT)+' fill="'+color+'">'+txt+(sub ? '<tspan font-size="12" dy="5">'+sub+'</tspan>' : '')+'</text>';
+}
+function xlxcChart(){
+  const L = 5e-3, C = 30e-6, w0 = 1/Math.sqrt(L*C);
+  const x0 = 70, x1 = 700, y0 = 280, yT = 30, W = 6000, Ym = 60;
+  const X = w => x0 + w/W*(x1-x0), Y = v => y0 - Math.min(v, Ym*1.05)/Ym*(y0-yT);
+  let g = '<g stroke="var(--line)">'; for (let w=1000; w<=W; w+=1000) g += '<line x1="'+X(w)+'" y1="'+yT+'" x2="'+X(w)+'" y2="'+y0+'"/>'; for (let v=10; v<=Ym; v+=10) g += '<line x1="'+x0+'" y1="'+Y(v)+'" x2="'+x1+'" y2="'+Y(v)+'"/>'; g += '</g>';
+  g += '<g stroke="var(--muted)" stroke-width="2"><line x1="'+x0+'" y1="'+y0+'" x2="'+x1+'" y2="'+y0+'"/><line x1="'+x0+'" y1="'+y0+'" x2="'+x0+'" y2="'+yT+'"/></g>';
+  for (let w=0; w<=W; w+=1000) g += '<text x="'+X(w)+'" y="'+(y0+20)+'" text-anchor="middle" font-size="13" fill="var(--muted)">'+w+'</text>';
+  for (let v=0; v<=Ym; v+=10) g += '<text x="'+(x0-8)+'" y="'+(Y(v)+5)+'" text-anchor="end" font-size="13" fill="var(--muted)">'+v+' \u03A9</text>';
+  g += '<text x="'+x1+'" y="'+(y0+40)+'" text-anchor="end" font-size="14" fill="var(--muted)">angular frequency \u03C9 (rad/s)</text>';
+  let a = '', b = '';
+  for (let k=1;k<=300;k++){ const w = k/300*W; a += (k>1?'L':'M')+X(w).toFixed(1)+' '+Y(w*L).toFixed(1); b += (k>1?'L':'M')+X(w).toFixed(1)+' '+Y(1/(w*C)).toFixed(1); }
+  g += '<defs><clipPath id="xlxcclip"><rect x="'+x0+'" y="'+yT+'" width="'+(x1-x0)+'" height="'+(y0-yT)+'"/></clipPath></defs><g clip-path="url(#xlxcclip)"><path d="'+a+'" fill="none" stroke="var(--vreac)" stroke-width="3.5"/><path d="'+b+'" fill="none" stroke="var(--vcap)" stroke-width="3.5" stroke-dasharray="9 5"/></g>';
+  g += '<line x1="'+X(w0)+'" y1="'+yT+'" x2="'+X(w0)+'" y2="'+y0+'" stroke="var(--ink)" stroke-dasharray="5 4"/><circle cx="'+X(w0)+'" cy="'+Y(w0*L)+'" r="6" fill="none" stroke="var(--ink)" stroke-width="2"/>';
+  g += '<text x="'+(X(w0)+8)+'" y="'+(yT+16)+'" font-size="15" fill="var(--ink)">\u03C9\u2080 = 2582 rad/s, X\u2097 = X\uA700 = 12.9 \u03A9</text>';
+  g += '<text x="'+X(5200)+'" y="'+(Y(5200*L)-10)+'" font-size="15" font-weight="700" fill="var(--vreac)">X\u2097 = \u03C9L</text><text x="'+X(500)+'" y="'+(Y(1/(1300*C)))+'" font-size="15" font-weight="700" fill="var(--vcap)">X\uA700 = 1/(\u03C9C)</text>';
+  return '<figure class="box"><svg viewBox="0 0 740 330" width="100%" role="img" aria-label="Graph of the two reactances against angular frequency for L = 5 millihenries and C = 30 microfarads. The inductive reactance is a straight line rising from zero. The capacitive reactance is a curve falling from very large values. They cross at omega zero = 2582 radians per second, where both equal 12.9 ohms." focusable="false">' + g + '</svg><figcaption>The two reactances against \\(\\omega\\) for \\(L=5\\ \\text{mH}\\), \\(C=30\\ \\mu\\text{F}\\). The solid line is \\(X_L\\) and the dashed curve is \\(X_C\\); they cross at resonance.</figcaption></figure>';
+}
+
+/* ================= phasor builder animation ================= */
+const UNIT_WORDS = { V:'volts', Hz:'hertz', '\u03A9':'ohms', mH:'millihenries', '\u00B5F':'microfarads', 'rad/s':'radians per second' };
+function slider(id, k, label, min, max, step, val, unit){
+  return '<div class="ctl"><label for="'+id+k+'">'+label+' <output id="'+id+k+'o"></output></label><input type="range" id="'+id+k+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'" data-unit="'+unit+'"></div>';
+}
+function bindSliders(id, p, ks, onChange){
+  ks.forEach(k => {
+    const inp = $('#'+id+k); if (!inp) return;
+    const upd = () => { const v = trim(+inp.value, 3), u = inp.dataset.unit; $('#'+id+k+'o').textContent = v + ' ' + u; inp.setAttribute('aria-valuetext', v + ' ' + (UNIT_WORDS[u]||u)); };
+    upd(); inp.addEventListener('input', () => { p[k] = +inp.value; upd(); onChange(k); });
+  });
+}
+function makeBuilder(root, fixed){
+  const id = nid('bd');
+  const p = { f:500, E0:10, R:8, LmH:5, CuF:30 };
+  let stage = 0, prog = 1, rot = 0, rotating = false, raf = 0, auto = false, autoTimer = 0;
+  const STAGES = 6;
+  const sliders = fixed ? '' : '<div class="controls">' + slider(id,'f','Frequency',50,1000,10,p.f,'Hz') + slider(id,'E0','Peak emf',1,20,0.5,p.E0,'V') + slider(id,'R','Resistance',1,40,0.5,p.R,'\u03A9') + slider(id,'LmH','Inductance',0.5,20,0.5,p.LmH,'mH') + slider(id,'CuF','Capacitance',2,100,1,p.CuF,'\u00B5F') + '</div>';
+  root.innerHTML = '<div class="sim" role="group" aria-labelledby="'+id+'h"><h3 id="'+id+'h" style="margin:0 0 8px">' + (fixed ? 'Animation: building the phasor diagram for the worked example' : 'Animation: building the RLC phasor diagram') + '</h3>'
+    + '<div class="legend" aria-hidden="true">'
+    + '<span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--curr)" stroke-width="4" stroke-dasharray="6 4"/></svg>Current I</span>'
+    + '<span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--vres)" stroke-width="4"/></svg>V<sub>R</sub></span>'
+    + '<span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--vreac)" stroke-width="4"/></svg>V<sub>L</sub></span>'
+    + '<span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--vcap)" stroke-width="4" stroke-dasharray="2 3"/></svg>V<sub>C</sub>, dotted</span>'
+    + '<span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--volt)" stroke-width="5"/></svg>Source \u2130<sub>0</sub></span></div>'
+    + '<div class="builder"><div class="svgwrap"><svg class="phasor" viewBox="0 0 460 420" role="img" aria-labelledby="'+id+'st" focusable="false" style="min-width:0"><title id="'+id+'st"></title><g id="'+id+'g"></g></svg></div>'
+    + '<div><p class="stepnum" id="'+id+'sn"></p><div class="caption" id="'+id+'cap" aria-live="polite"></div></div></div>'
+    + '<div class="bar"><button type="button" id="'+id+'prev">Previous step</button><button type="button" class="primary" id="'+id+'next">Next step</button><button type="button" id="'+id+'auto" aria-pressed="false">Play the build-up</button><button type="button" id="'+id+'rot" aria-pressed="false">Rotate</button><button type="button" id="'+id+'reset">Start over</button></div>'
+    + sliders + '</div>';
+  const el = s => $('#'+id+s);
+  const vals = () => rlc({ f:p.f, E0:p.E0, R:p.R, L:p.LmH/1000, C:p.CuF*1e-6 });
+  function captions(v){
+    const lead = v.d > 0.005 ? 'The source phasor is ahead of the current, so the current trails: \\(i(t)=I\\cos(\\omega t-\\varphi)\\).' : v.d < -0.005 ? 'The source phasor is behind the current, so the current leads: \\(i(t)=I\\cos(\\omega t+\\varphi)\\).' : 'The source phasor lies along the current: resonance, \\(\\varphi=0\\).';
+    return [
+      'Draw the current phasor \\(I\\) at about \\(30^\\circ\\). It is the reference for everything else. Here \\(I=\\mathcal{E}_0/Z=' + sig(v.I,3) + '\\ \\text{A}\\), which you will understand at the last step.',
+      'Resistor: \\(V_R=RI=(' + trim(p.R,2) + ')(' + sig(v.I,3) + ')=' + sig(v.VR,3) + '\\ \\text{V}\\), drawn along \\(I\\).',
+      'Inductor: \\(X_L=\\omega L=' + sig(v.XL,3) + '\\ \\Omega\\), so \\(V_L=X_LI=' + sig(v.VL,3) + '\\ \\text{V}\\), drawn \\(90^\\circ\\) counterclockwise from \\(I\\) (ELI).',
+      'Capacitor: \\(X_C=1/(\\omega C)=' + sig(v.XC,3) + '\\ \\Omega\\), so \\(V_C=X_CI=' + sig(v.VC,3) + '\\ \\text{V}\\), drawn \\(90^\\circ\\) clockwise from \\(I\\) (ICE).',
+      '\\(V_L\\) and \\(V_C\\) are on one line in opposite directions. Slide \\(V_C\\) onto the tip of \\(V_L\\): what remains is \\(V_L-V_C=' + sig(v.VL-v.VC,3) + '\\ \\text{V}\\), pointing ' + (v.d >= 0 ? 'counterclockwise from' : 'clockwise from') + ' \\(I\\).',
+      'Add the perpendicular legs: \\(\\mathcal{E}_0=\\sqrt{V_R^2+(V_L-V_C)^2}=' + sig(Math.hypot(v.VR, v.VL-v.VC),3) + '\\ \\text{V}\\), and \\(\\varphi=\\tan^{-1}(|V_L-V_C|/V_R)=' + trim(v.phi*DEG,1) + '^\\circ\\). ' + lead,
+      'Complete. Press Rotate to see the whole diagram spin counterclockwise as time passes (slowed down so you can follow it). The shape never changes, so the relative angles hold at every instant.'
+    ];
+  }
+  function draw(){
+    const v = vals();
+    const M = Math.max(v.VR, v.VL, v.VC, Math.hypot(v.VR, v.d*v.I));
+    const s = 165/M, cx = 230, cy = 210, base = (30 + rot)/DEG;
+    const ux = Math.cos(base), uy = -Math.sin(base), wx = -Math.sin(base), wy = -Math.cos(base); // u along I, w 90 deg ccw
+    const P = (a, b) => [cx + s*(a*ux + b*wx), cy + s*(a*uy + b*wy)];
+    const line = (A, B, color, mk, dash, w) => '<line x1="'+A[0].toFixed(1)+'" y1="'+A[1].toFixed(1)+'" x2="'+B[0].toFixed(1)+'" y2="'+B[1].toFixed(1)+'" stroke="'+color+'" stroke-width="'+(w||4)+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+(mk?' marker-end="url(#'+id+mk+')"':'')+'/>';
+    const lab = (B, dx, dy, txt, color, sub) => '<text x="'+(B[0]+dx).toFixed(1)+'" y="'+(B[1]+dy).toFixed(1)+'" font-size="19" '+MATHFONT+' fill="'+color+'" stroke="var(--surface-2)" stroke-width="4" paint-order="stroke">'+txt+(sub?'<tspan font-size="13" dy="5">'+sub+'</tspan>':'')+'</text>';
+    const labUW = (B, du, dw, txt, color, sub) => lab([B[0] + du*ux + dw*wx, B[1] + du*uy + dw*wy], -8, 7, txt, color, sub);
+    const ease = t => t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+    const e = ease(prog);
+    const O = [cx, cy];
+    let g = arrowDefs(id) + '<g stroke="var(--line)" stroke-width="1.5"><line x1="20" y1="'+cy+'" x2="440" y2="'+cy+'"/><line x1="'+cx+'" y1="15" x2="'+cx+'" y2="405"/></g>';
+    const iLen = Math.min(0.45*M, Math.max(0.25*M, v.VR*0.6));
+    const sf = k => k < stage ? 1 : (k === stage ? e : 0);   // fraction for element introduced at stage k
+    // current
+    g += line(O, P(iLen*sf(0) || 0.001, 0), 'var(--curr)', 'i', '7 4', 3.5);
+    if (stage >= 0) g += labUW(P(iLen*sf(0), 0), 4, -16, 'I', 'var(--curr)');
+    if (stage >= 1) { g += line(O, P(v.VR*sf(1), 0), 'var(--vres)', 'r', null, 4.5); g += labUW(P(v.VR*sf(1),0), 20, 0, 'V', 'var(--vres)', 'R'); }
+    if (stage >= 2) { g += line(O, P(0, v.VL*sf(2)), 'var(--vreac)', 'l', null, 4); g += labUW(P(0, v.VL*sf(2)), -22, 14, 'V', 'var(--vreac)', 'L'); }
+    if (stage >= 3) {
+      const slide = stage >= 4 ? sf(4) : 0;           // VC slides from origin to tip of VL
+      const base0 = v.VL*slide;
+      const off = 12*slide, A0 = P(0, base0), B0 = P(0, base0 - v.VC*sf(3));
+      const A = [A0[0] + off*ux, A0[1] + off*uy], B = [B0[0] + off*ux, B0[1] + off*uy];
+      g += line(A, B, 'var(--vcap)', 'c', '2 4', 4);
+      g += slide > 0.5 ? labUW([(A[0]+B[0])/2, (A[1]+B[1])/2], 22, 0, 'V', 'var(--vcap)', 'C') : labUW(B, 18, -10, 'V', 'var(--vcap)', 'C');
+    }
+    if (stage >= 4){
+      const net = (v.VL - v.VC)*sf(4);
+      g += '<g opacity="'+(0.35+0.65*sf(4))+'">' + line(O, P(0, net), 'var(--ink)', 'k', null, 3) + '</g>';
+      const nt = P(0, net), nx = nt[0] - 62*ux, ny = nt[1] - 62*uy;
+      g += '<text x="'+(nx-28).toFixed(1)+'" y="'+(ny+7).toFixed(1)+'" font-size="18" '+MATHFONT+' fill="var(--ink)" stroke="var(--surface-2)" stroke-width="4" paint-order="stroke">V<tspan font-size="12" dy="5">L</tspan><tspan dy="-5"> \u2212 V</tspan><tspan font-size="12" dy="5">C</tspan></text>';
+    }
+    if (stage >= 5){
+      const t = sf(5), tip = P(v.VR, v.VL - v.VC);
+      g += '<g stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4" opacity="'+t+'">' + '<line x1="'+P(v.VR,0)[0]+'" y1="'+P(v.VR,0)[1]+'" x2="'+tip[0]+'" y2="'+tip[1]+'"/><line x1="'+P(0,v.VL-v.VC)[0]+'" y1="'+P(0,v.VL-v.VC)[1]+'" x2="'+tip[0]+'" y2="'+tip[1]+'"/></g>';
+      g += line(O, P(v.VR*t, (v.VL - v.VC)*t), 'var(--volt)', 'v', null, 5);
+      if (t > 0.6){
+        g += labUW(tip, 16, 8, '\u2130', 'var(--volt)', '0');
+        const ang = Math.atan2(v.VL - v.VC, v.VR), r = 50;
+        if (Math.abs(ang) > 0.03){
+          const a1 = base + Math.min(0, ang), a2 = base + Math.max(0, ang);
+          g += '<path d="M'+(cx + r*Math.cos(a1)).toFixed(1)+' '+(cy - r*Math.sin(a1)).toFixed(1)+' A '+r+' '+r+' 0 0 0 '+(cx + r*Math.cos(a2)).toFixed(1)+' '+(cy - r*Math.sin(a2)).toFixed(1)+'" fill="none" stroke="var(--ink)" stroke-width="2"/>';
+          const am = (a1+a2)/2; g += '<text x="'+(cx + (r+14)*Math.cos(am) - 5).toFixed(1)+'" y="'+(cy - (r+14)*Math.sin(am) + 6).toFixed(1)+'" font-size="18" '+MATHFONT+' fill="var(--ink)">\u03C6</text>';
+        }
+      }
+    }
+    el('g').innerHTML = g;
+    const cap = captions(v);
+    el('sn').textContent = 'Step ' + (stage+1) + ' of ' + (STAGES+1);
+    const c = el('cap'); if (c.dataset.stage !== String(stage) || c.dataset.key !== JSON.stringify(p)){ c.dataset.stage = stage; c.dataset.key = JSON.stringify(p); c.innerHTML = '<p>' + cap[stage] + '</p>'; typeset(c); }
+    el('st').textContent = 'Phasor diagram, step ' + (stage+1) + ' of 7. Current phasor at ' + Math.round((30+rot)%360) + ' degrees. ' + (stage>=1 ? 'V sub R, ' + sig(v.VR,3) + ' volts, along the current. ' : '') + (stage>=2 ? 'V sub L, ' + sig(v.VL,3) + ' volts, 90 degrees counterclockwise from the current. ' : '') + (stage>=3 ? 'V sub C, ' + sig(v.VC,3) + ' volts, 90 degrees clockwise from the current. ' : '') + (stage>=5 ? 'Source phasor, ' + sig(Math.hypot(v.VR, v.VL-v.VC),3) + ' volts, ' + trim(v.phi*DEG,1) + ' degrees ' + (v.d>=0 ? 'counterclockwise' : 'clockwise') + ' from the current.' : '');
+    el('prev').disabled = stage === 0; el('next').disabled = stage === STAGES;
+  }
+  function animateTo(newStage){
+    stage = Math.max(0, Math.min(STAGES, newStage));
+    if (reduceMotion){ prog = 1; draw(); return; }
+    prog = 0; const t0 = performance.now();
+    cancelAnimationFrame(raf);
+    const step = now => { prog = Math.min(1, (now - t0)/900); draw(); if (prog < 1 || rotating) raf = requestAnimationFrame(rotating ? spin : step); };
+    raf = requestAnimationFrame(step);
+  }
+  let lastT = 0;
+  function spin(now){ if (!rotating) return; if (lastT) rot = (rot + (now-lastT)/1000*50) % 360; lastT = now; if (prog < 1) prog = Math.min(1, prog + 0.03); draw(); raf = requestAnimationFrame(spin); }
+  function setRotate(on){ rotating = on; const b = el('rot'); b.textContent = on ? 'Stop rotating' : 'Rotate'; b.setAttribute('aria-pressed', String(on)); cancelAnimationFrame(raf); lastT = 0; if (on) raf = requestAnimationFrame(spin); else draw(); }
+  function stopAuto(){ auto = false; clearTimeout(autoTimer); const b = el('auto'); b.textContent = 'Play the build-up'; b.setAttribute('aria-pressed','false'); }
+  function autoStep(){ if (!auto) return; if (stage >= STAGES){ stopAuto(); return; } animateTo(stage+1); autoTimer = setTimeout(autoStep, reduceMotion ? 2500 : 2600); }
+  el('next').addEventListener('click', () => { stopAuto(); animateTo(stage+1); });
+  el('prev').addEventListener('click', () => { stopAuto(); stage = Math.max(0, stage-1); prog = 1; draw(); });
+  el('reset').addEventListener('click', () => { stopAuto(); setRotate(false); rot = 0; stage = 0; prog = 1; draw(); });
+  el('auto').addEventListener('click', () => { if (auto){ stopAuto(); return; } auto = true; const b = el('auto'); b.textContent = 'Pause the build-up'; b.setAttribute('aria-pressed','true'); if (stage >= STAGES){ stage = 0; prog = 1; draw(); } autoTimer = setTimeout(autoStep, 300); });
+  el('rot').addEventListener('click', () => setRotate(!rotating));
+  if (!fixed) bindSliders(id, p, ['f','E0','R','LmH','CuF'], () => { prog = 1; draw(); });
+  draw();
+  sims.push({ root, pause: () => { stopAuto(); if (rotating) setRotate(false); } });
+}
+
+/* ================= resonance curves ================= */
+function makeResChart(root){
+  const id = nid('rc');
+  const p = { E0:10, R:8, LmH:5, CuF:30, w:2000 };
+  root.innerHTML = '<div class="sim" role="group" aria-labelledby="'+id+'h"><h3 id="'+id+'h" style="margin:0 0 8px">Simulation: impedance and peak current against angular frequency</h3>'
+    + '<div class="legend" aria-hidden="true"><span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--volt)" stroke-width="4"/></svg>Impedance Z</span><span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--vreac)" stroke-width="3" stroke-dasharray="9 5"/></svg>X<sub>L</sub>, dashed</span><span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--vcap)" stroke-width="3" stroke-dasharray="2 4"/></svg>X<sub>C</sub>, dotted</span><span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--curr)" stroke-width="4"/></svg>Peak current I</span></div>'
+    + '<div class="svgwrap" tabindex="0" role="region" aria-label="Graphs. On small screens, scroll sideways to see all of them."><svg class="phasor" viewBox="0 0 740 560" role="img" aria-labelledby="'+id+'st" focusable="false"><title id="'+id+'st"></title><g id="'+id+'g"></g></svg></div>'
+    + '<div class="controls">' + slider(id,'E0','Peak emf',1,20,0.5,p.E0,'V') + slider(id,'R','Resistance',1,30,0.5,p.R,'\u03A9') + slider(id,'LmH','Inductance',2,20,0.5,p.LmH,'mH') + slider(id,'CuF','Capacitance',5,60,1,p.CuF,'\u00B5F') + slider(id,'w','Probe angular frequency \u03C9',100,10000,50,p.w,'rad/s') + '</div>'
+    + '<dl class="ro" id="'+id+'ro"></dl><p class="sr-only" aria-live="polite" id="'+id+'live"></p></div>';
+  const el = s => $('#'+id+s);
+  const live = debounce(() => { el('live').textContent = el('st').textContent; }, 800);
+  function draw(){
+    const L = p.LmH/1000, C = p.CuF*1e-6, w0 = 1/Math.sqrt(L*C), W = 10000;
+    const x0 = 80, x1 = 700, X = w => x0 + w/W*(x1-x0);
+    const zTop = 30, zBot = 240, Zm = 60, YZ = v => zBot - Math.min(v, Zm*1.1)/Zm*(zBot-zTop);
+    const iTop = 310, iBot = 510, Im = niceCeil(1.1*p.E0/p.R), YI = v => iBot - Math.min(v, Im*1.05)/Im*(iBot-iTop);
+    let g = '<defs><clipPath id="'+id+'c1"><rect x="'+x0+'" y="'+zTop+'" width="'+(x1-x0)+'" height="'+(zBot-zTop)+'"/></clipPath></defs>';
+    const grid = (top, bot, Y, max, step, unit) => { let s = '<g stroke="var(--line)">'; for (let w=2000; w<=W; w+=2000) s += '<line x1="'+X(w)+'" y1="'+top+'" x2="'+X(w)+'" y2="'+bot+'"/>'; for (let v=step; v<=max+1e-9; v+=step) s += '<line x1="'+x0+'" y1="'+Y(v)+'" x2="'+x1+'" y2="'+Y(v)+'"/>'; s += '</g><g stroke="var(--muted)" stroke-width="2"><line x1="'+x0+'" y1="'+bot+'" x2="'+x1+'" y2="'+bot+'"/><line x1="'+x0+'" y1="'+bot+'" x2="'+x0+'" y2="'+top+'"/></g>';
+      for (let v=0; v<=max+1e-9; v+=step) s += '<text x="'+(x0-8)+'" y="'+(Y(v)+5)+'" text-anchor="end" font-size="13" fill="var(--muted)">'+trim(v,2)+' '+unit+'</text>';
+      for (let w=0; w<=W; w+=2000) s += '<text x="'+X(w)+'" y="'+(bot+18)+'" text-anchor="middle" font-size="13" fill="var(--muted)">'+w+'</text>'; return s; };
+    g += grid(zTop, zBot, YZ, Zm, 10, '\u03A9') + grid(iTop, iBot, YI, Im, Im/4, 'A');
+    g += '<text x="'+x1+'" y="'+(iBot+40)+'" text-anchor="end" font-size="14" fill="var(--muted)">angular frequency \u03C9 (rad/s)</text>';
+    g += '<text x="'+(x0+8)+'" y="'+(zTop-10)+'" font-size="15" fill="var(--muted)">Impedance and reactances</text><text x="'+(x0+8)+'" y="'+(iTop-10)+'" font-size="15" fill="var(--muted)">Peak current</text>';
+    let z = '', xl = '', xc = '', ii = '';
+    for (let k=1;k<=500;k++){ const w = k/500*W, XL = w*L, XC = 1/(w*C), Zv = Math.hypot(p.R, XL-XC);
+      const pt = (Y, v) => X(w).toFixed(1)+' '+Y(v).toFixed(1);
+      z += (k>1?'L':'M')+pt(YZ, Zv); xl += (k>1?'L':'M')+pt(YZ, XL); xc += (k>1?'L':'M')+pt(YZ, XC); ii += (k>1?'L':'M')+pt(YI, p.E0/Zv); }
+    g += '<g clip-path="url(#'+id+'c1)"><path d="'+xl+'" fill="none" stroke="var(--vreac)" stroke-width="2.5" stroke-dasharray="9 5"/><path d="'+xc+'" fill="none" stroke="var(--vcap)" stroke-width="2.5" stroke-dasharray="2 4"/><path d="'+z+'" fill="none" stroke="var(--volt)" stroke-width="3.5"/></g>';
+    g += '<path d="'+ii+'" fill="none" stroke="var(--curr)" stroke-width="3.5"/>';
+    if (w0 <= W){ [ [zTop,zBot], [iTop,iBot] ].forEach(([a,b]) => { g += '<line x1="'+X(w0)+'" y1="'+a+'" x2="'+X(w0)+'" y2="'+b+'" stroke="var(--ink)" stroke-dasharray="5 4"/>'; });
+      g += '<text x="'+(X(w0)+6)+'" y="'+(iTop+14)+'" font-size="14" fill="var(--ink)">\u03C9\u2080 = '+sig(w0,4)+' rad/s</text>'; }
+    const v = rlc({ w:p.w, E0:p.E0, R:p.R, L, C });
+    g += '<line x1="'+X(p.w)+'" y1="'+zTop+'" x2="'+X(p.w)+'" y2="'+iBot+'" stroke="var(--accent)" stroke-width="2"/>';
+    g += '<circle cx="'+X(p.w)+'" cy="'+YZ(v.Z)+'" r="6" fill="var(--volt)" stroke="var(--surface)" stroke-width="2"/><circle cx="'+X(p.w)+'" cy="'+YI(v.I)+'" r="6" fill="var(--curr)" stroke="var(--surface)" stroke-width="2"/>';
+    el('g').innerHTML = g;
+    const rel = Math.abs(v.d) < 0.01*p.R ? 'at resonance, in phase' : v.d > 0 ? 'above resonance, current trails' : 'below resonance, current leads';
+    el('st').textContent = 'Resonance at omega zero = ' + sig(w0,4) + ' radians per second, where the impedance is a minimum of ' + trim(p.R,2) + ' ohms and the peak current a maximum of ' + sig(p.E0/p.R,3) + ' amperes. At the probe frequency ' + p.w + ' radians per second: X sub L ' + sig(v.XL,3) + ' ohms, X sub C ' + sig(v.XC,3) + ' ohms, impedance ' + sig(v.Z,3) + ' ohms, peak current ' + sig(v.I,3) + ' amperes, ' + rel + '.';
+    const ro = [['\u03C9\u2080', sig(w0,4)+' rad/s (f\u2080 = '+sig(w0/TAU,4)+' Hz)'], ['Q = \u03C9\u2080L/R', sig(w0*L/p.R,3)], ['X<sub>L</sub>', sig(v.XL,3)+' \u03A9'], ['X<sub>C</sub>', sig(v.XC,3)+' \u03A9'], ['Z', sig(v.Z,3)+' \u03A9'], ['I', sig(v.I,3)+' A'], ['\u03C6', trim(v.phi*DEG,1)+'\u00B0, ' + rel]];
+    el('ro').innerHTML = ro.map(r => '<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>').join('');
+    live();
+  }
+  bindSliders(id, p, ['E0','R','LmH','CuF','w'], draw);
+  draw();
+}
+
+/* ================= instantaneous power chart ================= */
+function makePowerChart(root){
+  const id = nid('pw');
+  const p = { f:500, E0:10, R:8, LmH:5, CuF:30 };
+  root.innerHTML = '<div class="sim" role="group" aria-labelledby="'+id+'h"><h3 id="'+id+'h" style="margin:0 0 8px">Simulation: instantaneous power in each component over two periods</h3>'
+    + '<p class="attempts" style="margin-top:0">Shaded area above the axis is energy flowing into the component; below the axis, energy flowing back out. The dashed line is the average.</p>'
+    + '<div class="svgwrap" tabindex="0" role="region" aria-label="Graphs. On small screens, scroll sideways to see all of them."><svg class="phasor" viewBox="0 0 740 600" role="img" aria-labelledby="'+id+'st" focusable="false"><title id="'+id+'st"></title><g id="'+id+'g"></g></svg></div>'
+    + '<div class="controls">' + slider(id,'f','Frequency',100,1000,10,p.f,'Hz') + slider(id,'R','Resistance',1,30,0.5,p.R,'\u03A9') + '</div>'
+    + '<dl class="ro" id="'+id+'ro"></dl><p class="sr-only" aria-live="polite" id="'+id+'live"></p></div>';
+  const el = s => $('#'+id+s);
+  const live = debounce(() => { el('live').textContent = el('st').textContent; }, 800);
+  function draw(){
+    const v = rlc({ f:p.f, E0:p.E0, R:p.R, L:p.LmH/1000, C:p.CuF*1e-6 });
+    const sgn = v.d >= 0 ? -1 : 1, phi = v.phi;   // i = I cos(wt + sgn*phi)
+    const N = 400, T2 = 2;   // two periods
+    const fns = [
+      ['Resistor: p\u1D63 = v\u1D63 i', 'var(--vres)', th => v.I*v.I*p.R*Math.cos(th)**2],
+      ['Inductor: p\u2097 = v\u2097 i', 'var(--vreac)', th => -v.I*v.I*v.XL*Math.sin(th)*Math.cos(th)],
+      ['Capacitor: p\uA700 = v\uA700 i', 'var(--vcap)', th => v.I*v.I*v.XC*Math.sin(th)*Math.cos(th)],
+      ['Source: p = \u2130 i', 'var(--volt)', (th, wt) => p.E0*Math.cos(wt)*v.I*Math.cos(th)]
+    ];
+    let maxAbs = 0; for (let k=0;k<=N;k++){ const wt = k/N*T2*TAU, th = wt + sgn*phi; fns.forEach(f => { maxAbs = Math.max(maxAbs, Math.abs(f[2](th, wt))); }); }
+    const Pm = niceCeil(maxAbs), x0 = 90, x1 = 710, H = 130, gap = 14;
+    let g = '';
+    const avgs = [0.5*v.I*v.I*p.R, 0, 0, v.P];
+    fns.forEach((f, idx) => {
+      const top = 10 + idx*(H+gap), mid = top + H/2, Y = val => mid - val/Pm*(H/2-6);
+      g += '<rect x="'+x0+'" y="'+top+'" width="'+(x1-x0)+'" height="'+H+'" fill="none" stroke="var(--line)"/>';
+      g += '<line x1="'+x0+'" y1="'+mid+'" x2="'+x1+'" y2="'+mid+'" stroke="var(--muted)" stroke-width="1.5"/>';
+      g += '<text x="'+(x0-8)+'" y="'+(Y(Pm)+12)+'" text-anchor="end" font-size="12" fill="var(--muted)">'+sig(Pm,2)+' W</text><text x="'+(x0-8)+'" y="'+(mid+4)+'" text-anchor="end" font-size="12" fill="var(--muted)">0</text><text x="'+(x0-8)+'" y="'+(Y(-Pm)-4)+'" text-anchor="end" font-size="12" fill="var(--muted)">'+minus(sig(-Pm,2))+' W</text>';
+      let d = 'M'+x0+' '+mid, line = '';
+      for (let k=0;k<=N;k++){ const wt = k/N*T2*TAU, th = wt + sgn*phi, x = x0 + k/N*(x1-x0), y = Y(f[2](th, wt)); d += ' L'+x.toFixed(1)+' '+y.toFixed(1); line += (k?'L':'M')+x.toFixed(1)+' '+y.toFixed(1); }
+      d += ' L'+x1+' '+mid+' Z';
+      g += '<path d="'+d+'" fill="'+f[1]+'" fill-opacity=".18"/><path d="'+line+'" fill="none" stroke="'+f[1]+'" stroke-width="3"/>';
+      g += '<line x1="'+x0+'" y1="'+Y(avgs[idx])+'" x2="'+x1+'" y2="'+Y(avgs[idx])+'" stroke="var(--ink)" stroke-width="2" stroke-dasharray="7 5"/>';
+      g += '<text x="'+(x0+8)+'" y="'+(top+18)+'" font-size="14" font-weight="700" fill="var(--ink)" stroke="var(--surface-2)" stroke-width="4" paint-order="stroke">'+f[0]+'</text><text x="'+(x1-8)+'" y="'+(top+18)+'" text-anchor="end" font-size="14" fill="var(--ink)" stroke="var(--surface-2)" stroke-width="4" paint-order="stroke">average '+sig(avgs[idx],3)+' W</text>';
+    });
+    const bot = 10 + 4*(H+gap) - gap;
+    g += '<text x="'+x0+'" y="'+(bot+20)+'" font-size="13" fill="var(--muted)">0</text><text x="'+((x0+x1)/2)+'" y="'+(bot+20)+'" text-anchor="middle" font-size="13" fill="var(--muted)">T</text><text x="'+x1+'" y="'+(bot+20)+'" text-anchor="end" font-size="13" fill="var(--muted)">2T</text>';
+    el('g').innerHTML = g;
+    el('st').textContent = 'Instantaneous power over two periods. Resistor: always zero or positive, average ' + sig(avgs[0],3) + ' watts. Inductor and capacitor: oscillate equally above and below zero at twice the frequency, average zero. Source: average ' + sig(v.P,3) + ' watts, equal to the resistor’s. Power factor ' + sig(v.pf,3) + '.';
+    const ro = [['I', sig(v.I,3)+' A'], ['\u03C6', trim(phi*DEG,1)+'\u00B0'], ['Power factor cos \u03C6', sig(v.pf,3)], ['\u27E8p\u1D63\u27E9 = \u00BDI\u00B2R', sig(avgs[0],3)+' W'], ['\u27E8p\u2097\u27E9, \u27E8p\uA700\u27E9', '0 W'], ['\u27E8p\u27E9 = \u00BD\u2130\u2080I cos \u03C6', sig(v.P,3)+' W']];
+    el('ro').innerHTML = ro.map(r => '<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>').join('');
+    live();
+  }
+  bindSliders(id, p, ['f','R'], draw);
+  draw();
+}
+
+/* ================= power factor correction (parallel) ================= */
+function makePFChart(root){
+  const id = nid('pf');
+  const v = rlc({ f:500, E0:10, R:8, L:5e-3, C:30e-6 });
+  const p = { Cp:0 };
+  const best = v.d/(v.w*v.Z*v.Z)*1e6;
+  root.innerHTML = '<div class="sim" role="group" aria-labelledby="'+id+'h"><h3 id="'+id+'h" style="margin:0 0 8px">Simulation: adding a parallel capacitor to the worked example</h3>'
+    + '<p class="attempts" style="margin-top:0">Current phasors, with the source voltage along the horizontal axis. Find the capacitance that brings the source current into phase with the voltage.</p>'
+    + '<div class="legend" aria-hidden="true"><span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--volt)" stroke-width="4"/></svg>Source voltage direction</span><span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--vres)" stroke-width="4"/></svg>RLC branch current</span><span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--vcap)" stroke-width="4" stroke-dasharray="2 3"/></svg>Capacitor current, dotted</span><span><svg width="30" height="10"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--curr)" stroke-width="4" stroke-dasharray="7 4"/></svg>Total source current, dashed</span></div>'
+    + '<div class="svgwrap" tabindex="0" role="region" aria-label="Phasor diagram. On small screens, scroll sideways to see all of it."><svg class="phasor" viewBox="0 0 740 330" role="img" aria-labelledby="'+id+'st" focusable="false"><title id="'+id+'st"></title><g id="'+id+'g"></g></svg></div>'
+    + '<div class="controls">' + slider(id,'Cp','Parallel capacitor C\u2032',0,40,0.5,0,'\u00B5F') + '</div><dl class="ro" id="'+id+'ro"></dl><p class="sr-only" aria-live="polite" id="'+id+'live"></p></div>';
+  const el = s => $('#'+id+s);
+  const live = debounce(() => { el('live').textContent = el('st').textContent; }, 800);
+  function draw(){
+    const Ic = v.w*p.Cp*1e-6*10, ax = v.I*Math.cos(v.phi), ay = -v.I*Math.sin(v.phi) + Ic;
+    const Is = Math.hypot(ax, ay), ang = Math.atan2(ay, ax), pf = Math.cos(ang);
+    const cx = 120, cy = 165, s = 420/1.2;
+    const P = (x, y) => [cx + s*x, cy - s*y];
+    let g = arrowDefs(id) + '<g stroke="var(--line)" stroke-width="1.5"><line x1="20" y1="'+cy+'" x2="560" y2="'+cy+'"/><line x1="'+cx+'" y1="15" x2="'+cx+'" y2="315"/></g>';
+    const L = (A, B, c, mk, dash) => '<line x1="'+A[0].toFixed(1)+'" y1="'+A[1].toFixed(1)+'" x2="'+B[0].toFixed(1)+'" y2="'+B[1].toFixed(1)+'" stroke="'+c+'" stroke-width="4"'+(dash?' stroke-dasharray="'+dash+'"':'')+' marker-end="url(#'+id+mk+')"/>';
+    g += L(P(0,0), P(1.15,0), 'var(--volt)', 'v') + '<text x="'+(P(1.15,0)[0]-18)+'" y="'+(cy-10)+'" font-size="18" '+MATHFONT+' fill="var(--volt)">\u2130</text>';
+    const tipLoad = P(v.I*Math.cos(v.phi), -v.I*Math.sin(v.phi));
+    g += L(P(0,0), tipLoad, 'var(--vres)', 'r');
+    g += '<text x="'+(tipLoad[0]+8)+'" y="'+(tipLoad[1]+16)+'" font-size="15" fill="var(--vres)" font-weight="700">RLC branch '+sig(v.I,3)+' A</text>';
+    if (Ic > 0.002){ g += L(tipLoad, P(v.I*Math.cos(v.phi), -v.I*Math.sin(v.phi) + Ic), 'var(--vcap)', 'c', '2 4'); }
+    g += L(P(0,0), P(ax, ay), 'var(--curr)', 'i', '7 4');
+    g += '<text x="'+(P(ax,ay)[0]+8)+'" y="'+(P(ax,ay)[1]-8)+'" font-size="15" font-weight="700" fill="var(--curr)">source '+sig(Is,3)+' A</text>';
+    el('g').innerHTML = g;
+    const lagLead = Math.abs(ang) < 0.005 ? 'in phase with the voltage' : ang < 0 ? 'trailing the voltage by ' + trim(-ang*DEG,1) + ' degrees' : 'leading the voltage by ' + trim(ang*DEG,1) + ' degrees';
+    el('st').textContent = 'With a parallel capacitor of ' + trim(p.Cp,1) + ' microfarads, the capacitor current is ' + sig(Ic,3) + ' amperes, 90 degrees ahead of the voltage. The total source current is ' + sig(Is,3) + ' amperes, ' + lagLead + '. Power factor ' + sig(pf,3) + '. The best value is ' + sig(best,3) + ' microfarads.';
+    const ro = [['C\u2032', trim(p.Cp,1)+' \u00B5F'], ['Capacitor current \u03C9C\u2032\u2130\u2080', sig(Ic,3)+' A'], ['Source current', sig(Is,3)+' A'], ['Source power factor', sig(pf,3)], ['Power delivered', sig(v.P,3)+' W (unchanged)']];
+    el('ro').innerHTML = ro.map(r => '<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>').join('');
+    live();
+  }
+  bindSliders(id, p, ['Cp'], draw);
+  draw();
+}
+
+/* ================= angle widget for questions ================= */
+function angleWidget(host, aI, onChange){
+  const id = nid('aw');
+  let theta = (aI + 180) % 360;
+  host.innerHTML = '<div class="anglebox"><svg viewBox="0 0 360 360" width="100%" style="max-width:360px;touch-action:none" role="img" aria-labelledby="'+id+'t" focusable="false"><title id="'+id+'t"></title><g id="'+id+'g"></g></svg>'
+    + '<div><label for="'+id+'r">Angle of your source phasor <output id="'+id+'o"></output></label><input type="range" id="'+id+'r" min="0" max="359" step="1" value="'+theta+'">'
+    + '<div class="numrow"><label for="'+id+'n">Or type the angle</label><input type="number" id="'+id+'n" min="0" max="359" step="1" value="'+theta+'"><span class="unit">degrees</span></div>'
+    + '<p class="attempts">Drag the tip of the red arrow, use the slider, or type a value. Angles are measured counterclockwise from the positive horizontal axis; grid lines are \\(10^\\circ\\) apart.</p></div></div>';
+  const el = s => $('#'+id+s), cx = 180, cy = 180, r = 140;
+  function draw(){
+    let g = arrowDefs(id) + polarGrid(cx, cy, r, true);
+    g += arrowAt(cx, cy, r*0.6, aI, 'var(--curr)', id+'i', '7 4', 4) + labelAt(cx, cy, r*0.6+16, aI, 'I', 'var(--curr)');
+    g += arrowAt(cx, cy, r*0.85, theta, 'var(--volt)', id+'v', null, 4.5) + labelAt(cx, cy, r*0.85+16, theta, '\u2130', 'var(--volt)', '0');
+    const t = theta/DEG; g += '<circle cx="'+(cx+r*0.85*Math.cos(t)).toFixed(1)+'" cy="'+(cy-r*0.85*Math.sin(t)).toFixed(1)+'" r="10" fill="var(--volt)" fill-opacity=".25" stroke="var(--volt)"/>';
+    el('g').innerHTML = g;
+    el('t').textContent = 'Polar grid. The current phasor I is fixed at ' + aI + ' degrees. Your source phasor is at ' + theta + ' degrees.';
+    el('o').textContent = theta + '\u00B0'; el('r').value = theta; el('r').setAttribute('aria-valuetext', theta + ' degrees'); el('n').value = theta;
+    onChange(theta);
+  }
+  const set = v => { v = Math.round(((+v % 360) + 360) % 360); if (!isNaN(v)){ theta = v; draw(); } };
+  el('r').addEventListener('input', e => set(e.target.value));
+  el('n').addEventListener('change', e => set(e.target.value));
+  const svg = $('svg', host); let dragging = false;
+  const fromEvt = e => { const b = svg.getBoundingClientRect(); const x = (e.clientX - b.left)/b.width*360 - cx, y = cy - (e.clientY - b.top)/b.height*360; set(Math.atan2(y, x)*DEG); };
+  svg.addEventListener('pointerdown', e => { dragging = true; svg.setPointerCapture(e.pointerId); fromEvt(e); });
+  svg.addEventListener('pointermove', e => { if (dragging) fromEvt(e); });
+  svg.addEventListener('pointerup', () => { dragging = false; });
+  draw();
+  return { get: () => theta, disable(){ $$('input', host).forEach(x => x.disabled = true); svg.style.pointerEvents = 'none'; }, setValue: set };
+}
+
+/* ================= question engine (2 attempts) ================= */
+function parseNum(s){
+  s = String(s).trim().replace(/\u2212/g,'-').replace(/,/g,'.').replace(/\s+/g,'');
+  const m = s.match(/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?/i);
+  return m ? Number(m[0]) : NaN;
+}
+function registerSet(key, gen, build){
+  setDefs[key] = { count: 0 };
+  if (!state.sets[key] || !state.sets[key].params){ state.sets[key] = { params: gen(), res: [] }; save(); }
+  const S = state.sets[key];
+  const items = build(S.params);
+  setDefs[key].count = items.length;
+  const host = $('#' + key);
+  host.innerHTML = '<p class="setintro">' + items.length + ' questions, 2 points each. Two attempts per question. Each question appears when the previous one is finished.</p><div class="qlist"></div><div class="setdone" role="status"></div>';
+  const list = $('.qlist', host);
+  function finishedCount(){ return items.filter((_,i) => S.res[i] && S.res[i].done).length; }
+  function renderItem(i){
+    const it = items[i];
+    if (!S.res[i]) S.res[i] = { tries:0, done:false, pts:0, given:null };
+    const r = S.res[i];
+    const card = document.createElement('div'); card.className = 'q'; card.id = key + 'q' + i;
+    const qid = nid('q');
+    let input = '';
+    if (it.type === 'num') input = '<div class="numrow"><label for="'+qid+'in">'+it.label+'</label><input type="text" inputmode="decimal" autocomplete="off" id="'+qid+'in" aria-label="'+esc(it.aria)+'"><span class="unit">'+it.unit+'</span></div>';
+    else if (it.type === 'mcq') input = '<fieldset><legend>'+it.legend+'</legend>' + it.options.map((o,j) => '<div class="opt"><input type="radio" name="'+qid+'" id="'+qid+'o'+j+'" value="'+j+'"><label for="'+qid+'o'+j+'">'+'ABCDEF'[j]+'. '+o.html+'</label></div>').join('') + '</fieldset>';
+    else if (it.type === 'angle') input = '<div class="anglehost"></div>';
+    card.innerHTML = '<div class="q-head"><h3 tabindex="-1">Question ' + (i+1) + ' of ' + items.length + '</h3><span class="pts" aria-hidden="true">2 points</span></div>'
+      + (it.figure ? '<div class="qfig">' + it.figure + '</div>' : '') + '<div class="qprompt">' + it.prompt + '</div>' + input
+      + '<div class="actions"><button type="button" class="primary q-check">Check answer</button><span class="attempts q-left"></span></div>'
+      + '<div class="feedback" role="status" aria-live="polite"></div><div class="hint" hidden></div><div class="solution" hidden></div>';
+    list.appendChild(card);
+    let angle = null;
+    if (it.type === 'angle') angle = angleWidget($('.anglehost', card), it.aI, () => {});
+    const fb = $('.feedback', card), hint = $('.hint', card), sol = $('.solution', card), btn = $('.q-check', card), left = $('.q-left', card);
+    const getVal = () => {
+      if (it.type === 'num'){ const v = $('input', card).value; return v.trim() === '' ? null : v; }
+      if (it.type === 'mcq'){ const c = $('input[type=radio]:checked', card); return c ? +c.value : null; }
+      return angle.get();
+    };
+    const isRight = val => it.type === 'num' ? (() => { const x = parseNum(val); return !isNaN(x) && Math.abs(x - it.answer) <= Math.max(it.rel*Math.abs(it.answer), it.abs || 0); })()
+      : it.type === 'mcq' ? !!it.options[val].correct : Math.abs(((val - it.answer + 540) % 360) - 180) <= it.tolDeg;
+    const fmtGiven = val => it.type === 'num' ? esc(String(val)) + ' ' + it.unitText : it.type === 'mcq' ? 'ABCDEF'[val] : val + '\u00B0';
+    function lockInputs(){ btn.disabled = true; $$('input', card).forEach(x => x.disabled = true); if (angle) angle.disable(); }
+    function showHint(val){
+      hint.hidden = false;
+      hint.innerHTML = '<h4>Hint</h4><p>' + it.hint(val) + '</p><div class="concept"><h4>Remember</h4>' + it.concept + '</div>';
+      typeset(hint);
+    }
+    function showSolution(){ sol.hidden = false; sol.innerHTML = '<h4>Detailed explanation</h4>' + it.explain; typeset(sol); }
+    function paint(){
+      left.textContent = r.done ? '' : (2 - r.tries) + (2 - r.tries === 1 ? ' attempt left' : ' attempts left');
+      if (r.done){
+        lockInputs();
+        if (r.pts === 2) fb.className = 'feedback ok', fb.innerHTML = '<span class="tag">\u2713 Correct on the first attempt.</span> +2 points.';
+        else if (r.pts === 1) fb.className = 'feedback ok', fb.innerHTML = '<span class="tag">\u2713 Correct on the second attempt.</span> +1 point.';
+        else fb.className = 'feedback bad', fb.innerHTML = '<span class="tag">\u2717 Not this time.</span> The correct answer is ' + it.answerText + '. Study the explanation below' + (i + 1 < items.length ? '; the next question builds on it.' : '.');
+        if (r.given !== null && r.given !== undefined){
+          if (it.type === 'num') $('input', card).value = r.given;
+          else if (it.type === 'mcq'){ const o = $('#'+qid+'o'+r.given); if (o) o.checked = true; }
+          else angle.setValue(r.given);
+          if (r.lastHint !== undefined && r.tries === 2 && r.pts === 0) {}
+        }
+        if (r.hintVal !== undefined && r.hintVal !== null) showHint(r.hintVal);
+        showSolution();
+      } else if (r.tries === 1 && r.hintVal !== undefined){
+        fb.className = 'feedback bad'; fb.innerHTML = '<span class="tag">\u2717 Not yet.</span> You have one more attempt. Read the hint.';
+        showHint(r.hintVal);
+      }
+      typeset(fb);
+    }
+    btn.addEventListener('click', () => {
+      if (r.done) return;
+      const val = getVal();
+      if (val === null){ fb.className = 'feedback bad'; fb.innerHTML = it.type === 'mcq' ? 'Choose an answer first.' : 'Enter a number first.'; return; }
+      if (it.type === 'num' && isNaN(parseNum(val))){ fb.className = 'feedback bad'; fb.innerHTML = 'That does not look like a number. Enter digits, for example 12.5 or 3.2e-3.'; return; }
+      r.tries++; r.given = val;
+      if (isRight(val)){ r.done = true; r.pts = r.tries === 1 ? 2 : 1; }
+      else if (r.tries >= 2){ r.done = true; r.pts = 0; }
+      else { r.hintVal = val; }
+      save(); updateScore(); paint();
+      if (r.done){
+        if (i + 1 < items.length && !card.nextElementSibling){ renderItem(i+1); announce((r.pts ? 'Correct. ' : 'Out of attempts. ') + 'Explanation shown. Question ' + (i+2) + ' is now available below.'); const nb = document.createElement('div'); nb.className = 'actions'; nb.innerHTML = '<button type="button" class="q-next">Go to question ' + (i+2) + '</button>'; card.appendChild(nb); $('.q-next', nb).addEventListener('click', () => { const h = $('#'+key+'q'+(i+1)+' h3'); if (h){ h.scrollIntoView({ block:'start' }); h.focus({ preventScroll:true }); } }); }
+        else if (i + 1 === items.length) setComplete(true);
+        else announce('Explanation shown.');
+      } else announce('Not yet. One attempt left. A hint is shown below the question.');
+    });
+    paint();
+    typeset(card);
+    return card;
+  }
+  function setComplete(fresh){
+    const st = setStats(key);
+    if (!st.done) return;
+    const d = $('.setdone', host);
+    d.innerHTML = '<div class="box donebox"><p style="margin:0"><strong>Set finished: ' + st.pts + ' of ' + st.max + ' points.</strong> ' + (current < pages.length-1 ? 'Use the Next button below to continue.' : '') + '</p></div>';
+    refreshToc(); updatePager();
+    if (fresh){ announce('Set finished with ' + st.pts + ' of ' + st.max + ' points. The next section is unlocked.'); toast('Set finished: ' + st.pts + '/' + st.max + ' points. Next section unlocked!'); }
+  }
+  // render all reached items
+  let i = 0;
+  while (i < items.length){ renderItem(i); if (!(S.res[i] && S.res[i].done)) break; if (i + 1 < items.length){ const card = $('#'+key+'q'+i); const nb = document.createElement('div'); nb.className = 'actions'; nb.innerHTML = '<button type="button" class="q-next">Go to question ' + (i+2) + '</button>'; card.appendChild(nb); const ii = i; $('.q-next', nb).addEventListener('click', () => { const h = $('#'+key+'q'+(ii+1)+' h3'); if (h){ h.scrollIntoView({ block:'start' }); h.focus({ preventScroll:true }); } }); } i++; }
+  setComplete(false);
+}
+const numItem = o => Object.assign({ type:'num', rel:0.01, abs:0.005 }, o);
+const concept = html => html;
+
+/* ================= question sets ================= */
+function phasorPairFig(aI, aE, labels){
+  const id = nid('pf'), cx = 170, cy = 170, r = 130;
+  let g = arrowDefs(id) + polarGrid(cx, cy, r, true);
+  g += arrowAt(cx, cy, r*0.95, aI, 'var(--curr)', id+'i', '7 4', 4) + labelAt(cx, cy, r*0.95+18, aI, 'I', 'var(--curr)', '0');
+  g += arrowAt(cx, cy, r*0.7, aE, 'var(--volt)', id+'v', null, 4.5) + labelAt(cx, cy, r*0.7+18, aE, '\u2130', 'var(--volt)', '0');
+  return '<svg viewBox="0 0 340 340" width="100%" style="max-width:340px" role="img" aria-label="Phasor diagram on a polar grid with lines every 10 degrees. The current phasor I zero, dashed, points at ' + aI + ' degrees. The source voltage phasor script E zero, solid, points at ' + aE + ' degrees." focusable="false">' + g + '</svg>';
+}
+function gen1(){
+  for (;;){
+    const f = 50*randInt(4,20), E0 = randInt(6,20), R = randInt(4,20), LmH = pick([2,3,4,5,6,8,10,12,15]), CuF = pick([5,8,10,12,15,20,25,30,40,50]);
+    const v = rlc({ f, E0, R, L:LmH/1000, C:CuF*1e-6 });
+    const want = Math.random() < 0.5 ? 1 : -1;
+    const ratio = Math.abs(v.d)/R;
+    if (Math.sign(v.d) === want && ratio > 0.35 && ratio < 2.5){
+      const aI = randInt(1,4)*10, sign = Math.random() < 0.5 ? 1 : -1;
+      return { f, E0, R, LmH, CuF, q1:{ aI: randInt(5,30), aE: 0, sign }, aI2: randInt(2,6)*10 };
+    }
+  }
+}
+registerSet('set1', () => { const p = gen1(); p.q1.aE = p.q1.aI + p.q1.sign*randInt(35,65); return p; }, P => {
+  const L = P.LmH/1000, C = P.CuF*1e-6, v = rlc({ f:P.f, E0:P.E0, R:P.R, L, C });
+  const given = '\\(f=' + P.f + '\\ \\text{Hz}\\), \\(\\mathcal{E}_0=' + P.E0 + '\\ \\text{V}\\), \\(R=' + P.R + '\\ \\Omega\\), \\(L=' + P.LmH + '\\ \\text{mH}\\), \\(C=' + P.CuF + '\\ \\mu\\text{F}\\)';
+  const intro = '<p class="given">Circuit: ' + given + '.</p>';
+  const phiDeg = v.phi*DEG, inductive = v.d > 0;
+  const target = (P.aI2 + (inductive ? 1 : -1)*Math.round(phiDeg) + 360) % 360;
+  const q1ind = P.q1.sign > 0;
+  return [
+    { type:'mcq', figure: phasorPairFig(P.q1.aI, P.q1.aE),
+      prompt: '<p>This phasor diagram belongs to a <em>different</em> RLC circuit. The dashed arrow is the current phasor \\(I_0\\) and the solid arrow is the source voltage phasor \\(\\mathcal{E}_0\\). Based on their relative positions, which statement about the reactances is correct?</p>',
+      legend: 'Choose one', options: [ { html:'\\(X_L=X_C\\)' }, { html:'\\(X_L&gt;X_C\\)', correct:q1ind }, { html:'\\(X_L&lt;X_C\\)', correct:!q1ind }, { html:'More information is needed' } ],
+      answerText: q1ind ? 'B, \\(X_L&gt;X_C\\)' : 'C, \\(X_L&lt;X_C\\)',
+      hint: val => val === 0 ? '\\(X_L=X_C\\) would put the two phasors on top of each other. Here they are clearly apart.' : val === 3 ? 'The relative direction of the two phasors is all you need: which one is counterclockwise of the other?' : 'Find which phasor is counterclockwise of the other. If the source voltage is ahead (counterclockwise) of the current, the reactive voltage leg points “up” from \\(I\\).',
+      concept: '<p>In the phasor triangle the reactive leg is \\(V_L-V_C=I(X_L-X_C)\\), drawn \\(90^\\circ\\) counterclockwise from \\(I\\) when positive. So \\(\\mathcal{E}_0\\) is counterclockwise of \\(I\\) exactly when \\(X_L&gt;X_C\\).</p>',
+      explain: '<p>The current is at ' + P.q1.aI + '\\(^\\circ\\) and the source voltage at ' + P.q1.aE + '\\(^\\circ\\), so the source voltage is ' + Math.abs(P.q1.aE-P.q1.aI) + '\\(^\\circ\\) ' + (q1ind ? 'counterclockwise from (ahead of)' : 'clockwise from (behind)') + ' the current. The reactive leg \\(I(X_L-X_C)\\) therefore points ' + (q1ind ? 'counterclockwise' : 'clockwise') + ' from \\(I\\), which means \\(X_L-X_C' + (q1ind ? '&gt;' : '&lt;') + '0\\), so \\(X_L' + (q1ind ? '&gt;' : '&lt;') + 'X_C\\). The circuit behaves ' + (q1ind ? 'inductively and the current trails' : 'capacitively and the current leads') + '. You do not need any numbers: the geometry decides.</p>' },
+    numItem({ prompt: intro + '<p>Calculate the angular frequency \\(\\omega\\).</p>', label:'\\(\\omega=\\)', aria:'Angular frequency omega in radians per second', unit:'rad/s', unitText:'rad/s', answer: v.w,
+      answerText: '\\(\\omega=' + fix(v.w,2) + '\\ \\text{rad/s}\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - P.f) < 0.01*P.f ? 'That is the frequency \\(f\\) in hertz. The angular frequency is larger by a factor of \\(2\\pi\\).' : Math.abs(x - Math.PI*P.f) < 0.01*Math.PI*P.f ? 'Check the factor: \\(\\omega=2\\pi f\\), not \\(\\pi f\\).' : 'Multiply the frequency by \\(2\\pi\\).'; },
+      concept: '<p>\\(\\omega=2\\pi f\\). One full cycle is \\(2\\pi\\) radians, and there are \\(f\\) cycles per second.</p>',
+      explain: '<p>\\(\\omega=2\\pi f=2\\pi(' + P.f + '\\ \\text{Hz})=' + fix(v.w,2) + '\\ \\text{rad/s}\\). Every reactance below needs \\(\\omega\\), not \\(f\\).</p>' }),
+    numItem({ prompt: intro + '<p>Calculate the inductive reactance \\(X_L\\).</p>', label:'\\(X_L=\\)', aria:'Inductive reactance X sub L in ohms', unit:'\\(\\Omega\\)', unitText:'Ω', answer: v.XL,
+      answerText: '\\(X_L=' + fix(v.XL,2) + '\\ \\Omega\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - P.f*L) < 0.02*P.f*L ? 'You used \\(f\\) instead of \\(\\omega\\).' : (Math.abs(x/1000 - v.XL) < 0.02*v.XL || Math.abs(x*1000 - v.XL) < 0.02*v.XL) ? 'Check the unit: \\(1\\ \\text{mH}=10^{-3}\\ \\text{H}\\).' : Math.abs(x - 1/(v.w*L)) < 0.02/(v.w*L) ? 'That is the capacitor’s form. For an inductor, \\(X_L=\\omega L\\).' : 'Use \\(X_L=\\omega L\\) with \\(L\\) in henries.'; },
+      concept: '<p>\\(X_L=\\omega L\\): an inductor opposes changes of current more strongly at higher frequency.</p>',
+      explain: '<p>\\(X_L=\\omega L=(' + fix(v.w,2) + '\\ \\text{s}^{-1})(' + P.LmH + '\\times10^{-3}\\ \\text{H})=' + fix(v.XL,2) + '\\ \\Omega\\).</p>' }),
+    numItem({ prompt: intro + '<p>Calculate the capacitive reactance \\(X_C\\).</p>', label:'\\(X_C=\\)', aria:'Capacitive reactance X sub C in ohms', unit:'\\(\\Omega\\)', unitText:'Ω', answer: v.XC,
+      answerText: '\\(X_C=' + fix(v.XC,2) + '\\ \\Omega\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - 1/(P.f*C)) < 0.02/(P.f*C) ? 'You used \\(f\\) instead of \\(\\omega\\).' : (Math.abs(x/1e6 - v.XC) < 0.02*v.XC || Math.abs(x*1e6 - v.XC) < 0.02*v.XC || Math.abs(x/1000 - v.XC) < 0.02*v.XC || Math.abs(x*1000 - v.XC) < 0.02*v.XC) ? 'Check the unit: \\(1\\ \\mu\\text{F}=10^{-6}\\ \\text{F}\\).' : Math.abs(x - v.w*C) < 0.02*v.w*C ? 'Reactance is the reciprocal: \\(X_C=1/(\\omega C)\\).' : 'Use \\(X_C=1/(\\omega C)\\) with \\(C\\) in farads.'; },
+      concept: '<p>\\(X_C=\\dfrac{1}{\\omega C}\\): a capacitor opposes current less at higher frequency.</p>',
+      explain: '<p>\\(X_C=\\dfrac{1}{\\omega C}=\\dfrac{1}{(' + fix(v.w,2) + '\\ \\text{s}^{-1})(' + P.CuF + '\\times10^{-6}\\ \\text{F})}=' + fix(v.XC,2) + '\\ \\Omega\\).</p>' }),
+    numItem({ prompt: intro + '<p>Calculate the impedance \\(Z\\) of the circuit.</p>', label:'\\(Z=\\)', aria:'Impedance Z in ohms', unit:'\\(\\Omega\\)', unitText:'Ω', answer: v.Z,
+      answerText: '\\(Z=' + fix(v.Z,2) + '\\ \\Omega\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - (P.R + v.XL + v.XC)) < 0.02*(P.R+v.XL+v.XC) || Math.abs(x - (P.R + Math.abs(v.d))) < 0.02*(P.R+Math.abs(v.d)) ? 'Resistance and reactance do not add directly; they combine at right angles.' : Math.abs(x - Math.sqrt(P.R*P.R + v.XL*v.XL + v.XC*v.XC)) < 0.02*v.Z*2 && Math.abs(x - v.Z) > 0.01*v.Z ? 'The two reactances enter as a <em>difference</em>, \\(X_L-X_C\\), because \\(V_L\\) and \\(V_C\\) point in opposite directions.' : 'Use \\(Z=\\sqrt{R^2+(X_L-X_C)^2}\\).'; },
+      concept: '<p>\\(Z=\\sqrt{R^2+(X_L-X_C)^2}\\): the impedance triangle has legs \\(R\\) and \\(X_L-X_C\\).</p>',
+      explain: '<p>\\(X_L-X_C=' + fix(v.XL,2) + '-' + fix(v.XC,2) + '=' + tex(fix(v.d,2)) + '\\ \\Omega\\). Then \\(Z=\\sqrt{' + P.R + '^2+(' + tex(fix(v.d,2)) + ')^2}=\\sqrt{' + fix(P.R*P.R + v.d*v.d,1) + '}=' + fix(v.Z,2) + '\\ \\Omega\\). The sign of \\(X_L-X_C\\) disappears when squared; it comes back in the phase.</p>' }),
+    numItem({ prompt: intro + '<p>Calculate the peak current \\(I\\).</p>', label:'\\(I=\\)', aria:'Peak current I in amperes', unit:'A', unitText:'A', answer: v.I,
+      answerText: '\\(I=' + sig(v.I,3) + '\\ \\text{A}\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - P.E0/P.R) < 0.02*P.E0/P.R ? 'Dividing by \\(R\\) alone ignores the reactances. Divide by the impedance.' : Math.abs(x - P.E0*v.Z) < 0.02*P.E0*v.Z ? 'Current is voltage <em>divided</em> by impedance.' : 'Use \\(I=\\mathcal{E}_0/Z\\).'; },
+      concept: '<p>\\(I=\\dfrac{\\mathcal{E}_0}{Z}\\), Ohm’s law for the whole circuit, with peak values.</p>',
+      explain: '<p>\\(I=\\dfrac{\\mathcal{E}_0}{Z}=\\dfrac{' + P.E0 + '\\ \\text{V}}{' + fix(v.Z,2) + '\\ \\Omega}=' + sig(v.I,3) + '\\ \\text{A}\\). Component voltages: \\(V_R=' + sig(v.VR,3) + '\\ \\text{V}\\), \\(V_L=' + sig(v.VL,3) + '\\ \\text{V}\\), \\(V_C=' + sig(v.VC,3) + '\\ \\text{V}\\).</p>', rel:0.015 }),
+    numItem({ prompt: intro + '<p>Calculate the phase angle \\(\\varphi\\) between the current and the source voltage, in radians, as a positive number.</p>', label:'\\(\\varphi=\\)', aria:'Phase angle phi in radians', unit:'rad', unitText:'rad', answer: v.phi, rel:0.02, abs:0.01,
+      answerText: '\\(\\varphi=' + fix(v.phi,2) + '\\ \\text{rad}\\) \\((' + fix(phiDeg,1) + '^\\circ)\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - phiDeg) < 1 ? 'That is the angle in degrees. Give it in radians (set your calculator to radian mode).' : Math.abs(Math.abs(x) - (Math.PI/2 - v.phi)) < 0.02 ? 'You used \\(R/|X_L-X_C|\\). The tangent is the reactive leg over the resistive leg.' : x < 0 ? 'Give the size of the angle as a positive number; the next question asks about the direction.' : 'Use \\(\\varphi=\\tan^{-1}(|X_L-X_C|/R)\\) in radian mode.'; },
+      concept: '<p>\\(\\tan\\varphi=\\dfrac{|V_L-V_C|}{V_R}=\\dfrac{|X_L-X_C|}{R}\\).</p>',
+      explain: '<p>\\(\\varphi=\\tan^{-1}\\!\\left(\\dfrac{|' + tex(fix(v.d,2)) + '|}{' + P.R + '}\\right)=' + fix(v.phi,3) + '\\ \\text{rad}=' + fix(phiDeg,1) + '^\\circ\\). As a check, \\(\\cos\\varphi=R/Z=' + fix(P.R/v.Z,3) + '\\).</p>' }),
+    { type:'mcq', prompt: intro + '<p>For this circuit, how is the current timed relative to the source voltage?</p>', legend:'Choose one',
+      options: [ { html:'The current leads: \\(i(t)=I\\cos(\\omega t+\\varphi)\\)', correct: !inductive }, { html:'The current trails: \\(i(t)=I\\cos(\\omega t-\\varphi)\\)', correct: inductive }, { html:'They are in phase: \\(i(t)=I\\cos(\\omega t)\\)' } ],
+      answerText: inductive ? 'B, the current trails' : 'A, the current leads',
+      hint: val => val === 2 ? 'In phase only when \\(X_L=X_C\\). Compare your two reactances.' : 'Compare \\(X_L\\) and \\(X_C\\). Which voltage, \\(V_L\\) or \\(V_C\\), wins the tug of war?',
+      concept: '<p>\\(X_L&gt;X_C\\): inductive, source ahead, current trails (\\(-\\)). \\(X_L&lt;X_C\\): capacitive, current leads (\\(+\\)). ELI the ICE man.</p>',
+      explain: '<p>Here \\(X_L=' + fix(v.XL,2) + '\\ \\Omega\\) and \\(X_C=' + fix(v.XC,2) + '\\ \\Omega\\), so \\(X_L' + (inductive ? '&gt;' : '&lt;') + 'X_C\\). The ' + (inductive ? 'inductor' : 'capacitor') + ' dominates, so the circuit behaves ' + (inductive ? 'inductively (ELI): the voltage leads and the current trails' : 'capacitively (ICE): the current leads') + '. \\(i(t)=(' + sig(v.I,3) + '\\ \\text{A})\\cos(\\omega t' + (inductive ? '-' : '+') + fix(v.phi,2) + ')\\).</p>' },
+    { type:'angle', aI: P.aI2, answer: target, tolDeg: 6,
+      prompt: intro + '<p>In the diagram below, the dashed arrow is this circuit’s current phasor, at ' + P.aI2 + '\\(^\\circ\\). Rotate the red arrow so it shows the source voltage phasor. Use your phase angle rounded to the nearest degree. Only the direction is graded, not the length.</p>',
+      answerText: target + '\\(^\\circ\\)',
+      hint: val => { const mirror = (P.aI2 - (inductive ? 1 : -1)*Math.round(phiDeg) + 360) % 360; const near = (a,b) => Math.abs(((a-b+540)%360)-180) <= 6;
+        return near(val, mirror) ? 'Right size of angle, wrong direction. Decide whether the source voltage is ahead (counterclockwise) or behind (clockwise) the current.' : near(val, P.aI2) ? 'That puts the source voltage along the current, which only happens at resonance.' : near(val, P.aI2 + (inductive?1:-1)*v.phi) ? 'It looks like you used the angle in radians as if it were degrees. Convert: \\(1\\ \\text{rad}\\approx57.3^\\circ\\).' : 'Start from the current’s angle, then add or subtract \\(\\varphi\\) in degrees.'; },
+      concept: '<p>The source phasor is \\(\\varphi\\) away from the current: counterclockwise when \\(X_L&gt;X_C\\), clockwise when \\(X_L&lt;X_C\\).</p>',
+      explain: '<p>\\(\\varphi=' + fix(phiDeg,1) + '^\\circ\\approx' + Math.round(phiDeg) + '^\\circ\\). Because \\(X_L' + (inductive ? '&gt;' : '&lt;') + 'X_C\\), the source phasor is ' + (inductive ? 'counterclockwise' : 'clockwise') + ' from the current: \\(' + P.aI2 + '^\\circ' + (inductive ? '+' : '-') + Math.round(phiDeg) + '^\\circ=' + target + '^\\circ\\). Answers within \\(6^\\circ\\) are accepted.</p>' }
+  ];
+});
+
+registerSet('set2', () => {
+  for (;;){ const E0 = randInt(5,24), R = randInt(2,12), LmH = pick([1,2,2.5,4,5,8,10,12]), CuF = pick([2,4,5,8,10,15,20,25,40]); const f0 = 1/(TAU*Math.sqrt(LmH/1000*CuF*1e-6)); if (f0 > 150 && f0 < 4000) return { E0, R, LmH, CuF }; }
+}, P => {
+  const L = P.LmH/1000, C = P.CuF*1e-6, w0 = 1/Math.sqrt(L*C), f0 = w0/TAU, X0 = w0*L, I = P.E0/P.R, VL = I*X0;
+  const given = '\\(\\mathcal{E}_0=' + P.E0 + '\\ \\text{V}\\), \\(R=' + P.R + '\\ \\Omega\\), \\(L=' + P.LmH + '\\ \\text{mH}\\), \\(C=' + P.CuF + '\\ \\mu\\text{F}\\)';
+  const intro = '<p class="given">Circuit driven at its resonance frequency: ' + given + '.</p>';
+  return [
+    numItem({ prompt: intro + '<p>Calculate the resonance angular frequency \\(\\omega_0\\).</p>', label:'\\(\\omega_0=\\)', aria:'Resonance angular frequency omega zero in radians per second', unit:'rad/s', unitText:'rad/s', answer: w0,
+      answerText: '\\(\\omega_0=' + fix(w0,1) + '\\ \\text{rad/s}\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - f0) < 0.02*f0 ? 'That is \\(f_0\\) in hertz. The angular frequency has no \\(2\\pi\\) in the denominator.' : Math.abs(x - 1/(L*C)) < 0.02/(L*C) ? 'Do not forget the square root: \\(\\omega_0=1/\\sqrt{LC}\\).' : 'Use \\(\\omega_0=1/\\sqrt{LC}\\) with \\(L\\) in henries and \\(C\\) in farads.'; },
+      concept: '<p>Resonance happens when \\(X_L=X_C\\): \\(\\omega_0L=1/(\\omega_0C)\\), so \\(\\omega_0=1/\\sqrt{LC}\\).</p>',
+      explain: '<p>\\(\\omega_0=\\dfrac{1}{\\sqrt{LC}}=\\dfrac{1}{\\sqrt{(' + P.LmH + '\\times10^{-3})(' + P.CuF + '\\times10^{-6})}}=' + fix(w0,1) + '\\ \\text{rad/s}\\). The resistance and the source play no role in where resonance occurs.</p>' }),
+    numItem({ prompt: intro + '<p>Calculate the resonance frequency \\(f_0\\) in hertz.</p>', label:'\\(f_0=\\)', aria:'Resonance frequency f zero in hertz', unit:'Hz', unitText:'Hz', answer: f0,
+      answerText: '\\(f_0=' + fix(f0,1) + '\\ \\text{Hz}\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - w0) < 0.02*w0 ? 'That is \\(\\omega_0\\). Divide by \\(2\\pi\\) to get hertz.' : Math.abs(x - w0*TAU) < 0.02*w0*TAU ? 'Divide by \\(2\\pi\\), do not multiply.' : 'Use \\(f_0=\\omega_0/(2\\pi)\\).'; },
+      concept: '<p>\\(f_0=\\dfrac{\\omega_0}{2\\pi}=\\dfrac{1}{2\\pi\\sqrt{LC}}\\).</p>',
+      explain: '<p>\\(f_0=\\dfrac{' + fix(w0,1) + '}{2\\pi}=' + fix(f0,1) + '\\ \\text{Hz}\\). This is the number you would dial on a signal generator.</p>' }),
+    numItem({ prompt: intro + '<p>Calculate the inductive reactance \\(X_L\\) at resonance.</p>', label:'\\(X_L=\\)', aria:'Inductive reactance in ohms', unit:'\\(\\Omega\\)', unitText:'Ω', answer: X0,
+      answerText: '\\(X_L=' + fix(X0,2) + '\\ \\Omega\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - f0*L) < 0.02*f0*L ? 'Use \\(\\omega_0\\), not \\(f_0\\).' : 'Use \\(X_L=\\omega_0L\\).'; },
+      concept: '<p>\\(X_L=\\omega L\\). At resonance it also equals \\(\\sqrt{L/C}\\).</p>',
+      explain: '<p>\\(X_L=\\omega_0L=(' + fix(w0,1) + ')(' + P.LmH + '\\times10^{-3})=' + fix(X0,2) + '\\ \\Omega\\). Shortcut: \\(\\omega_0L=L/\\sqrt{LC}=\\sqrt{L/C}\\).</p>' }),
+    numItem({ prompt: intro + '<p>Calculate the capacitive reactance \\(X_C\\) at resonance.</p>', label:'\\(X_C=\\)', aria:'Capacitive reactance in ohms', unit:'\\(\\Omega\\)', unitText:'Ω', answer: X0,
+      answerText: '\\(X_C=' + fix(X0,2) + '\\ \\Omega\\)',
+      hint: () => 'At resonance there is a shortcut: what is the defining condition of resonance?',
+      concept: '<p>Resonance is defined by \\(X_L=X_C\\).</p>',
+      explain: '<p>\\(X_C=\\dfrac{1}{\\omega_0C}=' + fix(X0,2) + '\\ \\Omega\\), identical to \\(X_L\\). That equality is what resonance means.</p>' }),
+    numItem({ prompt: intro + '<p>Calculate the impedance \\(Z\\) of the circuit at resonance.</p>', label:'\\(Z=\\)', aria:'Impedance in ohms', unit:'\\(\\Omega\\)', unitText:'Ω', answer: P.R,
+      answerText: '\\(Z=' + fix(P.R,2) + '\\ \\Omega\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - Math.hypot(P.R, X0)) < 0.02*Math.hypot(P.R,X0) ? 'The reactances enter as a difference, \\(X_L-X_C\\). What is that difference here?' : 'Substitute \\(X_L-X_C=0\\) into \\(Z=\\sqrt{R^2+(X_L-X_C)^2}\\).'; },
+      concept: '<p>\\(Z=\\sqrt{R^2+(X_L-X_C)^2}\\) is smallest when \\(X_L=X_C\\).</p>',
+      explain: '<p>\\(Z=\\sqrt{' + P.R + '^2+0^2}=' + P.R + '\\ \\Omega=R\\). The inductor and capacitor cancel each other completely; only the resistor limits the current.</p>' }),
+    numItem({ prompt: intro + '<p>Calculate the peak current \\(I\\) at resonance.</p>', label:'\\(I=\\)', aria:'Peak current in amperes', unit:'A', unitText:'A', answer: I,
+      answerText: '\\(I=' + fix(I,2) + '\\ \\text{A}\\)',
+      hint: () => 'Use \\(I=\\mathcal{E}_0/Z\\) with the impedance you just found.',
+      concept: '<p>At resonance \\(I_{\\max}=\\mathcal{E}_0/R\\): the largest current this circuit can carry at any frequency.</p>',
+      explain: '<p>\\(I=\\dfrac{\\mathcal{E}_0}{R}=\\dfrac{' + P.E0 + '}{' + P.R + '}=' + fix(I,2) + '\\ \\text{A}\\). At any other frequency \\(Z&gt;R\\) and the current is smaller.</p>' }),
+    numItem({ prompt: intro + '<p>Calculate the phase angle between the current and the source voltage, in radians. Round to an integer.</p>', label:'\\(\\varphi=\\)', aria:'Phase angle in radians, rounded to an integer', unit:'rad', unitText:'rad', answer: 0, abs:0.01,
+      answerText: '\\(\\varphi=0\\)',
+      hint: () => 'What is \\(X_L-X_C\\) at resonance? Then evaluate \\(\\tan^{-1}\\) of that over \\(R\\).',
+      concept: '<p>\\(\\tan\\varphi=|X_L-X_C|/R\\).</p>',
+      explain: '<p>\\(\\varphi=\\tan^{-1}(0/' + P.R + ')=0\\). Current and source voltage are in phase, and the source phasor lies along the current phasor.</p>' }),
+    numItem({ prompt: intro + '<p>Bonus surprise: calculate the peak voltage \\(V_L\\) across the inductor at resonance. Compare it with \\(\\mathcal{E}_0\\).</p>', label:'\\(V_L=\\)', aria:'Peak inductor voltage in volts', unit:'V', unitText:'V', answer: VL,
+      answerText: '\\(V_L=' + fix(VL,2) + '\\ \\text{V}\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - P.E0) < 0.02*P.E0 ? 'It is tempting to think no component can exceed the source voltage, but \\(V_L\\) and \\(V_C\\) cancel each other. Compute \\(V_L=X_LI\\).' : 'Use \\(V_L=X_LI\\) with the resonance values.'; },
+      concept: '<p>Each component’s peak voltage is its own resistance or reactance times the common peak current.</p>',
+      explain: '<p>\\(V_L=X_LI=(' + fix(X0,2) + ')(' + fix(I,2) + ')=' + fix(VL,2) + '\\ \\text{V}\\), which is ' + (VL > P.E0 ? fix(VL/P.E0,2) + ' times the source peak of ' + P.E0 + ' V' : 'less than the source peak of ' + P.E0 + ' V here, but with a smaller \\(R\\) it would exceed it') + '. \\(V_C\\) has the same size and the opposite direction, so the two cancel in the loop.</p>' })
+  ];
+});
+
+function arrowsFig(aI, arrows){
+  const id = nid('af'), cx = 170, cy = 170, r = 130;
+  const cols = ['#6A2CA0','#0F7A5C','#222222','#2F5FD0'];
+  let g = arrowDefs(id) + polarGrid(cx, cy, r, true);
+  g += '<defs>' + cols.map((c,j) => '<marker id="'+id+'m'+j+'" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="'+c+'"/></marker>').join('') + '</defs>';
+  g += arrowAt(cx, cy, r*0.98, aI, 'var(--curr)', id+'i', '7 4', 3.5) + labelAt(cx, cy, r*0.98+16, aI, 'I', 'var(--curr)', '0');
+  arrows.forEach((a,j) => { g += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r*0.72*Math.cos(a.deg/DEG)).toFixed(1)+'" y2="'+(cy-r*0.72*Math.sin(a.deg/DEG)).toFixed(1)+'" stroke="'+cols[j]+'" stroke-width="4" marker-end="url(#'+id+'m'+j+')"/><text x="'+(cx+(r*0.72+16)*Math.cos((a.deg+7)/DEG)-6).toFixed(1)+'" y="'+(cy-(r*0.72+16)*Math.sin((a.deg+7)/DEG)+6).toFixed(1)+'" font-size="18" font-weight="700" fill="'+cols[j]+'" stroke="var(--surface)" stroke-width="3" paint-order="stroke">'+'ABCD'[j]+'</text>'; });
+  return '<svg viewBox="0 0 340 340" width="100%" style="max-width:340px" role="img" aria-label="Phasor diagram on a polar grid. The current phasor I zero, dashed, points at ' + aI + ' degrees. Four candidate arrows: ' + arrows.map((a,j) => 'arrow ' + 'ABCD'[j] + ' at ' + a.deg + ' degrees').join(', ') + '." focusable="false">' + g + '</svg>';
+}
+registerSet('set3', () => {
+  const aI = randInt(1,5)*10;
+  const degs = shuffle([aI, aI + randInt(5,8)*10, aI - randInt(5,8)*10, aI + 180 - randInt(1,3)*10]).map(d => (d+360)%360);
+  return { aI, degs, below: Math.random() < 0.5, E0: randInt(6,15), VL: randInt(20,60), R2: pick([2,3]) };
+}, P => {
+  const correctIdx = P.degs.indexOf(P.aI);
+  const q3opts = shuffle([ { html:'They have equal lengths and point in opposite directions, so they cancel.', correct:true, k:'ok' }, { html:'They both point along the current phasor.', k:'along' }, { html:'They are both zero.', k:'zero' }, { html:'\\(V_L\\) is \\(90^\\circ\\) ahead of \\(V_C\\).', k:'90' } ]);
+  const q4opts = shuffle([ { html:'\\(\\omega_0\\) is unchanged and the peak current at resonance is divided by ' + P.R2 + '.', correct:true, k:'ok' }, { html:'\\(\\omega_0\\) is divided by ' + P.R2 + ' and the peak current is unchanged.', k:'w' }, { html:'Both \\(\\omega_0\\) and the peak current are divided by ' + P.R2 + '.', k:'both' }, { html:'Nothing changes, because the reactances cancel.', k:'none' } ]);
+  const below = P.below;
+  return [
+    { type:'mcq', figure: arrowsFig(P.aI, P.degs.map(d => ({ deg:d }))),
+      prompt: '<p>The dashed arrow is the current phasor \\(I_0\\) of an RLC circuit. If the circuit is <em>at resonance</em>, which arrow, A to D, correctly shows the source voltage phasor?</p>',
+      legend:'Choose one', options: P.degs.map((d,j) => ({ html: 'Arrow ' + 'ABCD'[j], correct: j === correctIdx, deg:d })),
+      answerText: 'arrow ' + 'ABCD'[correctIdx],
+      hint: () => 'At resonance, what is the phase angle between current and source voltage?',
+      concept: '<p>At resonance \\(X_L=X_C\\), so \\(\\varphi=\\tan^{-1}(0/R)=0\\).</p>',
+      explain: '<p>At resonance \\(V_L\\) and \\(V_C\\) cancel, leaving \\(\\mathcal{E}_0=V_R\\), which is parallel to the current. The source phasor must point along \\(I_0\\), at ' + P.aI + '\\(^\\circ\\): arrow ' + 'ABCD'[correctIdx] + '. Its length differs from the current arrow because volts and amperes are drawn on different scales.</p>' },
+    { type:'mcq', prompt: '<p>An RLC circuit is driven at an angular frequency ' + (below ? '<strong>below</strong>' : '<strong>above</strong>') + ' its resonance frequency, \\(\\omega' + (below ? '&lt;' : '&gt;') + '\\omega_0\\). How is the current timed relative to the source voltage?</p>',
+      legend:'Choose one', options: [ { html:'The current leads the source voltage.', correct: below }, { html:'The current trails the source voltage.', correct: !below }, { html:'They are in phase.' }, { html:'It depends on the value of \\(R\\).' } ],
+      answerText: below ? 'A, the current leads' : 'B, the current trails',
+      hint: () => 'Which reactance is larger ' + (below ? 'below' : 'above') + ' resonance? Remember \\(X_L=\\omega L\\) grows with \\(\\omega\\) and \\(X_C=1/(\\omega C)\\) shrinks.',
+      concept: '<p>The larger reactance decides: \\(X_C\\) wins at low frequency (current leads, ICE), \\(X_L\\) wins at high frequency (current trails, ELI).</p>',
+      explain: '<p>' + (below ? 'Below resonance \\(\\omega L&lt;1/(\\omega C)\\), so \\(X_C&gt;X_L\\). The capacitor dominates and the circuit behaves capacitively: the current leads.' : 'Above resonance \\(\\omega L&gt;1/(\\omega C)\\), so \\(X_L&gt;X_C\\). The inductor dominates and the circuit behaves inductively: the current trails.') + ' \\(R\\) changes the size of \\(\\varphi\\) but never its direction.</p>' },
+    { type:'mcq', prompt: '<p>At resonance, what can you say about the inductor and capacitor voltage phasors \\(V_L\\) and \\(V_C\\)?</p>', legend:'Choose one', options: q3opts,
+      answerText: 'the statement that they are equal and opposite',
+      hint: val => q3opts[val].k === 'zero' ? 'Each one carries the full peak current through a nonzero reactance, so neither voltage is zero.' : 'Where do \\(V_L\\) and \\(V_C\\) point relative to the current, and how do their lengths compare when \\(X_L=X_C\\)?',
+      concept: '<p>\\(V_L\\) is \\(90^\\circ\\) counterclockwise from \\(I\\); \\(V_C\\) is \\(90^\\circ\\) clockwise. Their lengths are \\(X_LI\\) and \\(X_CI\\).</p>',
+      explain: '<p>\\(V_L\\) and \\(V_C\\) always point in opposite directions, \\(180^\\circ\\) apart. At resonance \\(X_L=X_C\\), so \\(V_L=X_LI=X_CI=V_C\\): equal lengths, opposite directions, exact cancellation. Neither is zero; each can be far larger than \\(\\mathcal{E}_0\\).</p>' },
+    { type:'mcq', prompt: '<p>The resistance of an RLC circuit is multiplied by ' + P.R2 + ' while \\(L\\), \\(C\\) and the source stay the same. What happens at resonance?</p>', legend:'Choose one', options: q4opts,
+      answerText: 'the statement that ω₀ is unchanged and the current is divided by ' + P.R2,
+      hint: () => 'Which quantities appear in \\(\\omega_0=1/\\sqrt{LC}\\)? And what limits the current at resonance?',
+      concept: '<p>\\(\\omega_0=1/\\sqrt{LC}\\) has no \\(R\\). At resonance \\(Z=R\\) and \\(I=\\mathcal{E}_0/R\\).</p>',
+      explain: '<p>\\(\\omega_0\\) depends only on \\(L\\) and \\(C\\), so it does not move. At resonance \\(Z=R\\), so multiplying \\(R\\) by ' + P.R2 + ' divides the peak current by ' + P.R2 + '. The peak also becomes wider: \\(Q=\\omega_0L/R\\) drops.</p>' },
+    numItem({ prompt: '<p>A circuit is at resonance with a source of peak voltage \\(\\mathcal{E}_0=' + P.E0 + '\\ \\text{V}\\). The peak voltage across the inductor is measured to be \\(V_L=' + P.VL + '\\ \\text{V}\\). What is the peak voltage across the capacitor?</p>', label:'\\(V_C=\\)', aria:'Peak capacitor voltage in volts', unit:'V', unitText:'V', answer: P.VL, rel:0.005,
+      answerText: '\\(V_C=' + P.VL + '\\ \\text{V}\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - (P.VL - P.E0)) < 0.1 || Math.abs(x - P.E0) < 0.1 ? 'Peak voltages do not add like numbers. Think about the resonance condition and the common current.' : 'At resonance \\(X_C=X_L\\), and the same current flows through both.'; },
+      concept: '<p>\\(V_C=X_CI\\) and \\(V_L=X_LI\\) share the same \\(I\\).</p>',
+      explain: '<p>At resonance \\(X_C=X_L\\), and both carry the same current, so \\(V_C=X_CI=X_LI=V_L=' + P.VL + '\\ \\text{V}\\). Both exceed the ' + P.E0 + ' V source, yet they cancel in the loop, leaving \\(\\mathcal{E}_0=V_R\\).</p>' })
+  ];
+});
+
+registerSet('set4', () => {
+  for (;;){
+    const grid = pick([{ f:60, E0:170, rms:120, where:'a North American outlet' }, { f:50, E0:325, rms:230, where:'a European outlet' }]);
+    const R = randInt(10,60), LmH = 10*randInt(5,30), CuF = 10*randInt(5,40);
+    const v = rlc({ f:grid.f, E0:grid.E0, R, L:LmH/1000, C:CuF*1e-6 });
+    if (v.d > 0 && v.pf > 0.45 && v.pf < 0.92) return Object.assign({ R, LmH, CuF }, grid);
+  }
+}, P => {
+  const L = P.LmH/1000, C = P.CuF*1e-6, v = rlc({ f:P.f, E0:P.E0, R:P.R, L, C });
+  const Ctot = 1/(v.w*v.XL), Cs = 1/(1/Ctot - 1/C), Cp = v.d/(v.w*v.Z*v.Z), Inew = v.I*v.pf, Irms = v.I/Math.SQRT2;
+  const intro = '<p class="given">A workshop load (think: a motor with some built-in capacitance) is modeled as a series RLC circuit plugged into ' + P.where + ': \\(f=' + P.f + '\\ \\text{Hz}\\), \\(\\mathcal{E}_0=' + P.E0 + '\\ \\text{V}\\) (' + P.rms + ' V rms), \\(R=' + P.R + '\\ \\Omega\\), \\(L=' + P.LmH + '\\ \\text{mH}\\), \\(C=' + P.CuF + '\\ \\mu\\text{F}\\).</p>';
+  const base = '<p>For reference: \\(\\omega=' + fix(v.w,2) + '\\ \\text{rad/s}\\), \\(X_L=' + fix(v.XL,2) + '\\ \\Omega\\), \\(X_C=' + fix(v.XC,2) + '\\ \\Omega\\), \\(Z=' + fix(v.Z,2) + '\\ \\Omega\\), \\(I=' + sig(v.I,4) + '\\ \\text{A}\\).</p>';
+  return [
+    numItem({ prompt: intro + '<p>Calculate the power factor \\(\\cos\\varphi\\) of this load.</p>', label:'\\(\\cos\\varphi=\\)', aria:'Power factor, a number between 0 and 1', unit:'', unitText:'', answer: v.pf, rel:0.01,
+      answerText: '\\(\\cos\\varphi=' + fix(v.pf,3) + '\\)',
+      hint: val => { const x = parseNum(val); return x > 1 ? 'A power factor is never larger than 1. It is a ratio of two sides of the impedance triangle.' : Math.abs(x - Math.abs(v.d)/v.Z) < 0.01 ? 'That is \\(\\sin\\varphi\\). The power factor uses the resistive leg: \\(R/Z\\).' : 'Find \\(X_L\\), \\(X_C\\) and \\(Z\\) first, then \\(\\cos\\varphi=R/Z\\).'; },
+      concept: '<p>Power factor \\(=\\cos\\varphi=R/Z\\), the fraction of the apparent power that is actually delivered.</p>',
+      explain: base + '<p>\\(\\cos\\varphi=\\dfrac{R}{Z}=\\dfrac{' + P.R + '}{' + fix(v.Z,2) + '}=' + fix(v.pf,3) + '\\). Since \\(X_L&gt;X_C\\), this is a <em>lagging</em> power factor, typical of motors.</p>' }),
+    numItem({ prompt: intro + '<p>Calculate the average power delivered by the source.</p>', label:'\\(P=\\)', aria:'Average power in watts', unit:'W', unitText:'W', answer: v.P, rel:0.015,
+      answerText: '\\(P=' + sig(v.P,4) + '\\ \\text{W}\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - 2*v.P) < 0.03*v.P*2 ? 'You are missing a factor \\(\\tfrac12\\): with peak values, \\(P=\\tfrac12\\mathcal{E}_0I\\cos\\varphi\\).' : Math.abs(x - 0.5*P.E0*v.I) < 0.02*0.5*P.E0*v.I ? 'That is the apparent power. Multiply by the power factor.' : 'Use \\(P=\\tfrac12\\mathcal{E}_0I\\cos\\varphi\\), or \\(P=\\tfrac12I^2R\\).'; },
+      concept: '<p>\\(\\langle p\\rangle=\\tfrac12\\mathcal{E}_0I\\cos\\varphi=\\mathcal{E}_{\\text{rms}}I_{\\text{rms}}\\cos\\varphi=\\tfrac12I^2R\\).</p>',
+      explain: '<p>\\(P=\\tfrac12\\mathcal{E}_0I\\cos\\varphi=\\tfrac12(' + P.E0 + ')(' + sig(v.I,4) + ')(' + fix(v.pf,3) + ')=' + sig(v.P,4) + '\\ \\text{W}\\). Check: \\(\\tfrac12I^2R=\\tfrac12(' + sig(v.I,4) + ')^2(' + P.R + ')=' + sig(0.5*v.I*v.I*P.R,4) + '\\ \\text{W}\\).</p>' }),
+    numItem({ prompt: intro + '<p>What is the average power dissipated in the inductor?</p>', label:'\\(\\langle p_L\\rangle=\\)', aria:'Average power in the inductor in watts', unit:'W', unitText:'W', answer: 0, abs:0.01,
+      answerText: '\\(0\\ \\text{W}\\)',
+      hint: () => 'Over one full cycle, does an ideal inductor keep energy or give it back? Think of \\(p_L=-\\tfrac12I^2X_L\\sin 2\\theta\\).',
+      concept: '<p>Ideal inductors and capacitors store energy for a quarter cycle and return it the next quarter cycle.</p>',
+      explain: '<p>\\(p_L(t)=-\\tfrac12I^2X_L\\sin2\\theta\\) is positive half the time and negative half the time; its average over a period is exactly zero. Only the resistor turns electrical energy into heat (or, in a real motor, into mechanical work, which the model lumps into \\(R\\)).</p>' }),
+    numItem({ prompt: intro + '<p>Calculate the rms current \\(I_{\\text{rms}}\\) drawn by the load.</p>', label:'\\(I_{\\text{rms}}=\\)', aria:'rms current in amperes', unit:'A', unitText:'A', answer: Irms,
+      answerText: '\\(I_{\\text{rms}}=' + sig(Irms,3) + '\\ \\text{A}\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - v.I) < 0.02*v.I ? 'That is the peak current. Divide by \\(\\sqrt2\\).' : Math.abs(x - v.I/2) < 0.02*v.I/2 ? 'Divide by \\(\\sqrt2\\), not by 2.' : 'Find \\(I=\\mathcal{E}_0/Z\\), then \\(I_{\\text{rms}}=I/\\sqrt2\\).'; },
+      concept: '<p>For sinusoids, \\(I_{\\text{rms}}=I/\\sqrt2\\); ammeters and breakers are rated in rms values.</p>',
+      explain: '<p>\\(I_{\\text{rms}}=\\dfrac{I}{\\sqrt2}=\\dfrac{' + sig(v.I,4) + '}{\\sqrt2}=' + sig(Irms,3) + '\\ \\text{A}\\). Check: \\(P=\\mathcal{E}_{\\text{rms}}I_{\\text{rms}}\\cos\\varphi=(' + P.rms + ')(' + sig(Irms,3) + ')(' + fix(v.pf,3) + ')\\approx' + sig(P.rms*Irms*v.pf,3) + '\\ \\text{W}\\) (the small difference comes from \\(' + P.rms + '\\sqrt2\\approx' + P.E0 + '\\)).</p>' }),
+    numItem({ prompt: intro + '<p>A capacitor \\(C\'\\) is added <strong>in series</strong> to bring the power factor to 1. What capacitance is needed, in microfarads?</p>', label:'\\(C\'=\\)', aria:'Series capacitor in microfarads', unit:'\\(\\mu\\text{F}\\)', unitText:'µF', answer: Cs*1e6, rel:0.02,
+      answerText: '\\(C\'=' + sig(Cs*1e6,3) + '\\ \\mu\\text{F}\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - Ctot*1e6) < 0.02*Ctot*1e6 ? 'That is the <em>total</em> capacitance needed. The existing ' + P.CuF + ' µF capacitor is already in the loop; find the extra one using the series rule.' : Math.abs(x - (C - Ctot)*1e6) < 0.02*Math.abs(C-Ctot)*1e6 ? 'Series capacitors do not subtract like that: \\(1/C_{\\text{tot}}=1/C+1/C\'\\).' : 'First \\(C_{\\text{tot}}=1/(\\omega X_L)\\) for resonance, then \\(1/C\'=1/C_{\\text{tot}}-1/C\\).'; },
+      concept: '<p>Power factor 1 means resonance: \\(X_{C,\\text{tot}}=X_L\\). Series capacitors: \\(1/C_{\\text{tot}}=1/C+1/C\'\\).</p>',
+      explain: base + '<p>\\(C_{\\text{tot}}=\\dfrac{1}{\\omega X_L}=\\dfrac{1}{(' + fix(v.w,2) + ')(' + fix(v.XL,2) + ')}=' + sig(Ctot*1e6,4) + '\\ \\mu\\text{F}\\). Then \\(C\'=\\left(\\dfrac{1}{' + sig(Ctot*1e6,4) + '}-\\dfrac{1}{' + P.CuF + '}\\right)^{-1}\\mu\\text{F}=' + sig(Cs*1e6,3) + '\\ \\mu\\text{F}\\). Adding a capacitor in series <em>lowers</em> the total capacitance, raising \\(X_C\\) up to \\(X_L\\).</p>' }),
+    numItem({ prompt: intro + '<p>Instead, a capacitor \\(C\'\\) is added <strong>in parallel</strong> with the whole load, as an industrial plant would do. What capacitance brings the source power factor to 1, in microfarads?</p>', label:'\\(C\'=\\)', aria:'Parallel capacitor in microfarads', unit:'\\(\\mu\\text{F}\\)', unitText:'µF', answer: Cp*1e6, rel:0.02,
+      answerText: '\\(C\'=' + sig(Cp*1e6,3) + '\\ \\mu\\text{F}\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - Cs*1e6) < 0.02*Cs*1e6 ? 'That is the series answer. In parallel the capacitor must cancel the out-of-phase part of the load current.' : 'Set \\(\\omega C\'\\mathcal{E}_0=I\\sin\\varphi\\), which gives \\(C\'=(X_L-X_C)/(\\omega Z^2)\\).'; },
+      concept: '<p>A parallel capacitor draws \\(\\omega C\'\\mathcal{E}_0\\), \\(90^\\circ\\) ahead of the voltage, cancelling the load current’s lagging part \\(I\\sin\\varphi\\).</p>',
+      explain: '<p>\\(C\'=\\dfrac{X_L-X_C}{\\omega Z^2}=\\dfrac{' + fix(v.d,2) + '}{(' + fix(v.w,2) + ')(' + fix(v.Z,2) + ')^2}=' + sig(Cp*1e6,3) + '\\ \\mu\\text{F}\\). Check: the capacitor current \\(\\omega C\'\\mathcal{E}_0=' + sig(v.w*Cp*P.E0,3) + '\\ \\text{A}\\) equals \\(I\\sin\\varphi=' + sig(v.I*Math.abs(v.d)/v.Z,3) + '\\ \\text{A}\\). The load itself is untouched.</p>' }),
+    numItem({ prompt: intro + '<p>With the parallel capacitor in place, what peak current does the source now supply?</p>', label:'\\(I_{\\text{source}}=\\)', aria:'Peak source current in amperes after correction', unit:'A', unitText:'A', answer: Inew, rel:0.015,
+      answerText: '\\(I_{\\text{source}}=' + sig(Inew,3) + '\\ \\text{A}\\)',
+      hint: val => { const x = parseNum(val); return Math.abs(x - v.I) < 0.02*v.I ? 'The load branch still carries that current, but the source no longer supplies its out-of-phase part.' : 'Only the in-phase part of the load current remains: \\(I\\cos\\varphi\\).'; },
+      concept: '<p>After correction the source supplies only the part of the load current in phase with the voltage.</p>',
+      explain: '<p>\\(I_{\\text{source}}=I\\cos\\varphi=(' + sig(v.I,4) + ')(' + fix(v.pf,3) + ')=' + sig(Inew,3) + '\\ \\text{A}\\), down ' + Math.round((1-v.pf)*100) + '%. The power delivered is unchanged, and line losses, which go as \\(I^2\\), drop by about ' + Math.round((1-v.pf*v.pf)*100) + '%. That is why utilities reward a high power factor.</p>' })
+  ];
+});
+
+/* ================= results and card ================= */
+const nameInput = $('#firstName'), name2Input = $('#secondName');
+nameInput.value = state.name || ''; name2Input.value = state.name2 || '';
+const submitName = e => {
+  e.preventDefault();
+  const v = nameInput.value.trim().split(/\s+/)[0] || '';
+  if (!v){ $('#nameErr').textContent = 'Please type your first name.'; nameInput.setAttribute('aria-invalid','true'); nameInput.focus(); return; }
+  nameInput.removeAttribute('aria-invalid'); $('#nameErr').textContent = '';
+  state.name = v; state.name2 = name2Input.value.trim().split(/\s+/)[0] || ''; nameInput.value = state.name; name2Input.value = state.name2;
+  if (!state.completedAt) state.completedAt = new Date().toISOString();
+  save(); renderCard(true);
+};
+$('#nameSubmit').addEventListener('click', submitName);
+['#firstName','#secondName'].forEach(sel => { const x = $(sel); if (x) x.addEventListener('keydown', e => { if (e.key === 'Enter') submitName(e); }); });
+function renderResults(){
+  const t = totals();
+  $('#scoreTable').innerHTML = '<div class="table-scroll"><table class="qty"><caption>Your scores</caption><thead><tr><th scope="col">Question set</th><th scope="col">Points</th></tr></thead><tbody>'
+    + SETS.map(k => { const s = setStats(k); return '<tr><th scope="row">' + esc(SETNAMES[k]) + '</th><td>' + s.pts + ' of ' + s.max + '</td></tr>'; }).join('')
+    + '<tr><th scope="row">Total</th><td><strong>' + t.pts + ' of ' + t.max + '</strong></td></tr></tbody></table></div>';
+  if (state.name) renderCard(false); else $('#finish').innerHTML = '';
+}
+function renderCard(fresh){
+  const t = totals(), pct = t.max ? Math.round(t.pts/t.max*100) : 0;
+  const nm = esc(state.name) + (state.name2 ? ' and ' + esc(state.name2) : '');
+  const when = new Date(state.completedAt || Date.now()).toLocaleString(undefined, { weekday:'long', year:'numeric', month:'long', day:'numeric', hour:'numeric', minute:'2-digit' });
+  const title = pct >= 90 ? 'Resonance achieved!' : pct >= 70 ? 'Strong signal!' : pct >= 50 ? 'Tuned in!' : 'Circuit complete!';
+  const id = nid('cd');
+  let curve = ''; for (let k=0;k<=200;k++){ const w = k/200*4, Z = Math.hypot(0.25, w - 1/Math.max(w,0.05)); const x = 60 + k*1.5, y = 180 - Math.min(130, 32/Z); curve += (k?'L':'M') + x.toFixed(1) + ' ' + y.toFixed(1); }
+  $('#finish').innerHTML = '<div class="cert" id="cert">'
+    + '<svg viewBox="0 0 420 210" role="img" aria-label="Celebration picture: a glowing resonance curve peaking sharply in the middle of an oscilloscope screen, with stars around the peak." focusable="false">'
+    + '<rect x="30" y="10" width="360" height="190" rx="16" fill="var(--scope-frame)"/><rect x="44" y="24" width="332" height="162" rx="8" fill="var(--scope-bg)"/>'
+    + '<g stroke="var(--scope-grid)" stroke-width="1">' + [1,2,3,4,5].map(i => '<line x1="'+(44+i*55.3)+'" y1="24" x2="'+(44+i*55.3)+'" y2="186"/>').join('') + [1,2,3].map(j => '<line x1="44" y1="'+(24+j*40.5)+'" x2="376" y2="'+(24+j*40.5)+'"/>').join('') + '</g>'
+    + '<path d="'+curve+'" fill="none" stroke="var(--trace)" stroke-width="3.5"/>'
+    + '<g fill="var(--guide)">' + [[135,40,11],[110,62,7],[165,58,8],[300,60,6],[340,120,7],[80,110,6]].map(s => '<path transform="translate('+s[0]+' '+s[1]+') scale('+(s[2]/10)+')" d="M0 -10 L2.6 -3.4 L9.5 -3.1 L4.1 1.3 L5.9 8.1 L0 4.2 L-5.9 8.1 L-4.1 1.3 L-9.5 -3.1 L-2.6 -3.4 z"/>').join('') + '</g></svg>'
+    + '<p class="certkick">' + title + '</p><h3>Congratulations, ' + nm + '!</h3>'
+    + '<p class="when">You completed <strong>The series RLC circuit</strong> with <strong>' + t.pts + ' out of ' + t.max + ' points</strong> (' + pct + '%).</p>'
+    + '<ul class="certlist">' + SETS.map(k => { const s = setStats(k); return '<li>' + esc(SETNAMES[k]) + ': ' + s.pts + '/' + s.max + '</li>'; }).join('') + '</ul>'
+    + '<p class="when">Completed on ' + esc(when) + ' (your local time).</p>'
+    + '<div class="actions" style="justify-content:center"><button type="button" class="primary" id="printCert">Print or save this card</button></div></div>';
+  $('#printCert').addEventListener('click', () => window.print());
+  if (fresh){
+    announce('Congratulations ' + state.name + (state.name2 ? ' and ' + state.name2 : '') + '. Your score is ' + t.pts + ' out of ' + t.max + '.');
+    $('#cert').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block:'start' });
+    if (!reduceMotion){ const cols = ['#0B6B60','#FFD15C','#3343A8','#B3261E','#5FD3C1','#7B2FA8']; for (let i=0;i<60;i++){ const c = document.createElement('span'); c.className = 'confetti'; c.setAttribute('aria-hidden','true'); c.style.left = (Math.random()*100) + 'vw'; c.style.background = cols[i%cols.length]; c.style.animationDelay = (Math.random()*0.7) + 's'; document.body.appendChild(c); setTimeout(() => c.remove(), 3800); } }
+  }
+}
+
+/* ================= mount ================= */
+$('#circRLC').innerHTML = circuitRLC();
+$('#impTriangle').innerHTML = impedanceTriangle();
+$('#xlxcChart').innerHTML = xlxcChart();
+makeBuilder($('#builderMain'), false);
+makeBuilder($('#builderExample'), true);
+makeResChart($('#resChart'));
+makePowerChart($('#powerChart'));
+makePFChart($('#pfChart'));
+buildToc(); updateScore();
+show(location.hash.slice(1) || 'welcome', false);
+})();
+</script>
+</body>
+</html>
