@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electromagnetic Induction — Guided Activity (PHY2049)</title>
+<script>
+(function(){var t=null;try{t=localStorage.getItem('emi-theme');}catch(e){}if(!t){t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();
+window.MathJax = {
+  tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+  svg: { fontCache: 'global' },
+  startup: { typeset: false }
+};
+</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js"></script>
+<style>
+:root{
+  --bg:#f7f8fb; --card:#ffffff; --ink:#1a1d24; --muted:#4a5160; --line:#cfd5e0;
+  --accent:#1b4f9c; --accent2:#0d3a78; --ok:#1d6b34; --okbg:#e7f4ea; --bad:#a3222b; --badbg:#fbeaea;
+  --warn:#7a4b00; --warnbg:#fff4dc; --violet:#5b2a86; --green:#1b7f3b; --copper:#a0521a;
+  --focus:#ffbf47; --btn:#1b4f9c; --heading:#0d3a78; --note:#eef3fb; --key:#f3eefa; --readout:#f1f4f9;
+  --tagbg:#e4ebf7; --tagink:#0d3a78; --hover:#f4f7fc; --explainbg:#f4f6fa; --explainline:#8a93a6;
+  --inputbg:#ffffff; --inputline:#6b7385; --canvasbg:#fdfdfd; --figbg:#ffffff; --hintline:#c78a00;
+  --certbg:#fffdf5; --certink:#6b4e00; --certline:#b58a1b; --certcell:#d9c58b; --header:#0d3a78;
+  color-scheme: light;
+}
+[data-theme=dark]{
+  --bg:#0f141b; --card:#18202b; --ink:#e8ecf3; --muted:#aab3c2; --line:#334155;
+  --accent:#8ab8ff; --accent2:#a9c8ff; --ok:#7ddc97; --okbg:#14301e; --bad:#ff9aa0; --badbg:#3a1a1e;
+  --warn:#ffd27a; --warnbg:#332a12; --violet:#c3a2ff; --green:#4cd07d;
+  --btn:#2459b8; --heading:#a9c8ff; --note:#1a2636; --key:#241d33; --readout:#1d2633;
+  --tagbg:#22324a; --tagink:#cfe0ff; --hover:#1f2a38; --explainbg:#1b232e; --explainline:#5c6a80;
+  --inputbg:#111821; --inputline:#7a8699; --canvasbg:#121820; --figbg:#151b24; --hintline:#e0a526;
+  --certbg:#1f1c12; --certink:#ffd76a; --certline:#c9a23a; --certcell:#5c4f2a; --header:#0a1a33;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.55}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;box-shadow:0 0 0 5px var(--bg)}
+.skip{position:absolute;left:-999px;top:0;background:var(--card);color:var(--ink);padding:.5rem 1rem;z-index:100}
+.skip:focus{left:1rem}
+header.top{background:var(--header);color:#fff;padding:.8rem 1.2rem;display:flex;flex-wrap:wrap;gap:.6rem 1.5rem;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+header.top h1{font-size:1.15rem;margin:0}
+.scorebox{display:flex;align-items:center;gap:.8rem;font-weight:600}
+.bar{width:180px;height:12px;background:#ffffff40;border-radius:6px;overflow:hidden}
+.bar>span{display:block;height:100%;background:#ffd166;width:0}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+button,.btn{font:inherit;font-weight:600;border-radius:8px;border:2px solid var(--btn);background:var(--btn);color:#fff;padding:.45rem .95rem;cursor:pointer;min-height:44px}
+button.secondary{background:var(--card);color:var(--accent);border-color:var(--accent)}
+.themebtn{background:transparent;border-color:#fff;color:#fff;min-height:36px;padding:.2rem .7rem}
+button:disabled{opacity:.55;cursor:not-allowed}
+button.small{min-height:36px;padding:.25rem .6rem;font-size:.9rem}
+input[type=text],select{font:inherit;padding:.35rem .5rem;border:2px solid var(--inputline);border-radius:6px;background:var(--inputbg);color:var(--ink);min-height:40px}
+input[aria-invalid=true],select[aria-invalid=true]{border-color:var(--bad);background:var(--badbg)}
+input.okfield,select.okfield{border-color:var(--ok);background:var(--okbg)}
+.wrap{max-width:1500px;margin:0 auto;padding:1rem}
+/* start */
+#start{max-width:760px;margin:2rem auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.6rem 1.8rem}
+#start h2{margin-top:0}
+.field{margin:.8rem 0}
+.field label{display:block;font-weight:600;margin-bottom:.25rem}
+.field input{width:100%;max-width:360px}
+.note{background:var(--note);border-left:5px solid var(--accent);padding:.7rem 1rem;border-radius:6px}
+/* layout */
+#app{display:none}
+.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:1.2rem;align-items:start}
+#simPanel{position:sticky;top:64px;max-height:calc(100vh - 72px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem}
+@media (max-width:1100px){.layout{grid-template-columns:1fr}#simPanel{position:static;max-height:none}}
+#simPanel h2{margin:.1rem 0 .4rem;font-size:1.15rem}
+canvas.simc{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:10px;background:var(--canvasbg);touch-action:none}
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.4rem 1rem;margin-top:.7rem}
+.ctrl label{font-weight:600;font-size:.92rem;display:flex;justify-content:space-between;gap:.5rem}
+.ctrl input[type=range]{width:100%;accent-color:var(--accent);min-height:32px}
+.btnrow{display:flex;flex-wrap:wrap;gap:.45rem;margin:.6rem 0}
+fieldset{border:1px solid var(--line);border-radius:8px;padding:.4rem .8rem;margin:.5rem 0}
+legend{font-weight:700;padding:0 .3rem}
+.checks{display:flex;flex-wrap:wrap;gap:.3rem 1rem}
+.checks label{display:flex;align-items:center;gap:.35rem;min-height:36px}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.3rem .8rem;background:var(--readout);border-radius:8px;padding:.5rem .8rem;margin-top:.5rem;font-variant-numeric:tabular-nums}
+.readout div{font-size:.88rem;line-height:1.25}.readout b{display:block;font-size:1rem;line-height:1.25;min-height:2.5em;font-variant-numeric:tabular-nums}
+/* activity */
+#activity h2.part{margin:1.6rem 0 .5rem;font-size:1.25rem;color:var(--heading);border-bottom:3px solid var(--heading);padding-bottom:.2rem}
+.intro{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem}
+.intro h3{margin:.2rem 0 .4rem;font-size:1.02rem}
+.keybox{background:var(--key);border-left:5px solid var(--violet);padding:.5rem .9rem;border-radius:6px;margin:.6rem 0}
+.q{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.15rem;margin-bottom:1.1rem}
+.q.done-ok{border-left:8px solid var(--ok)}.q.done-bad{border-left:8px solid var(--bad)}
+.q h3{margin:0 0 .4rem;font-size:1.06rem;display:flex;flex-wrap:wrap;gap:.4rem .8rem;align-items:baseline}
+.tag{font-size:.8rem;font-weight:700;background:var(--tagbg);color:var(--tagink);border-radius:999px;padding:.1rem .6rem}
+.pts{font-size:.85rem;color:var(--muted);font-weight:600}
+.figbox{position:relative;max-width:620px;margin:.6rem 0}
+.figbox svg{width:100%;height:auto;display:block;background:var(--figbg);border:1px solid var(--line);border-radius:8px}
+canvas.drawpad{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none;border-radius:8px}
+.opts{display:flex;flex-direction:column;gap:.35rem;margin:.4rem 0}
+.opts label{display:flex;gap:.6rem;align-items:flex-start;padding:.45rem .6rem;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.opts label:hover{background:var(--hover)}
+.opts input{margin-top:.3rem;width:1.1rem;height:1.1rem}
+.qctrl{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-top:.7rem}
+.attempts{font-weight:600;color:var(--muted)}
+.hint{background:var(--warnbg);border-left:5px solid var(--hintline);padding:.55rem .9rem;border-radius:6px;margin-top:.6rem}
+.fb{margin-top:.6rem;padding:.55rem .9rem;border-radius:6px;display:none}
+.fb.ok{display:block;background:var(--okbg);border-left:5px solid var(--ok)}
+.fb.bad{display:block;background:var(--badbg);border-left:5px solid var(--bad)}
+.fb.info{display:block;background:var(--note);border-left:5px solid var(--accent)}
+.explain{margin-top:.6rem;background:var(--explainbg);border:1px dashed var(--explainline);border-radius:8px;padding:.6rem .9rem}
+.rank{list-style:none;padding:0;margin:.5rem 0;counter-reset:r}
+.rank li{counter-increment:r;display:flex;align-items:center;gap:.6rem;border:2px solid var(--line);border-radius:8px;padding:.35rem .6rem;margin:.3rem 0;background:var(--card)}
+.rank li::before{content:counter(r);font-weight:800;background:var(--btn);color:#fff;border-radius:50%;width:1.7rem;height:1.7rem;display:flex;align-items:center;justify-content:center;flex:none}
+.rank li .lbl{flex:1}
+.rank li.dragging{opacity:.5}
+.hot{cursor:pointer}
+.hot:focus{outline:none}
+.hot:focus-visible .hl,.hot.sel .hl{stroke:#e07b00;stroke-width:4;stroke-dasharray:none;fill:#ffbf4733}
+.altbox{margin-top:.5rem}
+.form p{margin:.5rem 0}
+.form input[type=text]{width:9.5rem}
+.unit{margin-left:.3rem}
+.nextbtn{margin-top:.6rem}
+/* certificate */
+#cert{display:none;max-width:900px;margin:1.5rem auto}
+.certcard{background:var(--certbg);border:6px double var(--certline);border-radius:16px;padding:1.5rem 2rem;text-align:center}
+.certcard h2{font-size:2rem;margin:.3rem 0;color:var(--certink);font-family:Georgia,serif}
+.certcard .nm{font-size:1.8rem;font-weight:700;font-family:Georgia,serif;margin:.3rem 0}
+.certcard table{margin:.8rem auto;border-collapse:collapse}
+.certcard td,.certcard th{border:1px solid var(--certcell);padding:.25rem .8rem}
+
+/* dark-mode recolouring of figure drawings (CSS overrides SVG presentation attributes) */
+[data-theme=dark] .figbox svg rect[fill="#e8f2fc"]{fill:#1c2532}
+[data-theme=dark] .figbox svg rect[fill="#fff"]{fill:#151b24}
+[data-theme=dark] .figbox svg circle[fill="#fff"]{fill:#1c2532}
+[data-theme=dark] .figbox svg circle[fill="#ffffffaa"]{fill:#1c2532cc}
+[data-theme=dark] .figbox svg text:not([fill]){fill:#e8ecf3}
+[data-theme=dark] .figbox svg circle:not([fill]){fill:#e8ecf3}
+[data-theme=dark] .figbox svg [stroke="#111"]:not(.prof *),[data-theme=dark] .figbox svg [stroke="#333"]:not(.prof *),[data-theme=dark] .figbox svg [stroke="#555"]{stroke:#d6dce6}
+[data-theme=dark] .figbox svg marker path[fill="#111"]{fill:#d6dce6}
+[data-theme=dark] .figbox svg [fill="#5b2a86"]{fill:#c3a2ff}
+[data-theme=dark] .figbox svg [stroke="#5b2a86"]{stroke:#c3a2ff}
+[data-theme=dark] .figbox svg [fill="#0b57d0"]{fill:#7fb2ff}
+[data-theme=dark] .figbox svg [stroke="#0b57d0"]{stroke:#7fb2ff}
+[data-theme=dark] .figbox svg [stroke="#1f5fbf"]{stroke:#7fb2ff}
+[data-theme=dark] .figbox svg [stroke="#d3d9e3"]{stroke:#3a4556}
+[data-theme=dark] .figbox svg [stroke="#eef1f6"]{stroke:#252e3b}
+[data-theme=dark] .figbox svg [stroke="#d9a777"]{stroke:#8a5a36}
+[data-theme=dark] .figbox svg rect[fill="#b8c2cc"]{fill:#6c7787}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.confetti circle,.confetti rect{animation:fall 3s ease-in infinite}
+@keyframes fall{0%{transform:translateY(-10px);opacity:1}100%{transform:translateY(40px);opacity:.2}}
+</style>
+</head>
+<body>
+<a class="skip" href="#activity">Skip to the activity questions</a>
+<header class="top">
+  <h1>Electromagnetic Induction — Guided Activity</h1>
+  <div class="scorebox" aria-live="off">
+    <span id="scoreTxt">Score: 0 / 100</span>
+    <div class="bar" role="progressbar" aria-label="Questions completed" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0" id="progBar"><span id="progFill"></span></div>
+    <span id="progTxt">0 / 20 done</span>
+    <button type="button" id="bTheme" class="themebtn" aria-pressed="false">Dark mode</button>
+  </div>
+</header>
+
+<main class="wrap">
+<section id="start" aria-labelledby="startH">
+  <h2 id="startH">Welcome!</h2>
+  <p>In this activity you will first <strong>watch</strong> what happens when a magnet moves near a coil connected to a light bulb, then <strong>explain</strong> it with magnetic flux and Lenz's law, and finally <strong>calculate</strong> induced emfs and currents.</p>
+  <div class="note">
+    <p style="margin:.2rem 0"><strong>How it works:</strong> 20 questions, 5 points each (100 points total). You get <strong>3 attempts</strong> per question. A correct answer on any attempt earns 5 points; after 3 incorrect attempts the question earns 0 points and the solution is shown. The next question appears once the current one is finished. Numbers change every time you start, so your answers are your own.</p>
+    <p style="margin:.2rem 0">Question types: multiple choice, select-all, fill in the blank, ranking, hotspots (click a part of a figure), and drawing on the screen. Every drawing question has a keyboard alternative.</p>
+  </div>
+  <form id="startForm">
+    <div class="field"><label for="fname">Your first name (required)</label><input id="fname" type="text" autocomplete="given-name" required></div>
+    <div class="field"><label for="pname">Partner's first name (optional)</label><input id="pname" type="text" autocomplete="off"></div>
+    <p id="startErr" role="alert" style="color:var(--bad);font-weight:600"></p>
+    <button type="submit">Start the activity</button>
+  </form>
+</section>
+
+<div id="app">
+<div class="layout">
+<section id="simPanel" aria-labelledby="simH">
+  <h2 id="simH">Simulation: magnet, coil and light bulb</h2>
+  <p style="margin:.2rem 0 .5rem;font-size:.93rem">Drag the magnet (or the coil) with the mouse or a finger, or use the sliders and buttons below. The viewer on the right looks at the coil along its axis; the area vector of the coil points toward that viewer.</p>
+  <canvas id="simCanvas" class="simc" width="720" height="400" role="img" aria-label="Simulation drawing. Use the readouts and the Describe button for a text description."></canvas>
+  <canvas id="graphCanvas" class="simc" width="720" height="210" style="margin-top:.5rem" role="img" aria-label="Graphs of magnetic flux and induced emf versus time for the last 8 seconds."></canvas>
+  <div class="readout" aria-label="Live readouts">
+    <div>Flux through coil, total<b id="roPhi">0</b></div>
+    <div>Induced emf<b id="roEmf">0</b></div>
+    <div>Current<b id="roI">0</b></div>
+    <div>Recent peak |emf|<b id="roPeak">0</b></div>
+    <div>Bulb power<b id="roP">0</b></div>
+    <div>Current seen by viewer<b id="roDir">none</b></div>
+  </div>
+  <div class="btnrow">
+    <button type="button" id="bPush">Push magnet in</button>
+    <button type="button" id="bPull">Pull magnet out</button>
+    <button type="button" id="bFlip" class="secondary">Flip magnet</button>
+    <button type="button" id="bPause" class="secondary" aria-pressed="false">Pause</button>
+    <button type="button" id="bReset" class="secondary">Reset</button>
+    <button type="button" id="bDesc" class="secondary">Describe what is happening</button>
+  </div>
+  <p id="simDesc" role="status" aria-live="polite" style="margin:.2rem 0;font-size:.95rem"></p>
+  <fieldset><legend>Motion mode</legend>
+    <div class="checks">
+      <label><input type="radio" name="mode" value="drag" checked> Manual (drag / push / pull)</label>
+      <label><input type="radio" name="mode" value="osc"> Automatic in-and-out</label>
+      <label><input type="radio" name="mode" value="spin"> Spin the magnet (generator)</label>
+    </div>
+  </fieldset>
+  <div class="ctrls">
+    <div class="ctrl"><label for="sMagX">Magnet position <output id="oMagX"></output></label><input id="sMagX" type="range" min="-0.22" max="0.14" step="0.002"></div>
+    <div class="ctrl"><label for="sCoilX">Coil position <output id="oCoilX"></output></label><input id="sCoilX" type="range" min="-0.14" max="-0.04" step="0.002"></div>
+    <div class="ctrl"><label for="sSpeed">Push / pull speed <output id="oSpeed"></output></label><input id="sSpeed" type="range" min="0.1" max="1.5" step="0.05" value="0.5"></div>
+    <div class="ctrl"><label for="sFreq">In-and-out frequency <output id="oFreq"></output></label><input id="sFreq" type="range" min="0.2" max="2" step="0.1" value="0.6"></div>
+    <div class="ctrl"><label for="sSpin">Spin rate <output id="oSpin"></output></label><input id="sSpin" type="range" min="0.2" max="3" step="0.1" value="1"></div>
+    <div class="ctrl"><label for="sM">Magnet strength <output id="oM"></output></label><input id="sM" type="range" min="1" max="10" step="0.5" value="4"></div>
+    <div class="ctrl"><label for="sN">Number of turns N <output id="oN"></output></label><input id="sN" type="range" min="25" max="400" step="25" value="200"></div>
+    <div class="ctrl"><label for="sA">Loop radius <output id="oA"></output></label><input id="sA" type="range" min="0.02" max="0.05" step="0.0025" value="0.03"></div>
+    <div class="ctrl"><label for="sR">Circuit resistance <output id="oR"></output></label><input id="sR" type="range" min="0.5" max="20" step="0.5" value="2"></div>
+  </div>
+  <fieldset><legend>Show</legend>
+    <div class="checks">
+      <label><input type="checkbox" id="cField" checked> Magnet's field</label>
+      <label><input type="checkbox" id="cInd" checked> Induced field and coil poles</label>
+      <label><input type="checkbox" id="cDots" checked> Current (moving dots)</label>
+      <label><input type="checkbox" id="cArea"> Area vector</label>
+      <label><input type="checkbox" id="cInset" checked> Viewer's view of the coil</label>
+      <label><input type="checkbox" id="cSlow"> Slow motion (automatic modes)</label>
+    </div>
+  </fieldset>
+</section>
+
+<section id="activity" aria-label="Guided activity questions" tabindex="-1"></section>
+</div>
+</div>
+
+<section id="cert" aria-labelledby="certH"></section>
+</main>
+
+<script>
+"use strict";
+const R = String.raw;
+const $ = s => document.querySelector(s);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+function rnd(a, b, step) { const n = Math.round((b - a) / step); return +(a + step * Math.floor(Math.random() * (n + 1))).toFixed(6); }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function sig(x, n = 3) { if (x === 0) return '0'; const p = Math.floor(Math.log10(Math.abs(x))); const d = Math.max(0, n - 1 - p); return (+x.toPrecision(n)).toFixed(Math.min(d, 8)); }
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function typeset(el) { if (window.MathJax && MathJax.typesetPromise) { MathJax.typesetPromise([el]).catch(() => {}); } else { setTimeout(() => typeset(el), 400); } }
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* =====================================================================
+   SIMULATION
+   ===================================================================== */
+
+const THEMES = {
+  light: { bg: '#fdfdfd', ink: '#1a1d24', muted: '#4a5160', axis: '#b8bfcc', axis2: '#8a93a6', grid: '#e1e5ec', field: '#5b2a86', wire: '#4b4f58', coilBack: '#d9a777', cur: '#0b57d0', ind: '#1b7f3b', bulbOff: '#eef2f6', needle: '#a3222b', insetBg: '#ffffffee', insetLine: '#9aa3b2', face: '#ffffff' },
+  dark: { bg: '#121820', ink: '#e8ecf3', muted: '#aab3c2', axis: '#4a5568', axis2: '#7a8699', grid: '#2b3442', field: '#c3a2ff', wire: '#a7b0bf', coilBack: '#8a5a36', cur: '#7fb2ff', ind: '#4cd07d', bulbOff: '#2a3240', needle: '#ff7b7b', insetBg: '#1c2430ee', insetLine: '#4a5568', face: '#1c2430' }
+};
+let TH = THEMES.light;
+function isDark() { return document.documentElement.dataset.theme === 'dark'; }
+function applyTheme(t, save) {
+  document.documentElement.dataset.theme = t; TH = THEMES[t];
+  const b = document.getElementById('bTheme');
+  if (b) { b.setAttribute('aria-pressed', t === 'dark'); b.textContent = t === 'dark' ? 'Light mode' : 'Dark mode'; }
+  if (save) { try { localStorage.setItem('emi-theme', t); } catch (e) { } }
+}
+const MU0 = 4 * Math.PI * 1e-7;
+const S = {
+  W: 720, H: 400, ppm: 1500, ox: 400, oy: 150,
+  magX: 0.12, magTheta: Math.PI, magTarget: Math.PI, magLen: 0.10, magH: 0.028,
+  coilX: -0.06, coilLen: 0.08, a: 0.03, N: 200, m: 4, R: 2,
+  mode: 'drag', speed: 0.5, freq: 0.6, spin: 1, slow: false, paused: false,
+  t: 0, phi: 0, prevPhi: null, emf: 0, peak: 0, moveTarget: null, oscT: 0,
+  hist: [], dotPhase: 0,
+  show: { field: true, ind: true, dots: true, area: false, inset: true }
+};
+const DEFAULTS = JSON.parse(JSON.stringify({ magX: S.magX, coilX: S.coilX, a: S.a, N: S.N, m: S.m, R: S.R, speed: S.speed, freq: S.freq, spin: S.spin }));
+const cv = $('#simCanvas'), ctx = cv.getContext('2d');
+const gcv = $('#graphCanvas'), gctx = gcv.getContext('2d');
+function setupHiDPI(c, w, h) { const d = window.devicePixelRatio || 1; c.width = w * d; c.height = h * d; c.getContext('2d').setTransform(d, 0, 0, d, 0, 0); }
+setupHiDPI(cv, 720, 400); setupHiDPI(gcv, 720, 210);
+const wx = x => S.ox + x * S.ppm;
+
+function fluxTotal() {
+  const K = Math.min(S.N, 40); let s = 0;
+  const mx = S.m * Math.cos(S.magTheta); const a2 = S.a * S.a;
+  for (let i = 0; i < K; i++) {
+    const xt = S.coilX - S.coilLen / 2 + S.coilLen * (i + 0.5) / K;
+    const z = xt - S.magX;
+    s += MU0 * mx * a2 / (2 * Math.pow(a2 + z * z, 1.5));
+  }
+  return s * S.N / K;
+}
+function oscCenter() { return S.coilX + 0.10; }
+
+function step(dtReal) {
+  dtReal = Math.min(dtReal, 0.05);
+  if (S.paused) { S.prevPhi = null; return; }
+  const scale = (S.slow && S.mode !== 'drag') ? 0.25 : 1;
+  const dt = dtReal * scale;
+  S.t += dt;
+  if (S.mode === 'osc') { S.oscT += dt; S.magX = oscCenter() + 0.08 * Math.sin(2 * Math.PI * S.freq * S.oscT); syncSlider(); }
+  if (S.mode === 'spin') { S.magTheta += 2 * Math.PI * S.spin * dt; S.magTarget = S.magTheta; }
+  if (S.mode === 'drag' && S.moveTarget !== null) {
+    const d = S.moveTarget - S.magX, st = S.speed * dt;
+    if (Math.abs(d) <= st) { S.magX = S.moveTarget; S.moveTarget = null; } else S.magX += Math.sign(d) * st;
+    syncSlider();
+  }
+  if (S.mode !== 'spin' && Math.abs(S.magTarget - S.magTheta) > 1e-6) {
+    const d = S.magTarget - S.magTheta, st = Math.PI / 0.3 * dt;
+    S.magTheta = Math.abs(d) <= st ? S.magTarget : S.magTheta + Math.sign(d) * st;
+  }
+  S.magX = clamp(S.magX, -0.22, 0.14);
+  S.phi = fluxTotal();
+  const raw = S.prevPhi === null ? 0 : -(S.phi - S.prevPhi) / dt;
+  S.prevPhi = S.phi;
+  S.emf += (raw - S.emf) * Math.min(1, dt / 0.035);
+  S.hist.push({ t: S.t, phi: S.phi, emf: S.emf });
+  while (S.hist.length && S.hist[0].t < S.t - 8) S.hist.shift();
+  let pk = 0; for (const h of S.hist) if (h.t > S.t - 2.5) pk = Math.max(pk, Math.abs(h.emf));
+  S.peak = pk;
+  const sNorm = S.emf / meterScale();
+  S.dotPhase += clamp(sNorm, -1.5, 1.5) * dt * 1.2;
+}
+function meterScale() {
+  let mx = 0; for (const h of S.hist) mx = Math.max(mx, Math.abs(h.emf));
+  const sc = [0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30];
+  for (const s of sc) if (mx <= s * 0.95) return s;
+  return 30;
+}
+function fmtV(v) { const a = Math.abs(v); if (a < 1e-5) return '0 V'; if (a < 1) return sig(v * 1000, 3) + ' mV'; return sig(v, 3) + ' V'; }
+function fmtA(v) { const a = Math.abs(v); if (a < 1e-6) return '0 A'; if (a < 1) return sig(v * 1000, 3) + ' mA'; return sig(v, 3) + ' A'; }
+function fmtWb(v) { const a = Math.abs(v); if (a < 1e-7) return '0 Wb'; return sig(v * 1000, 3) + ' mWb'; }
+function fmtW(v) { if (v < 1e-7) return '0 W'; if (v < 1) return sig(v * 1000, 3) + ' mW'; return sig(v, 3) + ' W'; }
+
+function arrow(c, x1, y1, x2, y2, col, w, head) {
+  head = head || 9; c.strokeStyle = col; c.fillStyle = col; c.lineWidth = w;
+  c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
+  const an = Math.atan2(y2 - y1, x2 - x1);
+  c.beginPath(); c.moveTo(x2 + Math.cos(an) * 2, y2 + Math.sin(an) * 2);
+  c.lineTo(x2 - head * Math.cos(an - 0.45), y2 - head * Math.sin(an - 0.45));
+  c.lineTo(x2 - head * Math.cos(an + 0.45), y2 - head * Math.sin(an + 0.45)); c.closePath(); c.fill();
+}
+function inMagnet(px, py, pad) {
+  const cx = wx(S.magX), cy = S.oy, th = S.magTheta;
+  const dx = px - cx, dy = py - cy;
+  const c = Math.cos(-th), s = Math.sin(-th);
+  const rx = dx * c + dy * s, ry = -dx * s + dy * c;
+  return Math.abs(rx) < S.magLen * S.ppm / 2 + pad && Math.abs(ry) < S.magH * S.ppm / 2 + pad;
+}
+function draw() {
+  const c = ctx, W = S.W, oy = S.oy;
+  c.clearRect(0, 0, W, S.H);
+  c.fillStyle = TH.bg; c.fillRect(0, 0, W, S.H);
+  const sNorm = S.emf / meterScale();
+  const showCur = Math.abs(sNorm) > 0.04 && Math.abs(S.emf) > 2e-4;
+  // axis
+  c.setLineDash([5, 6]); c.strokeStyle = TH.axis; c.lineWidth = 1; c.beginPath(); c.moveTo(0, oy); c.lineTo(W, oy); c.stroke(); c.setLineDash([]);
+  // field grid
+  if (S.show.field) {
+    const L = S.magLen * S.ppm / 2, th = S.magTheta;
+    const nx = wx(S.magX) + L * Math.cos(th), ny = oy - L * Math.sin(th);
+    const sx = wx(S.magX) - L * Math.cos(th), sy = oy + L * Math.sin(th);
+    for (let gx = 15; gx < W; gx += 30) for (let gy = 15; gy < 290; gy += 30) {
+      if (S.show.inset && gx > W - 175 && gy < 125) continue;
+      if (inMagnet(gx, gy, 6)) continue;
+      if (gx > W - 62 && Math.abs(gy - oy) < 55) continue;
+      let bx = 0, by = 0;
+      let dx = gx - nx, dy = gy - ny, r3 = Math.pow(dx * dx + dy * dy + 30, 1.5); bx += dx / r3; by += dy / r3;
+      dx = gx - sx; dy = gy - sy; r3 = Math.pow(dx * dx + dy * dy + 30, 1.5); bx -= dx / r3; by -= dy / r3;
+      const mag = Math.hypot(bx, by) * S.m / 4; if (mag === 0) continue;
+      const ux = bx / Math.hypot(bx, by), uy = by / Math.hypot(bx, by);
+      const al = clamp(0.15 + 0.3 * Math.log10(mag / 2e-6), 0.1, 0.95);
+      c.globalAlpha = al; arrow(c, gx - ux * 7, gy - uy * 7, gx + ux * 7, gy + uy * 7, TH.field, 1.6, 5); c.globalAlpha = 1;
+    }
+  }
+  // coil geometry
+  const nV = clamp(Math.round(S.N / 25), 1, 16);
+  const ry = S.a * S.ppm, rx = Math.max(5, ry * 0.28);
+  const xs = []; for (let i = 0; i < nV; i++) xs.push(wx(S.coilX - S.coilLen / 2 + S.coilLen * (i + 0.5) / nV));
+  const ccx = wx(S.coilX), bx0 = ccx, by0 = 345;
+  // wires to bulb
+  c.strokeStyle = TH.wire; c.lineWidth = 3; c.beginPath();
+  c.moveTo(xs[0], oy + ry); c.lineTo(xs[0] - 12, oy + ry + 8); c.lineTo(xs[0] - 12, by0 + 28); c.lineTo(bx0 - 7, by0 + 28); c.lineTo(bx0 - 7, by0 + 20);
+  c.moveTo(xs[nV - 1], oy + ry); c.lineTo(xs[nV - 1] + 12, oy + ry + 8); c.lineTo(xs[nV - 1] + 12, by0 + 28); c.lineTo(bx0 + 7, by0 + 28); c.lineTo(bx0 + 7, by0 + 20);
+  c.stroke();
+  // back halves
+  c.strokeStyle = TH.coilBack; c.lineWidth = 4;
+  for (const x of xs) { c.beginPath(); c.ellipse(x, oy, rx, ry, 0, Math.PI / 2, 3 * Math.PI / 2); c.stroke(); }
+  // magnet
+  c.save(); c.translate(wx(S.magX), oy); c.rotate(-S.magTheta);
+  const ML = S.magLen * S.ppm, MH = S.magH * S.ppm;
+  c.fillStyle = '#1565c0'; c.fillRect(-ML / 2, -MH / 2, ML / 2, MH);
+  c.fillStyle = '#c62828'; c.fillRect(0, -MH / 2, ML / 2, MH);
+  c.strokeStyle = '#222'; c.lineWidth = 1.5; c.strokeRect(-ML / 2, -MH / 2, ML, MH);
+  c.fillStyle = '#fff'; c.font = 'bold 22px Segoe UI, Arial'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  for (const [px, t] of [[-ML / 4, 'S'], [ML / 4, 'N']]) { c.save(); c.translate(px, 0); c.rotate(S.magTheta); c.fillText(t, 0, 1); c.restore(); }
+  c.restore();
+  // front halves + dots
+  c.strokeStyle = '#a0521a'; c.lineWidth = 4.5;
+  for (const x of xs) { c.beginPath(); c.ellipse(x, oy, rx, ry, 0, -Math.PI / 2, Math.PI / 2); c.stroke(); }
+  if (S.show.dots && showCur) {
+    c.fillStyle = TH.cur;
+    for (const x of xs) for (let k = 0; k < 2; k++) {
+      let f = ((S.dotPhase + k * 0.5) % 1 + 1) % 1; const ph = -Math.PI / 2 + f * Math.PI;
+      c.beginPath(); c.arc(x + rx * Math.cos(ph), oy + ry * Math.sin(ph), 3.4, 0, 2 * Math.PI); c.fill();
+    }
+  }
+  // induced field + poles
+  if (S.show.ind && showCur) {
+    const dir = Math.sign(S.emf), len = clamp(Math.abs(sNorm), 0.2, 1) * (S.coilLen * S.ppm + 30);
+    const yA = oy - ry * 0.55;
+    arrow(c, ccx - dir * len / 2, yA, ccx + dir * len / 2, yA, TH.ind, 5, 13);
+    c.fillStyle = TH.ind; c.font = 'bold 14px Segoe UI, Arial'; c.textAlign = 'center'; c.fillText('B induced', ccx, oy - ry - 8);
+    const xL = xs[0] - rx - 16, xR = xs[nV - 1] + rx + 16, yP = oy - ry - 12;
+    const pole = (x, t) => { c.fillStyle = t === 'N' ? '#c62828' : '#1565c0'; c.fillRect(x - 11, yP - 11, 22, 22); c.fillStyle = '#fff'; c.font = 'bold 15px Segoe UI'; c.textBaseline = 'middle'; c.fillText(t, x, yP + 1); };
+    pole(xR, dir > 0 ? 'N' : 'S'); pole(xL, dir > 0 ? 'S' : 'N');
+    c.textBaseline = 'alphabetic';
+  }
+  if (S.show.area) {
+    const x0 = xs[nV - 1] + rx + 4, y = oy + ry + 22;
+    arrow(c, x0, y, x0 + 55, y, TH.ink, 3, 10); c.fillStyle = TH.ink; c.font = 'italic bold 15px Georgia'; c.textAlign = 'left'; c.fillText('A', x0 + 60, y + 5);
+  }
+  // bulb
+  const P = S.emf * S.emf / S.R, br = clamp(Math.sqrt(P / 0.004), 0, 1);
+  if (br > 0.02) { const g = c.createRadialGradient(bx0, by0, 4, bx0, by0, 18 + 55 * br); g.addColorStop(0, `rgba(255,214,0,${0.9 * br})`); g.addColorStop(1, 'rgba(255,214,0,0)'); c.fillStyle = g; c.beginPath(); c.arc(bx0, by0, 18 + 55 * br, 0, 2 * Math.PI); c.fill(); }
+  c.fillStyle = br > 0.02 ? `rgb(255,${Math.round(250 - 30 * br)},${Math.round(200 - 150 * br)})` : TH.bulbOff;
+  c.strokeStyle = '#555'; c.lineWidth = 2; c.beginPath(); c.arc(bx0, by0, 17, 0, 2 * Math.PI); c.fill(); c.stroke();
+  c.strokeStyle = br > 0.05 ? '#d35400' : '#777'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(bx0 - 7, by0 + 15); c.lineTo(bx0 - 5, by0); c.lineTo(bx0 - 2, by0 - 4); c.lineTo(bx0 + 2, by0 + 2); c.lineTo(bx0 + 5, by0); c.lineTo(bx0 + 7, by0 + 15); c.stroke();
+  c.fillStyle = '#8a8f99'; c.fillRect(bx0 - 9, by0 + 15, 18, 8);
+  c.fillStyle = TH.ink; c.font = '13px Segoe UI, Arial'; c.textAlign = 'center'; c.fillText('bulb ' + Math.round(br * 100) + '%', bx0, by0 + 46 > 398 ? 396 : by0 + 46);
+  // meter
+  const mxc = 70, myc = 360, mr = 48, sc = meterScale();
+  c.fillStyle = TH.face; c.strokeStyle = TH.ink; c.lineWidth = 2; c.beginPath(); c.arc(mxc, myc, mr, Math.PI, 2 * Math.PI); c.closePath(); c.fill(); c.stroke();
+  c.strokeStyle = TH.ink; c.lineWidth = 1; for (let k = -4; k <= 4; k++) { const an = -Math.PI / 2 + k * Math.PI / 10; c.beginPath(); c.moveTo(mxc + (mr - 8) * Math.cos(an), myc + (mr - 8) * Math.sin(an)); c.lineTo(mxc + mr * Math.cos(an), myc + mr * Math.sin(an)); c.stroke(); }
+  const na = -Math.PI / 2 + clamp(S.emf / sc, -1, 1) * (0.4 * Math.PI);
+  arrow(c, mxc, myc, mxc + (mr - 6) * Math.cos(na), myc + (mr - 6) * Math.sin(na), TH.needle, 2.5, 7);
+  c.fillStyle = TH.ink; c.font = '12px Segoe UI'; c.textAlign = 'center';
+  c.fillText('−' + (sc < 1 ? sig(sc * 1000, 2) + ' mV' : sc + ' V'), mxc - mr + 2, myc + 14); c.fillText('+' + (sc < 1 ? sig(sc * 1000, 2) + ' mV' : sc + ' V'), mxc + mr - 2, myc + 14);
+  c.font = 'bold 12px Segoe UI'; c.fillText('emf meter', mxc, myc - mr - 6);
+  // viewer (human profile facing the coil) + inset
+  profileCanvas(c, W - 30, oy + 4, 0.5);
+  c.fillStyle = TH.ink; c.font = '12px Segoe UI'; c.textAlign = 'center'; c.fillText('viewer', W - 30, oy + 50);
+  if (S.show.inset) {
+    const ix = W - 88, iy = 66, ir = 32;
+    c.fillStyle = TH.insetBg; c.strokeStyle = TH.insetLine; c.lineWidth = 1; c.fillRect(W - 172, 4, 168, 118); c.strokeRect(W - 172, 4, 168, 118);
+    c.fillStyle = TH.ink; c.font = 'bold 12px Segoe UI'; c.textAlign = 'left'; c.fillText('Viewer on the right sees:', W - 166, 20);
+    // eye
+    c.strokeStyle = '#a0521a'; c.lineWidth = 5; c.beginPath(); c.arc(ix, iy, ir, 0, 2 * Math.PI); c.stroke();
+    if (Math.abs(S.phi) > 1e-6) {
+      c.strokeStyle = TH.field; c.fillStyle = TH.field; c.lineWidth = 2.5;
+      if (S.phi > 0) { c.beginPath(); c.arc(ix, iy, 9, 0, 2 * Math.PI); c.stroke(); c.beginPath(); c.arc(ix, iy, 3, 0, 2 * Math.PI); c.fill(); }
+      else { c.beginPath(); c.moveTo(ix - 7, iy - 7); c.lineTo(ix + 7, iy + 7); c.moveTo(ix + 7, iy - 7); c.lineTo(ix - 7, iy + 7); c.stroke(); }
+    }
+    let txt = 'no current';
+    if (showCur) {
+      const ccw = S.emf > 0; txt = ccw ? 'counterclockwise' : 'clockwise';
+      c.strokeStyle = TH.cur; c.lineWidth = 3; const r2 = ir - 11;
+      const a0 = ccw ? 0.15 * Math.PI : -0.15 * Math.PI, a1 = ccw ? -1.35 * Math.PI : 1.35 * Math.PI;
+      c.beginPath(); c.arc(ix, iy, r2, a0, a1, ccw); c.stroke();
+      const ex = ix + r2 * Math.cos(a1), ey = iy + r2 * Math.sin(a1), tang = a1 + (ccw ? -Math.PI / 2 : Math.PI / 2);
+      arrow(c, ex - 4 * Math.cos(tang), ey - 4 * Math.sin(tang), ex + 3 * Math.cos(tang), ey + 3 * Math.sin(tang), TH.cur, 3, 9);
+    }
+    c.fillStyle = TH.ink; c.font = '12px Segoe UI'; c.textAlign = 'center'; c.fillText(txt, ix, 114);
+  }
+}
+function drawGraphs() {
+  const c = gctx, W = 720, H = 210; c.clearRect(0, 0, W, H); c.fillStyle = TH.bg; c.fillRect(0, 0, W, H);
+  const panels = [{ key: 'phi', y0: 4, h: 96, lab: 'Flux Φ (mWb)', mul: 1000, col: TH.field, min: 1e-4 }, { key: 'emf', y0: 108, h: 96, lab: 'emf ε (mV)', mul: 1000, col: TH.needle, min: 1e-3 }];
+  for (const p of panels) {
+    let mx = p.min; for (const h of S.hist) mx = Math.max(mx, Math.abs(h[p.key]));
+    const L = 70, Rr = 10, cy = p.y0 + p.h / 2, sy = (p.h / 2 - 6) / mx;
+    c.strokeStyle = TH.grid; c.lineWidth = 1; c.strokeRect(L, p.y0, W - L - Rr, p.h);
+    c.strokeStyle = TH.axis2; c.beginPath(); c.moveTo(L, cy); c.lineTo(W - Rr, cy); c.stroke();
+    c.fillStyle = TH.ink; c.font = 'bold 12px Segoe UI'; c.textAlign = 'left'; c.fillText(p.lab, 4, p.y0 + 14);
+    c.font = '11px Segoe UI'; c.fillText('+' + sig(mx * p.mul, 2), 4, p.y0 + 30); c.fillText('−' + sig(mx * p.mul, 2), 4, p.y0 + p.h - 4); c.fillText('0', 56, cy + 4);
+    c.strokeStyle = p.col; c.lineWidth = 2.2; c.beginPath(); let first = true;
+    for (const h of S.hist) { const x = L + (h.t - (S.t - 8)) / 8 * (W - L - Rr), y = cy - h[p.key] * sy; if (first) { c.moveTo(x, y); first = false; } else c.lineTo(x, y); }
+    c.stroke();
+  }
+  c.fillStyle = TH.muted; c.font = '11px Segoe UI'; c.textAlign = 'right'; c.fillText('time → (last 8 s)', W - 12, H - 2);
+}
+
+const HEAD = {
+  skin: 'M40,22 C33,26 29,33 28,40 C27.5,43 27,45 26,46 C27,48 27.5,50 27,52 C25,56 21,62 18.5,66 C17.5,67.5 18,69 20,69.5 C21.5,70 23,70.5 24,71.5 C24.2,72.8 23.5,73.8 22.8,74.6 C22.4,75.4 23.2,76.2 24,76.5 C23.2,77.3 22.8,78.3 23.3,79.3 C24,80.5 25.5,81 26.2,81.6 C25.6,83.5 25.6,85.8 27,87.5 C28.8,89.6 32,90.5 35.5,90.4 C40,90.2 44,89 47,88 C47.5,94 47.6,101 47,108 L46,120 L82,120 C80,111 79,104 79.5,97 C86,90 90,80 91,68 C92,48 86,30 73,22 C64,17 50,17 40,22 Z',
+  neckShade: 'M47,88 C55,89.5 62,91.5 68,95.5 C72,97.5 76,98 79.5,97 C73,91 68,83 66.5,77.5 C62,83 55,86 47,88 Z',
+  hair: 'M37,21.5 C45,11.5 62,9 75,14.5 C89,20.5 96,36 94.8,54 C94,67 90.5,78 84,87.5 C85.2,77 84.2,68.5 80.5,62.5 C77.5,58.5 74.5,57.5 72.5,54.5 C70.5,46.5 64,38.5 55,33.5 C48,29.8 41,29 34.5,31.3 C32.6,27.3 34,23.6 37,21.5 Z',
+  hairHi: 'M42,20 C52,14.5 66,14 77,19.5 M48,24 C58,19.5 71,20.5 82,28 M60,30 C70,30 80,37 86,48 M74,44 C81,50 85,60 86,72',
+  sideburn: 'M60.5,40 C63,44 64,49 63.5,55 C62.2,51 60.8,47 58.6,43.5 Z',
+  ear: 'M66,56 C71,54.5 74.5,58 74,63.5 C73.6,68 71,71.5 67.5,72 C65.6,72.2 64.6,70.6 65.2,69 C65.6,67 64.5,65 64.6,62 C64.7,59 65,57 66,56 Z',
+  earIn: 'M67.6,60 C70.6,59.8 71.4,64 69.4,66.6 M67.8,63.4 C68.8,63.6 69,65 68.2,65.6',
+  jaw: 'M47,88 C55,86 62,83 66.4,77.2',
+  eyeWhite: 'M29.5,47.2 C31.5,45.6 34,45.4 36,46.4 C34.6,48.4 31.8,48.8 29.5,47.2 Z',
+  lid: 'M29.1,46.9 C31.4,44.9 34.3,44.8 36.5,46.1',
+  lash: 'M29.7,46.6 L27.9,45.6 M30.6,46 L29.2,44.7',
+  brow: 'M28.4,42.6 C31.5,40.5 35.6,40.2 39.2,41.6',
+  nostril: 'M22.4,67.8 C23.5,67 24.9,67.4 25.1,68.5',
+  lips: 'M24,71.6 C24.2,72.8 23.5,73.8 22.8,74.6 C22.4,75.4 23.2,76.2 24,76.5 C23.2,77.3 22.8,78.3 23.3,79.3 C24.1,80.3 25.2,80.6 26.2,80.4 C27,79 27.4,77.6 27.6,76.5 C27,74.5 25.8,72.6 24,71.6 Z',
+  mouth: 'M23.8,76.5 L27.8,76.6',
+  collar: 'M43,107 C52,112.5 70,112.5 84.5,105.5 L89,120 L39,120 Z',
+  collarLine: 'M45.5,108.5 C53,115 63,116 71,113.5'
+};
+function headSVG(x, y, sc, rot, id) {
+  id = id || 'h' + Math.random().toString(36).slice(2, 7);
+  const P = HEAD;
+  return `<g transform="translate(${x},${y}) rotate(${rot || 0}) scale(${sc}) translate(-55,-60)" class="prof" aria-hidden="true">
+<defs><linearGradient id="${id}s" x1="0" y1="0" x2="1" y2="0.3"><stop offset="0" stop-color="#F3C9A6"/><stop offset="0.6" stop-color="#E3AA82"/><stop offset="1" stop-color="#C98B64"/></linearGradient>
+<linearGradient id="${id}h" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5A3622"/><stop offset="1" stop-color="#2E1A10"/></linearGradient>
+<radialGradient id="${id}c" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#E9897A" stop-opacity="0.45"/><stop offset="1" stop-color="#E9897A" stop-opacity="0"/></radialGradient></defs>
+<path d="${P.skin}" fill="url(#${id}s)" stroke="#8A5236" stroke-width="1.3" stroke-linejoin="round"/>
+<path d="${P.neckShade}" fill="#B9774F" opacity="0.45"/>
+<ellipse cx="38" cy="66" rx="8" ry="6" fill="url(#${id}c)"/>
+<path d="${P.jaw}" fill="none" stroke="#B57A55" stroke-width="1" opacity="0.7"/>
+<path d="${P.lips}" fill="#C9716A" opacity="0.85"/>
+<path d="${P.mouth}" fill="none" stroke="#7E3A33" stroke-width="0.9" stroke-linecap="round"/>
+<path d="${P.nostril}" fill="none" stroke="#8A5236" stroke-width="1" stroke-linecap="round"/>
+<path d="${P.ear}" fill="#E0A27A" stroke="#8A5236" stroke-width="1.2"/>
+<path d="${P.earIn}" fill="none" stroke="#9C5F3E" stroke-width="1" stroke-linecap="round"/>
+<path d="${P.hair}" fill="url(#${id}h)"/>
+<path d="${P.hairHi}" fill="none" stroke="#8C5A3A" stroke-width="1.1" stroke-linecap="round" opacity="0.8"/>
+<path d="${P.eyeWhite}" fill="#FBF7F2"/>
+<circle cx="31.4" cy="46.9" r="1.45" fill="#4A2E1C"/><circle cx="30.9" cy="46.4" r="0.45" fill="#FFFFFF"/>
+<path d="${P.lid}" fill="none" stroke="#3A2414" stroke-width="1.2" stroke-linecap="round"/>
+<path d="${P.lash}" fill="none" stroke="#3A2414" stroke-width="0.8" stroke-linecap="round"/>
+<path d="${P.brow}" fill="none" stroke="#3B2316" stroke-width="1.9" stroke-linecap="round"/>
+<path d="${P.collar}" fill="#2A6F7F" stroke="#1C4E5A" stroke-width="1.2"/>
+<path d="${P.collarLine}" fill="none" stroke="#1C4E5A" stroke-width="1"/>
+</g>`;
+}
+function headCanvas(c, x, y, sc) {
+  const P = HEAD, p = k => new Path2D(P[k]);
+  c.save(); c.translate(x, y); c.scale(sc, sc); c.translate(-55, -60); c.lineJoin = 'round'; c.lineCap = 'round';
+  let g = c.createLinearGradient(20, 40, 92, 62); g.addColorStop(0, '#F3C9A6'); g.addColorStop(0.6, '#E3AA82'); g.addColorStop(1, '#C98B64');
+  c.fillStyle = g; c.strokeStyle = '#8A5236'; c.lineWidth = 1.3; c.fill(p('skin')); c.stroke(p('skin'));
+  c.globalAlpha = 0.45; c.fillStyle = '#B9774F'; c.fill(p('neckShade')); c.globalAlpha = 1;
+  g = c.createRadialGradient(38, 66, 0, 38, 66, 8); g.addColorStop(0, 'rgba(233,137,122,0.45)'); g.addColorStop(1, 'rgba(233,137,122,0)'); c.fillStyle = g; c.beginPath(); c.ellipse(38, 66, 8, 6, 0, 0, 7); c.fill();
+  c.globalAlpha = 0.7; c.strokeStyle = '#B57A55'; c.lineWidth = 1; c.stroke(p('jaw')); c.globalAlpha = 0.85; c.fillStyle = '#C9716A'; c.fill(p('lips')); c.globalAlpha = 1;
+  c.strokeStyle = '#7E3A33'; c.lineWidth = 0.9; c.stroke(p('mouth')); c.strokeStyle = '#8A5236'; c.lineWidth = 1; c.stroke(p('nostril'));
+  c.fillStyle = '#E0A27A'; c.lineWidth = 1.2; c.fill(p('ear')); c.stroke(p('ear')); c.strokeStyle = '#9C5F3E'; c.lineWidth = 1; c.stroke(p('earIn'));
+  g = c.createLinearGradient(34, 10, 95, 88); g.addColorStop(0, '#5A3622'); g.addColorStop(1, '#2E1A10'); c.fillStyle = g; c.fill(p('hair'));
+  c.globalAlpha = 0.8; c.strokeStyle = '#8C5A3A'; c.lineWidth = 1.1; c.stroke(p('hairHi')); c.globalAlpha = 1;
+  c.fillStyle = '#FBF7F2'; c.fill(p('eyeWhite')); c.fillStyle = '#4A2E1C'; c.beginPath(); c.arc(31.4, 46.9, 1.45, 0, 7); c.fill(); c.fillStyle = '#fff'; c.beginPath(); c.arc(30.9, 46.4, 0.45, 0, 7); c.fill();
+  c.strokeStyle = '#3A2414'; c.lineWidth = 1.2; c.stroke(p('lid')); c.lineWidth = 0.8; c.stroke(p('lash')); c.strokeStyle = '#3B2316'; c.lineWidth = 1.9; c.stroke(p('brow'));
+  c.fillStyle = '#2A6F7F'; c.strokeStyle = '#1C4E5A'; c.lineWidth = 1.2; c.fill(p('collar')); c.stroke(p('collar')); c.lineWidth = 1; c.stroke(p('collarLine'));
+  c.restore();
+}
+
+let HEAD_UID = 0;
+function profileSVG(x, y, sc, rot, label) {
+  return headSVG(x, y, sc, rot, 'hd' + (++HEAD_UID)) + (label ? `<text x="${x}" y="${y + 60 * sc + 22}" text-anchor="middle" font-size="14">${label}</text>` : '');
+}
+function profileCanvas(c, x, y, sc) { headCanvas(c, x, y, sc); }
+
+let lastRO = 0;
+function updateReadouts(now) {
+  if (now - lastRO < 120) return; lastRO = now;
+  $('#roPhi').textContent = fmtWb(S.phi);
+  $('#roEmf').textContent = fmtV(S.emf);
+  $('#roI').textContent = fmtA(S.emf / S.R);
+  $('#roPeak').textContent = fmtV(S.peak);
+  $('#roP').textContent = fmtW(S.emf * S.emf / S.R);
+  const sN = S.emf / meterScale();
+  $('#roDir').textContent = (Math.abs(sN) > 0.04 && Math.abs(S.emf) > 2e-4) ? (S.emf > 0 ? 'counterclockwise' : 'clockwise') : 'none';
+}
+function describe() {
+  const facing = Math.cos(S.magTheta) < -0.5 ? 'north (N) end facing the coil' : Math.cos(S.magTheta) > 0.5 ? 'south (S) end facing the coil' : 'turned sideways';
+  const gap = S.magX - S.magLen / 2 - (S.coilX + S.coilLen / 2);
+  let where = gap > 0.003 ? `${sig(gap * 100, 2)} cm to the right of the coil` : (Math.abs(S.magX - S.coilX) < S.coilLen / 2 ? 'inside the coil' : 'partly inside or past the coil');
+  const sN = S.emf / meterScale(), on = Math.abs(sN) > 0.04 && Math.abs(S.emf) > 2e-4;
+  const P = S.emf * S.emf / S.R, br = Math.round(clamp(Math.sqrt(P / 0.004), 0, 1) * 100);
+  return `Magnet with its ${facing}, ${where}. Flux through the coil ${fmtWb(S.phi)} (positive means the field points toward the viewer). Induced emf ${fmtV(S.emf)}; current ${on ? (S.emf > 0 ? 'counterclockwise' : 'clockwise') + ' as seen by the viewer on the right' : 'essentially zero'}. Bulb brightness ${br} percent.`;
+}
+let lastT = performance.now();
+function loop(now) { const dt = (now - lastT) / 1000; lastT = now; step(dt); draw(); drawGraphs(); updateReadouts(now); requestAnimationFrame(loop); }
+
+// controls
+function out(id, txt) { $(id).textContent = txt; }
+function syncSlider() { $('#sMagX').value = S.magX; out('#oMagX', sig(S.magX * 100, 3) + ' cm'); $('#sCoilX').value = S.coilX; out('#oCoilX', sig(S.coilX * 100, 3) + ' cm'); }
+function syncAll() {
+  syncSlider();
+  $('#sSpeed').value = S.speed; out('#oSpeed', S.speed.toFixed(2) + ' m/s');
+  $('#sFreq').value = S.freq; out('#oFreq', S.freq.toFixed(1) + ' Hz');
+  $('#sSpin').value = S.spin; out('#oSpin', S.spin.toFixed(1) + ' rev/s');
+  $('#sM').value = S.m; out('#oM', S.m.toFixed(1) + ' A·m²');
+  $('#sN').value = S.N; out('#oN', S.N);
+  $('#sA').value = S.a; out('#oA', (S.a * 100).toFixed(2) + ' cm');
+  $('#sR').value = S.R; out('#oR', S.R.toFixed(1) + ' Ω');
+}
+function setMode(m) { S.mode = m; S.moveTarget = null; document.querySelectorAll('input[name=mode]').forEach(r => r.checked = r.value === m); if (m === 'osc') S.oscT = 0; if (m !== 'spin') { const k = Math.round(S.magTheta / Math.PI); S.magTarget = k * Math.PI; } }
+function bindSim() {
+  $('#sMagX').addEventListener('input', e => { if (S.mode !== 'drag') setMode('drag'); S.moveTarget = null; S.magX = +e.target.value; out('#oMagX', sig(S.magX * 100, 3) + ' cm'); });
+  $('#sCoilX').addEventListener('input', e => { S.coilX = +e.target.value; out('#oCoilX', sig(S.coilX * 100, 3) + ' cm'); });
+  $('#sSpeed').addEventListener('input', e => { S.speed = +e.target.value; syncAll(); });
+  $('#sFreq').addEventListener('input', e => { S.freq = +e.target.value; syncAll(); });
+  $('#sSpin').addEventListener('input', e => { S.spin = +e.target.value; syncAll(); });
+  $('#sM').addEventListener('input', e => { S.m = +e.target.value; S.prevPhi = null; syncAll(); });
+  $('#sN').addEventListener('input', e => { S.N = +e.target.value; S.prevPhi = null; syncAll(); });
+  $('#sA').addEventListener('input', e => { S.a = +e.target.value; S.prevPhi = null; syncAll(); });
+  $('#sR').addEventListener('input', e => { S.R = +e.target.value; syncAll(); });
+  document.querySelectorAll('input[name=mode]').forEach(r => r.addEventListener('change', () => setMode(r.value)));
+  $('#bPush').addEventListener('click', () => { setMode('drag'); S.moveTarget = S.coilX; });
+  $('#bPull').addEventListener('click', () => { setMode('drag'); S.moveTarget = 0.14; });
+  $('#bFlip').addEventListener('click', () => { if (S.mode === 'spin') setMode('drag'); S.magTarget = S.magTarget + Math.PI; });
+  $('#bPause').addEventListener('click', e => { S.paused = !S.paused; e.target.textContent = S.paused ? 'Resume' : 'Pause'; e.target.setAttribute('aria-pressed', S.paused); });
+  $('#bReset').addEventListener('click', () => { Object.assign(S, JSON.parse(JSON.stringify(DEFAULTS))); S.magTheta = S.magTarget = Math.PI; S.hist = []; S.emf = 0; S.prevPhi = null; S.moveTarget = null; setMode('drag'); syncAll(); });
+  $('#bDesc').addEventListener('click', () => { $('#simDesc').textContent = describe(); });
+  const map = { cField: 'field', cInd: 'ind', cDots: 'dots', cArea: 'area', cInset: 'inset' };
+  for (const k in map) $('#' + k).addEventListener('change', e => S.show[map[k]] = e.target.checked);
+  $('#cSlow').addEventListener('change', e => S.slow = e.target.checked);
+  // dragging
+  let drag = null;
+  const cpos = e => { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * S.W / r.width, y: (e.clientY - r.top) * S.H / r.height }; };
+  cv.addEventListener('pointerdown', e => {
+    const p = cpos(e);
+    if (inMagnet(p.x, p.y, 8)) { drag = { what: 'mag', off: p.x - wx(S.magX) }; if (S.mode !== 'drag') setMode('drag'); S.moveTarget = null; }
+    else if (Math.abs(p.x - wx(S.coilX)) < S.coilLen * S.ppm / 2 + 10 && Math.abs(p.y - S.oy) < S.a * S.ppm + 10) drag = { what: 'coil', off: p.x - wx(S.coilX) };
+    if (drag) { cv.setPointerCapture(e.pointerId); e.preventDefault(); }
+  });
+  cv.addEventListener('pointermove', e => {
+    const p = cpos(e);
+    if (!drag) { cv.style.cursor = (inMagnet(p.x, p.y, 8) || (Math.abs(p.x - wx(S.coilX)) < S.coilLen * S.ppm / 2 + 10 && Math.abs(p.y - S.oy) < S.a * S.ppm + 10)) ? 'grab' : 'default'; return; }
+    const x = (p.x - drag.off - S.ox) / S.ppm;
+    if (drag.what === 'mag') S.magX = clamp(x, -0.22, 0.14); else S.coilX = clamp(x, -0.14, -0.04);
+    syncSlider();
+  });
+  const end = () => { drag = null; };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+  syncAll();
+}
+
+/* =====================================================================
+   SVG FIGURE HELPERS
+   ===================================================================== */
+let UID = 0;
+function svg(w, h, title, desc, inner, opts) {
+  opts = opts || {}; const id = 'f' + (++UID);
+  const mk = (n, col) => `<marker id="${id}${n}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${col}"/></marker>`;
+  inner = inner.replace(/MK_K/g, `url(#${id}k)`).replace(/MK_G/g, `url(#${id}g)`).replace(/MK_V/g, `url(#${id}v)`).replace(/MK_B/g, `url(#${id}b)`).replace(/MK_R/g, `url(#${id}r)`);
+  const role = opts.group ? `role="group" aria-label="${esc(title + '. ' + desc)}"` : `role="img" aria-labelledby="${id}t ${id}d"`;
+  return `<svg viewBox="0 0 ${w} ${h}" ${role} xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">${opts.group ? '' : `<title id="${id}t">${esc(title)}</title><desc id="${id}d">${esc(desc)}</desc>`}<defs>${mk('k', '#111')}${mk('g', '#1b7f3b')}${mk('v', '#5b2a86')}${mk('b', '#0b57d0')}${mk('r', '#a3222b')}</defs>${inner}</svg>`;
+}
+function coilParts(cx, cy, n, ry, sp) {
+  n = n || 6; ry = ry || 45; sp = sp || 13; const rx = 10; let back = '', front = '';
+  const x0 = cx - (n - 1) * sp / 2;
+  for (let i = 0; i < n; i++) {
+    const x = x0 + i * sp;
+    back += `<path d="M${x},${cy - ry} A${rx},${ry} 0 0 0 ${x},${cy + ry}" fill="none" stroke="#d9a777" stroke-width="5"/>`;
+    front += `<path d="M${x},${cy - ry} A${rx},${ry} 0 0 1 ${x},${cy + ry}" fill="none" stroke="#a0521a" stroke-width="5"/>`;
+  }
+  const xl = x0, xr = x0 + (n - 1) * sp;
+  back += `<path d="M${xl},${cy + ry} l-30,0 M${xr},${cy + ry} l0,8 l-${xr - xl + 30},0" fill="none" stroke="#a0521a" stroke-width="3"/>`;
+  return { back, front, xl: xl - rx, xr: xr + rx };
+}
+function magnet(cx, cy, left, w, h) {
+  w = w || 120; h = h || 34; const right = left === 'N' ? 'S' : 'N';
+  const col = t => t === 'N' ? '#c62828' : '#1565c0';
+  return `<rect x="${cx - w / 2}" y="${cy - h / 2}" width="${w / 2}" height="${h}" fill="${col(left)}" stroke="#222"/><rect x="${cx}" y="${cy - h / 2}" width="${w / 2}" height="${h}" fill="${col(right)}" stroke="#222"/>
+  <text x="${cx - w / 4}" y="${cy + 8}" text-anchor="middle" font-size="22" font-weight="700" fill="#fff">${left}</text><text x="${cx + w / 4}" y="${cy + 8}" text-anchor="middle" font-size="22" font-weight="700" fill="#fff">${right}</text>`;
+}
+function motionArrow(x1, x2, y, txt) { return `<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="#111" stroke-width="3" marker-end="MK_K"/><text x="${(x1 + x2) / 2}" y="${y - 9}" text-anchor="middle" font-size="13" font-weight="700">${txt}</text>`; }
+function graphSVG(o) {
+  const L = 58, Rr = 16, T = 18, B = 44, pw = o.w - L - Rr, ph = o.h - T - B;
+  const X = x => L + (x - o.x0) / (o.x1 - o.x0) * pw, Y = y => T + (o.y1 - y) / (o.y1 - o.y0) * ph;
+  let s = `<rect x="${L}" y="${T}" width="${pw}" height="${ph}" fill="#fff"/>`;
+  if (o.mdx) for (let x = o.x0; x <= o.x1 + 1e-9; x += o.mdx) s += `<line x1="${X(x)}" y1="${T}" x2="${X(x)}" y2="${T + ph}" stroke="#eef1f6"/>`;
+  if (o.mdy) for (let y = o.y0; y <= o.y1 + 1e-9; y += o.mdy) s += `<line x1="${L}" y1="${Y(y)}" x2="${L + pw}" y2="${Y(y)}" stroke="#eef1f6"/>`;
+  for (let x = o.x0; x <= o.x1 + 1e-9; x += o.dx) s += `<line x1="${X(x)}" y1="${T}" x2="${X(x)}" y2="${T + ph}" stroke="#d3d9e3"/><text x="${X(x)}" y="${Y(Math.max(o.y0, 0)) + 18}" text-anchor="middle" font-size="13">${o.fx ? o.fx(x) : +x.toFixed(2)}</text>`;
+  for (let y = o.y0; y <= o.y1 + 1e-9; y += o.dy) s += `<line x1="${L}" y1="${Y(y)}" x2="${L + pw}" y2="${Y(y)}" stroke="#d3d9e3"/>${o.noy ? '' : `<text x="${L - 6}" y="${Y(y) + 4}" text-anchor="end" font-size="13">${+y.toFixed(2)}</text>`}`;
+  s += `<line x1="${L}" y1="${Y(Math.max(o.y0, 0))}" x2="${L + pw + 8}" y2="${Y(Math.max(o.y0, 0))}" stroke="#111" stroke-width="2" marker-end="MK_K"/><line x1="${X(Math.max(o.x0, 0))}" y1="${T + ph}" x2="${X(Math.max(o.x0, 0))}" y2="${T - 8}" stroke="#111" stroke-width="2" marker-end="MK_K"/>`;
+  s += `<text x="${L + pw}" y="${o.h - 6}" text-anchor="end" font-size="14" font-weight="600">${o.xl}</text><text x="${L + 4}" y="${T + 14}" font-size="14" font-weight="600">${o.yl}</text>`;
+  if (o.pts) s += `<polyline points="${o.pts.map(p => X(p[0]) + ',' + Y(p[1])).join(' ')}" fill="none" stroke="${o.col || '#1f5fbf'}" stroke-width="3"/>`;
+  if (o.extra) s += o.extra(X, Y);
+  return s;
+}
+
+/* =====================================================================
+   QUESTION WIDGETS
+   ===================================================================== */
+function widgetMCQ(q, el) {
+  const name = 'r' + q.n; const opts = q.shuffle === false ? q.options.map((o, i) => ({ ...o, i })) : shuffle(q.options.map((o, i) => ({ ...o, i })));
+  el.innerHTML = `<fieldset><legend class="sr">Choose one answer</legend><div class="opts">${opts.map(o => `<label><input type="radio" name="${name}" value="${o.i}"><span>${o.t}</span></label>`).join('')}</div></fieldset>`;
+  return {
+    get: () => { const c = el.querySelector('input:checked'); return c ? +c.value : null; },
+    check: v => { if (v === null) return { incomplete: true, msg: 'Select an answer first.' }; const o = q.options[v]; return { ok: !!o.ok, msg: o.fb || '' }; },
+    disable: () => el.querySelectorAll('input').forEach(i => i.disabled = true),
+    reveal: () => { const k = q.options.findIndex(o => o.ok); const r = el.querySelector(`input[value="${k}"]`); if (r) r.checked = true; }
+  };
+}
+function widgetMulti(q, el) {
+  const opts = shuffle(q.options.map((o, i) => ({ ...o, i })));
+  el.innerHTML = `<fieldset><legend class="sr">Select all answers that apply</legend><div class="opts">${opts.map(o => `<label><input type="checkbox" value="${o.i}"><span>${o.t}</span></label>`).join('')}</div></fieldset>`;
+  return {
+    get: () => [...el.querySelectorAll('input:checked')].map(i => +i.value),
+    check: v => {
+      if (!v.length) return { incomplete: true, msg: 'Select at least one answer.' };
+      const missed = q.options.filter((o, i) => o.ok && !v.includes(i)).length;
+      const wrong = v.filter(i => !q.options[i].ok);
+      if (!missed && !wrong.length) return { ok: true, msg: '' };
+      let m = [];
+      if (wrong.length) m.push(`${wrong.length} of your selections ${wrong.length > 1 ? 'are' : 'is'} incorrect. ${q.options[wrong[0]].fb || ''}`);
+      if (missed) m.push(`You missed ${missed} correct situation${missed > 1 ? 's' : ''}.`);
+      return { ok: false, msg: m.join(' ') };
+    },
+    disable: () => el.querySelectorAll('input').forEach(i => i.disabled = true),
+    reveal: () => el.querySelectorAll('input').forEach(i => i.checked = !!q.options[+i.value].ok)
+  };
+}
+function parseNum(s) {
+  s = String(s).trim().replace(/−/g, '-').replace(/,/g, '').replace(/\s+/g, '');
+  s = s.replace(/(×|x|X|\*)10\^?\(?([-+]?\d+)\)?$/, 'e$2');
+  if (!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(s)) return NaN;
+  return parseFloat(s);
+}
+function norm(s) { return String(s).trim().toLowerCase().replace(/[.!]+$/, '').replace(/\s+/g, ' '); }
+function widgetForm(q, el) {
+  let html = q.form;
+  q.fields.forEach((f, i) => {
+    const id = `q${q.n}f${i}`; let w;
+    if (f.type === 'select') w = `<select id="${id}" aria-label="${esc(f.aria)}"><option value="">— choose —</option>${f.options.map((o, k) => `<option value="${k}">${esc(o)}</option>`).join('')}</select>`;
+    else w = `<input id="${id}" type="text" ${f.type === 'num' ? 'inputmode="decimal"' : 'autocomplete="off" spellcheck="false"'} aria-label="${esc(f.aria)}" size="${f.size || 10}">${f.unit ? `<span class="unit">${f.unit}</span>` : ''}`;
+    html = html.replace(`[[${i}]]`, w);
+  });
+  el.innerHTML = `<div class="form">${html}</div>`;
+  if (q.fields.some(f => f.type === 'num')) el.insertAdjacentHTML('beforeend', `<p style="font-size:.88rem;color:var(--muted);margin:.3rem 0">Numbers: you may type scientific notation as <code>1.5e-3</code> or <code>1.5x10^-3</code>. Answers within 2% are accepted.</p>`);
+  const inputs = q.fields.map((f, i) => el.querySelector(`#q${q.n}f${i}`));
+  return {
+    get: () => inputs.map(i => i.value),
+    check: v => {
+      if (v.some(x => String(x).trim() === '')) return { incomplete: true, msg: 'Fill in every blank first.' };
+      let allOk = true, msgs = [];
+      q.fields.forEach((f, i) => {
+        let ok;
+        if (f.type === 'select') ok = +v[i] === f.answer;
+        else if (f.type === 'text') ok = f.accept.map(norm).includes(norm(v[i]));
+        else {
+          const x = parseNum(v[i]);
+          if (isNaN(x)) { ok = false; msgs.push(`“${esc(v[i])}” is not a number I can read (${f.aria}).`); }
+          else {
+            ok = Math.abs(x - f.value) <= Math.abs(f.value) * (f.tol || 0.02) + 1e-12;
+            if (!ok) {
+              const r = x / f.value;
+              if (Math.abs(Math.abs(r) - 1) < 0.02 && r < 0) msgs.push(`${f.aria}: check the sign — a magnitude is asked.`);
+              else if (r > 0 && Math.abs(Math.log10(r) - Math.round(Math.log10(r))) < 0.01 && Math.round(Math.log10(r)) !== 0) msgs.push(`${f.aria}: your value is off by a power of ten — check unit conversions (cm → m, ms → s, prefixes).`);
+            }
+          }
+        }
+        inputs[i].setAttribute('aria-invalid', ok ? 'false' : 'true');
+        inputs[i].classList.toggle('okfield', ok);
+        if (!ok) { allOk = false; if (f.fb) msgs.push(f.fb); }
+      });
+      const nOk = q.fields.length - inputs.filter(i => i.getAttribute('aria-invalid') === 'true').length;
+      if (!allOk && q.fields.length > 1) msgs.unshift(`${nOk} of ${q.fields.length} entries are correct (correct ones are outlined in green).`);
+      return { ok: allOk, msg: msgs.join(' ') };
+    },
+    disable: () => inputs.forEach(i => i.disabled = true),
+    reveal: () => q.fields.forEach((f, i) => { if (f.type === 'select') inputs[i].value = f.answer; else if (f.type === 'text') inputs[i].value = f.accept[0]; else inputs[i].value = sig(f.value, 3); inputs[i].classList.add('okfield'); inputs[i].setAttribute('aria-invalid', 'false'); })
+  };
+}
+function widgetRank(q, el) {
+  let order = shuffle(q.items.map(i => i.id));
+  let tries = 0; while (order.join() === q.order.join() && tries++ < 10) order = shuffle(order);
+  const lab = id => q.items.find(i => i.id === id).label;
+  el.innerHTML = `<p style="margin:.2rem 0;font-size:.92rem">${q.rankHelp || 'Put the items in order: position 1 at the top.'} Use the Up/Down buttons or drag the items.</p><ol class="rank" aria-label="Ranking list"></ol><p class="sr" aria-live="polite"></p>`;
+  const ol = el.querySelector('ol'), live = el.querySelector('p.sr'); let disabled = false, dragId = null;
+  function render(focusId, dirFocus) {
+    ol.innerHTML = order.map((id, k) => `<li draggable="${!disabled}" data-id="${id}"><span class="lbl">${lab(id)}</span><button type="button" class="small secondary" data-act="up" aria-label="Move ${esc(stripTex(lab(id)))} up" ${k === 0 || disabled ? 'disabled' : ''}>Up</button><button type="button" class="small secondary" data-act="down" aria-label="Move ${esc(stripTex(lab(id)))} down" ${k === order.length - 1 || disabled ? 'disabled' : ''}>Down</button></li>`).join('');
+    typeset(ol);
+    if (focusId) { const b = ol.querySelector(`li[data-id="${focusId}"] button[data-act="${dirFocus}"]`); const b2 = ol.querySelector(`li[data-id="${focusId}"] button:not([disabled])`); (b && !b.disabled ? b : b2) && (b && !b.disabled ? b : b2).focus(); }
+  }
+  ol.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || disabled) return;
+    const id = b.closest('li').dataset.id, k = order.indexOf(id), j = b.dataset.act === 'up' ? k - 1 : k + 1;
+    if (j < 0 || j >= order.length) return;
+    [order[k], order[j]] = [order[j], order[k]]; render(id, b.dataset.act);
+    live.textContent = `${stripTex(lab(id))} moved to position ${j + 1}.`;
+  });
+  ol.addEventListener('dragstart', e => { const li = e.target.closest('li'); if (!li) return; dragId = li.dataset.id; li.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', dragId); } catch (_) { } });
+  ol.addEventListener('dragover', e => { e.preventDefault(); });
+  ol.addEventListener('drop', e => { e.preventDefault(); const li = e.target.closest('li'); if (!li || !dragId) return; const to = order.indexOf(li.dataset.id), from = order.indexOf(dragId); order.splice(from, 1); order.splice(to, 0, dragId); dragId = null; render(); });
+  ol.addEventListener('dragend', () => { dragId = null; render(); });
+  render();
+  return {
+    get: () => order.slice(),
+    check: v => { const n = v.filter((id, k) => id === q.order[k]).length; return n === v.length ? { ok: true, msg: '' } : { ok: false, msg: `${n} of ${v.length} items are in the correct position.` }; },
+    disable: () => { disabled = true; render(); },
+    reveal: () => { order = q.order.slice(); render(); }
+  };
+}
+function stripTex(s) { return String(s).replace(/\\\(|\\\)/g, '').replace(/\\text\{([^}]*)\}/g, '$1').replace(/\\[a-zA-Z]+/g, '').replace(/[{}]/g, '').replace(/<[^>]+>/g, ''); }
+function widgetHotspot(q, el) {
+  el.innerHTML = `<p style="margin:.2rem 0;font-size:.92rem">Click (or tab to and press Enter on) the part of the figure you choose. Selected: <strong class="selname">nothing yet</strong></p>`;
+  const fig = el.closest('.q').querySelector('.figbox'); let sel = null, disabled = false;
+  const hots = [...fig.querySelectorAll('.hot')];
+  hots.forEach(h => {
+    h.setAttribute('tabindex', '0'); h.setAttribute('role', 'button'); h.setAttribute('aria-pressed', 'false');
+    const choose = () => { if (disabled) return; sel = h.dataset.id; hots.forEach(o => { o.classList.toggle('sel', o === h); o.setAttribute('aria-pressed', o === h); }); el.querySelector('.selname').textContent = h.getAttribute('aria-label'); };
+    h.addEventListener('click', choose);
+    h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(); } });
+  });
+  return {
+    get: () => sel,
+    check: v => v === null ? { incomplete: true, msg: 'Select a part of the figure first.' } : { ok: v === q.answer, msg: (q.fb && q.fb[v]) || '' },
+    disable: () => { disabled = true; hots.forEach(h => h.setAttribute('tabindex', '-1')); },
+    reveal: () => { const h = hots.find(o => o.dataset.id === q.answer); if (h) { sel = q.answer; hots.forEach(o => { o.classList.toggle('sel', o === h); o.setAttribute('aria-pressed', o === h); }); el.querySelector('.selname').textContent = h.getAttribute('aria-label'); } }
+  };
+}
+function makePad(box, w, h, mode, gridFn) {
+  const c = document.createElement('canvas'); c.className = 'drawpad'; c.setAttribute('aria-hidden', 'true');
+  const d = window.devicePixelRatio || 1; c.width = w * d; c.height = h * d; box.appendChild(c);
+  const g = c.getContext('2d'); g.setTransform(d, 0, 0, d, 0, 0);
+  let strokes = [], cur = null, disabled = false;
+  const pos = e => { const r = c.getBoundingClientRect(); return { x: (e.clientX - r.left) * w / r.width, y: (e.clientY - r.top) * h / r.height }; };
+  function redraw() {
+    g.clearRect(0, 0, w, h); if (gridFn) gridFn(g);
+    const pc = isDark() ? '#3ddc84' : '#0a7d2c'; g.strokeStyle = pc; g.fillStyle = pc; g.lineWidth = 4; g.lineCap = 'round'; g.lineJoin = 'round';
+    for (const s of strokes) {
+      if (s.length < 2) continue; g.beginPath(); g.moveTo(s[0].x, s[0].y); for (const p of s) g.lineTo(p.x, p.y); g.stroke();
+      if (mode !== 'graph') { const a = s[s.length - 1]; let b = s[Math.max(0, s.length - 6)]; const an = Math.atan2(a.y - b.y, a.x - b.x); g.beginPath(); g.moveTo(a.x + 3 * Math.cos(an), a.y + 3 * Math.sin(an)); g.lineTo(a.x - 14 * Math.cos(an - 0.5), a.y - 14 * Math.sin(an - 0.5)); g.lineTo(a.x - 14 * Math.cos(an + 0.5), a.y - 14 * Math.sin(an + 0.5)); g.closePath(); g.fill(); }
+    }
+  }
+  c.addEventListener('pointerdown', e => { if (disabled) return; e.preventDefault(); c.setPointerCapture(e.pointerId); if (mode !== 'graph') strokes = []; cur = [pos(e)]; strokes.push(cur); redraw(); });
+  c.addEventListener('pointermove', e => { if (!cur) return; cur.push(pos(e)); redraw(); });
+  const up = () => { cur = null; }; c.addEventListener('pointerup', up); c.addEventListener('pointercancel', up);
+  redraw();
+  return { strokes: () => strokes, clear: () => { strokes = []; redraw(); }, disable: () => { disabled = true; c.style.cursor = 'default'; }, setStrokes: s => { strokes = s; redraw(); } };
+}
+function altBlock(q, el, inner) {
+  el.insertAdjacentHTML('beforeend', `<div class="btnrow"><button type="button" class="small secondary" data-clear>Clear drawing</button><label style="display:flex;align-items:center;gap:.4rem"><input type="checkbox" data-alt> Use the keyboard alternative instead of drawing</label></div><div class="altbox" hidden>${inner}</div>`);
+  const altCb = el.querySelector('[data-alt]'), box = el.querySelector('.altbox');
+  altCb.addEventListener('change', () => { box.hidden = !altCb.checked; if (altCb.checked) typeset(box); });
+  return { altCb, box };
+}
+function widgetDrawDir(q, el) {
+  const box = el.closest('.q').querySelector('.figbox');
+  const pad = makePad(box, q.size[0], q.size[1], q.kind);
+  el.innerHTML = `<p style="margin:.2rem 0;font-size:.92rem">${q.drawHelp}</p>`;
+  const name = 'alt' + q.n;
+  const a = altBlock(q, el, `<fieldset><legend>${q.altLegend}</legend><div class="opts">${q.alt.map(o => `<label><input type="radio" name="${name}" value="${o.id}"><span>${o.t}</span></label>`).join('')}</div></fieldset>`);
+  el.querySelector('[data-clear]').addEventListener('click', () => pad.clear());
+  return {
+    get: () => a.altCb.checked ? { alt: (el.querySelector(`input[name=${name}]:checked`) || {}).value || null } : { strokes: pad.strokes() },
+    check: v => {
+      let ans;
+      if ('alt' in v) { if (!v.alt) return { incomplete: true, msg: 'Choose an option first.' }; ans = v.alt; }
+      else {
+        const ss = v.strokes.filter(s => s.length > 3); if (!ss.length) return { incomplete: true, msg: 'Draw on the figure first.' };
+        const s = ss.reduce((a, b) => plen(b) > plen(a) ? b : a);
+        if (q.kind === 'drawArrow') {
+          if (plen(s) < 35) return { incomplete: true, msg: 'Draw a longer arrow (at least a couple of centimetres on screen).' };
+          const dx = s[s.length - 1].x - s[0].x, dy = s[s.length - 1].y - s[0].y;
+          if (Math.abs(dx) < 1.3 * Math.abs(dy)) return { incomplete: true, msg: 'Draw the arrow along the coil axis (horizontally), starting at the tail and ending at the tip. This did not count as an attempt.' };
+          ans = dx > 0 ? 'right' : 'left';
+        } else {
+          let cx = 0, cy = 0; s.forEach(p => { cx += p.x; cy += p.y; }); cx /= s.length; cy /= s.length;
+          let sweep = 0; for (let i = 1; i < s.length; i++) { let d = Math.atan2(s[i].y - cy, s[i].x - cx) - Math.atan2(s[i - 1].y - cy, s[i - 1].x - cx); if (d > Math.PI) d -= 2 * Math.PI; if (d < -Math.PI) d += 2 * Math.PI; sweep += d; }
+          if (Math.abs(sweep) < 1.2 * Math.PI) return { incomplete: true, msg: 'Trace at least about three quarters of the way around the loop in the direction of the current. This did not count as an attempt.' };
+          ans = sweep > 0 ? 'cw' : 'ccw';
+        }
+      }
+      return { ok: ans === q.answer, msg: (q.fb && q.fb[ans]) || '', detected: ans };
+    },
+    disable: () => { pad.disable(); el.querySelectorAll('input,button').forEach(i => i.disabled = true); },
+    reveal: () => { a.altCb.checked = true; a.box.hidden = false; const r = el.querySelector(`input[name=${name}][value="${q.answer}"]`); if (r) r.checked = true; typeset(a.box); }
+  };
+}
+function plen(s) { let L = 0; for (let i = 1; i < s.length; i++) L += Math.hypot(s[i].x - s[i - 1].x, s[i].y - s[i - 1].y); return L; }
+function widgetDrawGraph(q, el) {
+  const G = q.graph, w = G.w, h = G.h, L = 58, Rr = 16, T = 18, B = 44, pw = w - L - Rr, ph = h - T - B;
+  const X = t => L + (t - G.x0) / (G.x1 - G.x0) * pw, Y = v => T + (G.y1 - v) / (G.y1 - G.y0) * ph;
+  const tX = x => G.x0 + (x - L) / pw * (G.x1 - G.x0), vY = y => G.y1 - (y - T) / ph * (G.y1 - G.y0);
+  const box = el.closest('.q').querySelector('.figbox.pad');
+  box.innerHTML = svg(w, h, 'Empty graph for your sketch', `Axes: ${G.xl} horizontally from ${G.x0} to ${G.x1}, ${G.yl} vertically from ${G.y0} to ${G.y1}. Grid lines every ${G.mdy}.`, graphSVG({ w, h, x0: G.x0, x1: G.x1, y0: G.y0, y1: G.y1, dx: 1, dy: 1, mdy: G.mdy, xl: G.xl, yl: G.yl }));
+  const pad = makePad(box, w, h, 'graph');
+  el.innerHTML = `<p style="margin:.2rem 0;font-size:.92rem">Draw the graph with the mouse or a finger, as one or several strokes (horizontal segments are fine; vertical jumps between intervals are not checked). Use “Clear drawing” to start over.</p>`;
+  const a = altBlock(q, el, `<fieldset><legend>Enter the emf in each interval (in volts)</legend>${G.intervals.map((iv, k) => `<p><label for="g${q.n}_${k}">From \\(t=${iv[0]}\\ \\text{s}\\) to \\(t=${iv[1]}\\ \\text{s}\\): </label><input type="text" id="g${q.n}_${k}" inputmode="decimal" size="6"> V</p>`).join('')}</fieldset>`);
+  el.querySelector('[data-clear]').addEventListener('click', () => pad.clear());
+  return {
+    get: () => a.altCb.checked ? { alt: G.intervals.map((_, k) => el.querySelector(`#g${q.n}_${k}`).value) } : { strokes: pad.strokes() },
+    check: v => {
+      let vals = [];
+      if ('alt' in v) {
+        if (v.alt.some(s => s.trim() === '')) return { incomplete: true, msg: 'Fill in every interval.' };
+        vals = v.alt.map(parseNum); if (vals.some(isNaN)) return { incomplete: true, msg: 'One of the entries is not a number.' };
+      } else {
+        const pts = v.strokes.flat(); if (pts.length < 5) return { incomplete: true, msg: 'Draw the graph first.' };
+        for (const iv of G.intervals) {
+          const a0 = iv[0] + 0.2 * (iv[1] - iv[0]), a1 = iv[1] - 0.2 * (iv[1] - iv[0]);
+          const sel = pts.filter(p => { const t = tX(p.x); return t >= a0 && t <= a1; });
+          if (sel.length < 3) return { incomplete: true, msg: `Your sketch does not cover the interval from ${iv[0]} s to ${iv[1]} s. Draw across the whole time axis. This did not count as an attempt.` };
+          vals.push(sel.reduce((s, p) => s + vY(p.y), 0) / sel.length);
+        }
+      }
+      const bad = []; vals.forEach((x, k) => { if (Math.abs(x - G.expected[k]) > G.tol) bad.push(k); });
+      if (!bad.length) return { ok: true, msg: '' };
+      const iv = G.intervals[bad[0]], ex = G.expected[bad[0]], got = vals[bad[0]];
+      let tip = Math.sign(got) !== Math.sign(ex) && Math.abs(ex) > 0.01 ? 'the sign is wrong — remember the minus sign in Faraday’s law.' : (Math.abs(ex) < 0.01 ? 'the field is constant there, so what is the emf?' : 'the sign is right but the size is off — compute the slope carefully.');
+      return { ok: false, msg: `${G.intervals.length - bad.length} of ${G.intervals.length} intervals are correct. Look again at ${iv[0]} s to ${iv[1]} s: ${tip}` };
+    },
+    disable: () => { pad.disable(); el.querySelectorAll('input,button').forEach(i => i.disabled = true); },
+    reveal: () => { const s = G.intervals.map((iv, k) => [{ x: X(iv[0]), y: Y(G.expected[k]) }, { x: X(iv[1]), y: Y(G.expected[k]) }]); pad.setStrokes(s); }
+  };
+}
+const WIDGETS = { mcq: widgetMCQ, multi: widgetMulti, form: widgetForm, rank: widgetRank, hotspot: widgetHotspot, drawArrow: widgetDrawDir, drawCircle: widgetDrawDir, drawGraph: widgetDrawGraph };
+const TYPE_LABEL = { mcq: 'Multiple choice', multi: 'Select all that apply', form: 'Fill in the blanks', rank: 'Ranking task', hotspot: 'Hotspot', drawArrow: 'Draw on the screen', drawCircle: 'Draw on the screen', drawGraph: 'Draw a graph' };
+
+/* =====================================================================
+   PART INTRODUCTIONS
+   ===================================================================== */
+const PARTS = {
+  1: { title: 'Part 1 — Observe: what makes the bulb light?', html: R`
+  <p>In 1831 Faraday found that a magnet held still next to a loop of wire produces no current, but a current appears whenever the magnet and the loop move relative to each other. The current flows one way while the magnet approaches and the opposite way while it moves away. The coil behaves as if a battery (an emf source) were connected to it.</p>
+  <h3>Try this in the simulation</h3>
+  <ul>
+   <li>Press <strong>Push magnet in</strong>, wait, then <strong>Pull magnet out</strong>. Watch the bulb, the emf meter and the viewer's view of the coil.</li>
+   <li>Leave the magnet at rest inside the coil. Then drag the <em>coil</em> instead of the magnet.</li>
+   <li>Press <strong>Flip magnet</strong> while the magnet is at rest near the coil.</li>
+   <li>Change the push speed, the number of turns and the magnet strength, and compare the “Recent peak |emf|” readout.</li>
+  </ul>` },
+  2: { title: 'Part 2 — Magnetic flux and Faraday’s law', html: R`
+  <p>The magnetic flux through a flat surface of area \(A\) in a uniform field is</p>
+  <div class="keybox">\[\Phi_B=\vec B\cdot\vec A = BA\cos\theta ,\qquad 1\ \text{Wb}=1\ \text{T}\cdot\text{m}^2\]</div>
+  <p>where \(\theta\) is the angle between \(\vec B\) and the area vector \(\vec A\) (perpendicular to the surface). <strong>Convention used in this course:</strong> the area vector points toward you as you look at the surface. Faraday's law for a coil of \(N\) turns:</p>
+  <div class="keybox">\[\varepsilon=-N\frac{d\Phi_B}{dt}=-N\left[\frac{dB}{dt}A\cos\theta+B\frac{dA}{dt}\cos\theta-BA\sin\theta\frac{d\theta}{dt}\right]\]</div>
+  <p>So an emf appears when (i) the field strength changes, (ii) the area changes, or (iii) the angle between \(\vec B\) and \(\vec A\) changes.</p>` },
+  3: { title: 'Part 3 — Lenz’s law: which way does the current flow?', html: R`
+  <p><strong>Lenz's law:</strong> the induced current creates a magnetic field that <em>opposes the change</em> in flux that produced it.</p>
+  <h3>Procedure (problem-solving tips)</h3>
+  <ol>
+   <li>Choose the area vector \(\vec A\) (here: toward the viewer).</li>
+   <li>Find the sign of \(\Phi_B=\vec B\cdot\vec A\).</li>
+   <li>Find the sign of \(d\Phi_B/dt\). The emf has the <em>opposite</em> sign: \(d\Phi_B/dt>0\Rightarrow\varepsilon<0\); \(d\Phi_B/dt<0\Rightarrow\varepsilon>0\); \(d\Phi_B/dt=0\Rightarrow\varepsilon=0\).</li>
+   <li>Right-hand rule: thumb along \(\vec A\), fingers curl in the positive direction. \(\varepsilon>0\): current flows the way the fingers curl (counterclockwise for the viewer); \(\varepsilon<0\): the opposite way (clockwise).</li>
+  </ol>
+  <p><strong>Force picture:</strong> an approaching magnet is repelled, so the face of the coil nearest the magnet becomes the same pole as the approaching pole. A departing magnet is attracted back.</p>` },
+  4: { title: 'Part 4 — Reading emf from graphs', html: R`
+  <p>Because \(\varepsilon=-\dfrac{d\Phi}{dt}\), the emf is the <strong>negative of the slope</strong> of the flux-versus-time graph:</p>
+  <ul><li>positive slope \(\Rightarrow\) negative emf;</li><li>flat (constant flux) \(\Rightarrow\) zero emf;</li><li>negative slope \(\Rightarrow\) positive emf;</li><li>steeper slope \(\Rightarrow\) larger \(|\varepsilon|\).</li></ul>
+  <p>For a uniform field through a fixed loop, \(\Phi=BA\), so \(\varepsilon=-A\,\dfrac{dB}{dt}\): use the slope of the \(B\)-versus-\(t\) graph and multiply by \(-A\).</p>` },
+  5: { title: 'Part 5 — Generators and eddy currents', html: R`
+  <p><strong>Generator.</strong> An \(N\)-turn loop rotating with angular speed \(\omega\) in a uniform field has \(\Phi_B=BA\cos\omega t\), so</p>
+  <div class="keybox">\[\varepsilon=-N\frac{d\Phi_B}{dt}=NBA\omega\sin\omega t,\qquad I=\frac{NBA\omega}{R}\sin\omega t,\qquad \varepsilon_0=NBA\omega\]</div>
+  <p>The current alternates (AC). The mechanical power needed to turn the loop equals the electrical power \(P=\dfrac{(NBA\omega)^2}{R}\sin^2\omega t\) delivered to the circuit. Try “Spin the magnet” in the simulation to see an alternating emf.</p>
+  <p><strong>Eddy currents.</strong> A solid conductor moving through a field has circulating induced currents. They produce a force that opposes the motion (magnetic braking) and they heat the conductor, \(P=\varepsilon^2/R\). Laminating the conductor or cutting slots in it breaks up the current loops and reduces the losses.</p>` },
+  6: { title: 'Part 6 — Quantitative problems', html: R`
+  <div class="keybox"><strong>Summary.</strong> Flux: \(\Phi_B=\iint\vec B\cdot d\vec A\). Faraday: \(\varepsilon=-N\,d\Phi_B/dt\). Lenz: the induced current opposes the change in flux. Induced current: \(I=|\varepsilon|/R\). A changing flux in a stationary loop is associated with a non-conservative electric field, \(\oint\vec E_{nc}\cdot d\vec s=-d\Phi_B/dt\).</div>
+  <p>For a long straight wire, \(B=\dfrac{\mu_0 I}{2\pi r}\), so the flux through a rectangle of length \(l\) between distances \(s\) and \(s+w\) from the wire is \(\Phi_B=\dfrac{\mu_0 I l}{2\pi}\ln\!\left(\dfrac{s+w}{s}\right)\). Use \(\mu_0=4\pi\times10^{-7}\ \text{T}\cdot\text{m/A}\).</p>` }
+};
+
+/* =====================================================================
+   QUESTIONS (randomized each start)
+   ===================================================================== */
+let Q = [];
+function sceneFig(opts) {
+  // coil on the left, magnet, viewer on the right
+  const cp = coilParts(150, 105, 6, 46, 13);
+  let s = `<rect width="600" height="210" fill="#e8f2fc"/>` + cp.back;
+  if (opts.inside) s += magnet(cp.xl + 52, 105, opts.left || 'N', 104, 30);
+  s += cp.front;
+  if (!opts.inside && opts.magX) s += magnet(opts.magX, 105, opts.left || 'N');
+  if (opts.motion) s += motionArrow(opts.motion[0], opts.motion[1], 52, 'Direction of motion of the magnet');
+  s += profileSVG(552, 100, 0.62, 0, 'Viewer');
+  if (opts.extra) s += opts.extra(cp);
+  return s;
+}
+function buildQuestions() {
+  Q = [];
+  // ---------- PART 1 ----------
+  Q.push({ part: 1, kind: 'multi', prompt: R`Use the simulation. In which of these situations does the bulb light up (an emf is induced)? Select <strong>all</strong> that apply.`,
+    options: [
+      { t: 'The magnet is held at rest inside the coil.', ok: false, fb: 'With the magnet at rest the flux through the coil is large but constant — no change, no emf.' },
+      { t: 'The magnet is pushed into the coil.', ok: true },
+      { t: 'The magnet is pulled out of the coil.', ok: true },
+      { t: 'The magnet is held still and the coil is moved toward it.', ok: true },
+      { t: 'The magnet, at rest near the coil, is quickly flipped end for end.', ok: true },
+      { t: 'The magnet is held at rest far from the coil.', ok: false, fb: 'A magnet at rest produces a constant flux, however close or far it is.' }],
+    hint: R`Try each situation in the simulation and watch the emf meter. Ask yourself: is the flux through the coil <em>changing</em>?`,
+    explain: R`An emf appears only while the flux changes: pushing in, pulling out, moving the coil (only <em>relative</em> motion matters) and flipping the magnet (the flux reverses sign). A magnet at rest, near or far, gives a constant flux and therefore \(\varepsilon=0\).` });
+  Q.push({ part: 1, kind: 'form', prompt: R`Complete the sentences using what you observed (choose from each menu).`,
+    form: R`<p>No emf is induced when the magnet rests inside the coil, because the magnetic flux through the coil is not [[0]].</p><p>Pushing the magnet in twice as fast makes the peak emf [[1]] as large.</p><p>Reversing the direction of motion of the magnet [[2]] the direction of the induced current.</p>`,
+    fields: [
+      { type: 'select', aria: 'Blank 1', options: ['changing', 'strong', 'pointing toward the viewer'], answer: 0, fb: 'Blank 1: what must happen to the flux for an emf to appear?' },
+      { type: 'select', aria: 'Blank 2', options: ['twice', 'half', 'the same'], answer: 0, fb: 'Blank 2: compare the “Recent peak |emf|” at 0.50 m/s and 1.00 m/s.' },
+      { type: 'select', aria: 'Blank 3', options: ['reverses', 'does not change', 'stops'], answer: 0, fb: 'Blank 3: watch the viewer\'s view of the coil while pushing in and then pulling out.' }],
+    hint: R`Set the push speed to \(0.50\ \text{m/s}\), press Push, and read the peak emf. Repeat at \(1.00\ \text{m/s}\).`,
+    explain: R`\(\varepsilon=-N\,d\Phi/dt\): constant flux gives no emf; covering the same change in flux in half the time doubles \(d\Phi/dt\) and so doubles \(\varepsilon\); reversing the motion reverses the sign of \(d\Phi/dt\), so the current reverses.` });
+  Q.push({ part: 1, kind: 'rank', prompt: R`The same magnet is pushed into four coils of the same size. Rank the peak induced emf from <strong>largest</strong> (1) to <strong>smallest</strong> (4). You can test the cases in the simulation (turns, push speed, magnet strength).`,
+    items: [
+      { id: 'A', label: R`A: \(N=100\) turns, speed \(v\), magnet strength \(m\)` },
+      { id: 'B', label: R`B: \(N=200\) turns, speed \(v\), magnet strength \(m\)` },
+      { id: 'C', label: R`C: \(N=100\) turns, speed \(3v\), magnet strength \(m\)` },
+      { id: 'D', label: R`D: \(N=100\) turns, speed \(v\), magnet strength \(m/2\)` }],
+    order: ['C', 'B', 'A', 'D'],
+    hint: R`The flux per turn is proportional to the magnet strength; the emf is \(N\) times the rate of change of the flux per turn. How does each change scale the emf compared to case A?`,
+    explain: R`Relative to A: B doubles \(N\) (\(\times2\)); C triples the rate of change (\(\times3\)); D halves the flux (\(\times\tfrac12\)). Ranking: C \(>\) B \(>\) A \(>\) D.` });
+
+  // ---------- PART 2 ----------
+  const hot4 = cp => {
+    const cx = 150, cy = 105;
+    const a = (id, x2, y2, lx, ly, lab) => `<g class="hot" data-id="${id}" aria-label="Arrow ${lab}"><line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="transparent" stroke-width="26"/><line class="hl" x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="#111" stroke-width="4" stroke-dasharray="6 4" marker-end="MK_K"/><circle cx="${lx}" cy="${ly}" r="13" fill="#fff" stroke="#111"/><text x="${lx}" y="${ly + 5}" text-anchor="middle" font-size="15" font-weight="700">${lab}</text></g>`;
+    return a('right', 290, cy, 305, cy - 18, '1') + a('left', 40, cy, 28, cy - 20, '2') + a('up', cx, 25, cx + 20, 22, '3') + a('down', cx, 190, cx + 20, 194, '4');
+  };
+  Q.push({ part: 2, kind: 'hotspot', prompt: R`The viewer on the right looks at the coil along its axis. Using the course convention, which arrow represents the area vector \(\vec A\) of the coil's surface for this viewer?`,
+    fig: svg(600, 210, 'Coil seen from the side with a viewer on the right and four candidate arrows', 'A coil with its axis horizontal. Arrow 1 points right toward the viewer, arrow 2 points left away from the viewer, arrow 3 points up and arrow 4 points down.', sceneFig({ extra: hot4 }), { group: true }),
+    answer: 'right',
+    fb: { left: 'Arrow 2 is perpendicular to the coil but points away from the viewer.', up: 'The area vector is perpendicular to the surface of the loops; the loops lie in a vertical plane, so the area vector is horizontal.', down: 'The area vector is perpendicular to the surface of the loops; the loops lie in a vertical plane, so the area vector is horizontal.' },
+    hint: R`\(\vec A\) is perpendicular to the surface of each loop, and in this course it points <em>toward you</em> as you look at the surface.`,
+    explain: R`Each loop lies in a vertical plane, so \(\vec A\) lies along the axis. Pointing it toward the viewer gives arrow 1 (to the right). With this choice, field pointing toward the viewer gives \(\Phi>0\) and a positive emf drives a counterclockwise current as seen by the viewer.` });
+  const B5 = rnd(0.2, 0.8, 0.05), r5 = rnd(5, 15, 0.5), th5 = rnd(20, 70, 5);
+  const phi5 = B5 * Math.PI * (r5 / 100) ** 2 * Math.cos(th5 * Math.PI / 180) * 1000;
+  Q.push({ part: 2, kind: 'form', prompt: R`A circular loop of radius \(r=${r5}\ \text{cm}\) sits in a uniform magnetic field of magnitude \(B=${B5.toFixed(2)}\ \text{T}\). The angle between \(\vec B\) and the loop's area vector is \(\theta=${th5}^\circ\). What is the magnetic flux through the loop?`,
+    form: R`<p>\(\Phi_B=\) [[0]] mWb</p>`,
+    fields: [{ type: 'num', aria: 'Flux in milliwebers', value: phi5 }],
+    hint: R`\(\Phi_B=BA\cos\theta\) with \(A=\pi r^2\). Convert the radius to meters, and \(1\ \text{Wb}=1000\ \text{mWb}\).`,
+    explain: R`\(A=\pi(${(r5 / 100).toFixed(3)}\ \text{m})^2=${sig(Math.PI * (r5 / 100) ** 2, 3)}\ \text{m}^2\); \(\Phi_B=(${B5.toFixed(2)})(${sig(Math.PI * (r5 / 100) ** 2, 3)})\cos ${th5}^\circ=${sig(phi5 / 1000, 3)}\ \text{Wb}=${sig(phi5, 3)}\ \text{mWb}\).` });
+  Q.push({ part: 2, kind: 'form', prompt: R`The magnet approaches the coil with its north pole first, as shown. Take the area vector toward the viewer on the right.`,
+    fig: svg(600, 210, 'Magnet approaching a coil', 'Coil on the left. A bar magnet on the right with its N end facing the coil moves to the left toward the coil. The viewer is on the far right.', sceneFig({ magX: 400, left: 'N', motion: [460, 340] })),
+    form: R`<p>The flux of the magnet's field through the coil is [[0]], its magnitude \(|\Phi|\) is [[1]], so the induced emf is [[2]].</p>`,
+    fields: [
+      { type: 'select', aria: 'Sign of the flux', options: ['positive', 'negative', 'zero'], answer: 1, fb: 'Sign of Φ: field lines leave the N end, so near the coil they point left — compare with the area vector.' },
+      { type: 'select', aria: 'Trend of the magnitude of the flux', options: ['increasing', 'decreasing', 'constant'], answer: 0, fb: 'The field gets stronger as the magnet gets closer.' },
+      { type: 'select', aria: 'Sign of the emf', options: ['positive', 'negative', 'zero'], answer: 0, fb: 'Sign of ε: a negative flux becoming more negative means dΦ/dt < 0, and ε = −dΦ/dt.' }],
+    hint: R`Field lines leave the N pole. Near the coil they point to the <em>left</em>, while \(\vec A\) points to the right. Then use \(\varepsilon=-d\Phi/dt\).`,
+    explain: R`\(\vec B\) points left and \(\vec A\) points right, so \(\Phi<0\). As the magnet approaches, \(|\Phi|\) grows: \(\Phi\) becomes more negative, so \(d\Phi/dt<0\) and \(\varepsilon=-d\Phi/dt>0\).` });
+  Q.push({ part: 2, kind: 'mcq', prompt: R`Which of these situations does <strong>not</strong> induce an emf in the loop?`,
+    options: [
+      { t: R`A stationary loop in a magnetic field whose magnitude increases with time.`, ok: false, fb: 'Here dB/dt ≠ 0, so the flux changes.' },
+      { t: R`A loop whose area shrinks while it sits in a constant, uniform field.`, ok: false, fb: 'Here dA/dt ≠ 0, so the flux changes.' },
+      { t: R`A loop rotating about a diameter in a constant, uniform field.`, ok: false, fb: 'Here the angle θ changes, so the flux changes.' },
+      { t: R`A rigid loop moving at constant velocity while it stays entirely inside a uniform field.`, ok: true }],
+    hint: R`Check each case: does \(B\), \(A\) or \(\theta\) change?`,
+    explain: R`Moving a rigid loop at constant velocity inside a <em>uniform</em> field changes none of \(B\), \(A\) or \(\theta\), so \(\Phi_B\) stays constant and \(\varepsilon=0\). This is how a loop can move across a field without any induced current.` });
+
+  // ---------- PART 3 ----------
+  Q.push({ part: 3, kind: 'drawArrow', size: [600, 210], prompt: R`The magnet approaches the coil with its north pole first. On the figure, <strong>draw an arrow inside the coil</strong> showing the direction of the <em>induced</em> magnetic field \(\vec B_{\text{coil}}\).`,
+    fig: svg(600, 210, 'Magnet approaching a coil — draw the induced field', 'Coil on the left with its axis horizontal. A bar magnet on the right with its N end facing the coil moves left toward it. The viewer is on the far right.', sceneFig({ magX: 400, left: 'N', motion: [460, 340] })),
+    drawHelp: 'Press and drag inside the coil, from the tail to the tip of your arrow. Drawing again replaces your arrow.',
+    altLegend: 'Direction of the induced field inside the coil',
+    alt: [{ id: 'right', t: 'To the right (toward the magnet and the viewer)' }, { id: 'left', t: 'To the left (away from the magnet)' }],
+    answer: 'right',
+    fb: { left: 'That arrow points the same way as the magnet\'s field at the coil — it would add to the change instead of opposing it.' },
+    hint: R`The magnet's field at the coil points left and is getting stronger. The induced field must <em>oppose</em> that increase.`,
+    explain: R`The leftward flux is increasing, so by Lenz's law the coil produces a field to the <strong>right</strong>, toward the approaching magnet (and toward the viewer).` });
+  const hotEnds = cp => `<g class="hot" data-id="left" aria-label="Left end of the coil"><rect class="hl" x="${cp.xl - 34}" y="45" width="40" height="120" rx="8" fill="#ffffff22" stroke="#555" stroke-width="2" stroke-dasharray="6 4"/><text x="${cp.xl - 14}" y="40" text-anchor="middle" font-size="13" font-weight="600">Left end</text></g><g class="hot" data-id="right" aria-label="Right end of the coil"><rect class="hl" x="${cp.xr - 6}" y="45" width="40" height="120" rx="8" fill="#ffffff22" stroke="#555" stroke-width="2" stroke-dasharray="6 4"/><text x="${cp.xr + 14}" y="40" text-anchor="middle" font-size="13" font-weight="600">Right end</text></g>`;
+  Q.push({ part: 3, kind: 'hotspot', prompt: R`While the magnet approaches (north pole first), the coil behaves like a small bar magnet. Click the end of the coil that acts as a <strong>north pole</strong>.`,
+    fig: svg(600, 210, 'Magnet approaching a coil — choose the coil end that is a north pole', 'Coil on the left with selectable left end and right end. A magnet with its N end facing the coil moves left toward it.', sceneFig({ magX: 410, left: 'N', motion: [470, 350], extra: hotEnds }), { group: true }),
+    answer: 'right',
+    fb: { left: 'If the left end were north, the right end (facing the magnet) would be south and would attract the approaching N pole, speeding it up — that would violate energy conservation.' },
+    hint: R`Lenz's law in terms of forces: the coil must <em>repel</em> the approaching N pole. Like poles repel. (Field lines leave a north pole.)`,
+    explain: R`The induced field points right, so it exits the coil at its right end: the right end is a north pole. It faces the approaching N pole and repels it, opposing the motion.` });
+  const circFig = svg(600, 260, 'The coil as seen by the viewer on the right', 'A large copper circle represents the coil as the viewer on the right sees it. In front of it, the magnet points along the line of sight with its S end toward the viewer; the magnet moves away from the viewer toward the coil.',
+    `<rect width="600" height="260" fill="#e8f2fc"/><circle cx="300" cy="130" r="95" fill="none" stroke="#a0521a" stroke-width="10"/><circle cx="300" cy="130" r="22" fill="#1565c0" stroke="#222"/><text x="300" y="137" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">S</text><text x="20" y="28" font-size="14" font-weight="700">View from the right (viewer's point of view)</text><text x="20" y="244" font-size="13">Magnet: S end toward you, N end toward the coil, moving away from you into the coil.</text>`);
+  Q.push({ part: 3, kind: 'drawCircle', size: [600, 260], prompt: R`Same situation (magnet approaching, north pole first). The figure shows the coil as seen by the viewer on the right. <strong>Trace the direction of the induced current</strong> around the coil.`,
+    fig: circFig,
+    drawHelp: 'Press and trace around the copper loop in the direction the current flows (at least three quarters of a turn). Drawing again replaces your trace.',
+    altLegend: 'Direction of the induced current as seen by the viewer',
+    alt: [{ id: 'cw', t: 'Clockwise' }, { id: 'ccw', t: 'Counterclockwise' }],
+    answer: 'ccw',
+    fb: { cw: 'A clockwise current (as seen by the viewer) makes a field pointing away from the viewer — the same direction as the magnet\'s field, which would add to the change.' },
+    hint: R`You found that \(\vec B_{\text{coil}}\) points toward the viewer. Point your right thumb toward yourself: which way do your fingers curl?`,
+    explain: R`\(\varepsilon>0\) (Part 2) and \(\vec B_{\text{coil}}\) points toward the viewer, so the current is <strong>counterclockwise</strong> as seen by the viewer — exactly what the simulation shows when you push the magnet in.` });
+  Q.push({ part: 3, kind: 'form', prompt: R`The magnet starts at rest inside the coil (north pole on the left), then is pulled out. Give the direction of the induced current as seen by the viewer on the right in each case.`,
+    fig: svg(600, 210, 'Magnet at rest inside the coil', 'A bar magnet lies inside the coil with its N end on the left and S end on the right. The viewer is on the far right.', sceneFig({ inside: true, left: 'N', extra: cp => `<text x="150" y="40" text-anchor="middle" font-size="14" font-weight="600">Magnet inside the coil: N end on the left, S end on the right</text>` })),
+    form: R`<p>(a) The magnet is pulled out through the <strong>right</strong> end of the coil: [[0]]</p><p>(b) The magnet is instead pulled out through the <strong>left</strong> end of the coil: [[1]]</p>`,
+    fields: [
+      { type: 'select', aria: 'Case a, pulled out to the right', options: ['clockwise', 'counterclockwise', 'no current'], answer: 0, fb: '(a) Inside the magnet the field points from S to N (left). Is the leftward flux increasing or decreasing?' },
+      { type: 'select', aria: 'Case b, pulled out to the left', options: ['clockwise', 'counterclockwise', 'no current'], answer: 0, fb: '(b) Which way the magnet leaves does not change the fact that the leftward flux is decreasing.' }],
+    hint: R`Inside a bar magnet the field points from S to N, so here it points left: \(\Phi<0\). Pulling the magnet out (either way) makes \(|\Phi|\) smaller.`,
+    explain: R`\(\Phi<0\) and \(|\Phi|\) decreases, so \(d\Phi/dt>0\) and \(\varepsilon<0\): <strong>clockwise</strong> as seen by the viewer, in both cases. The coil tries to keep the leftward flux, producing its own leftward field. Check (a) with “Pull magnet out” in the simulation.` });
+  Q.push({ part: 3, kind: 'mcq', shuffle: false, prompt: R`You look down at a metal frame. A magnetic field pointing straight <strong>up</strong> (toward you) is turned on through the frame. While the field is being turned on, what is the direction of the induced current as you see it?`,
+    fig: svg(600, 230, 'Metal frame seen from above with an upward field being turned on', 'A horizontal rectangular metal frame drawn in perspective. Three arrows inside it point straight up toward a viewer looking down from above.',
+      `<rect width="600" height="230" fill="#e8f2fc"/>${profileSVG(300, 46, 0.5, -75, '')}<text x="340" y="36" font-size="14">You, looking down</text><polygon points="150,200 400,200 460,135 210,135" fill="none" stroke="#d4a017" stroke-width="7"/><g stroke="#5b2a86" stroke-width="4" marker-end="MK_V"><line x1="250" y1="185" x2="250" y2="105"/><line x1="305" y1="185" x2="305" y2="105"/><line x1="360" y1="185" x2="360" y2="105"/></g><text x="390" y="110" font-size="20" font-weight="700" font-style="italic" fill="#5b2a86">B</text><text x="470" y="215" font-size="13">field increasing</text>`),
+    options: [{ t: 'Clockwise', ok: true }, { t: 'Counterclockwise', ok: false, fb: 'A counterclockwise current (seen from above) makes an upward field — that would add to the increasing upward flux.' }],
+    hint: R`Area vector toward you (up): \(\Phi>0\) and increasing. The induced field must point down, away from you.`,
+    explain: R`\(\Phi>0\) and \(d\Phi/dt>0\), so \(\varepsilon<0\): the current is <strong>clockwise</strong> as seen from above, producing a downward field that opposes the increase.` });
+
+  // ---------- PART 4 ----------
+  const p1 = pick([4, 6, 8]), p2 = pick([-8, -12, -16]), sgn = pick([1, -1]);
+  const fpts = [[0, 0], [4, sgn * p1], [5, sgn * p2], [8, sgn * p2], [10, 0]];
+  const emfAt = { '2.5': -sgn * p1 / 4, '4.5': -sgn * (p2 - p1), '6.5': 0, '8.5': sgn * p2 / 2 };
+  const rkOrder = Object.keys(emfAt).sort((a, b) => emfAt[b] - emfAt[a]);
+  Q.push({ part: 4, kind: 'rank', prompt: R`The graph shows the magnetic flux through a loop as a function of time. Using \(\varepsilon=-\dfrac{d\Phi}{dt}\), rank the induced emf at the indicated times from <strong>most positive</strong> (1) to <strong>most negative</strong> (4).`,
+    fig: svg(620, 300, 'Flux versus time graph', `Piecewise-linear flux graph: from 0 Wb at t = 0 s to ${sgn * p1} Wb at 4 s, then to ${sgn * p2} Wb at 5 s, constant until 8 s, then back to 0 Wb at 10 s.`, graphSVG({ w: 620, h: 300, x0: 0, x1: 10, y0: -16, y1: 16, dx: 1, dy: 4, mdy: 2, pts: fpts, xl: 'Time (s)', yl: 'Flux Φ (Wb)' })),
+    items: ['2.5', '4.5', '6.5', '8.5'].map(t => ({ id: t, label: R`Induced emf at \(t=${t}\ \text{s}\)` })),
+    order: rkOrder,
+    rankHelp: 'Most positive at the top (position 1), most negative at the bottom (position 4).',
+    hint: R`Find the slope of each straight segment (rise over run, in Wb/s). The emf is the <em>negative</em> of that slope. A flat segment gives zero.`,
+    explain: R`Slopes: \(0\)–\(4\ \text{s}\): \(${sgn * p1 / 4}\ \text{Wb/s}\); \(4\)–\(5\ \text{s}\): \(${sgn * (p2 - p1)}\ \text{Wb/s}\); \(5\)–\(8\ \text{s}\): \(0\); \(8\)–\(10\ \text{s}\): \(${-sgn * p2 / 2}\ \text{Wb/s}\). So \(\varepsilon(2.5)=${emfAt['2.5']}\ \text{V}\), \(\varepsilon(4.5)=${emfAt['4.5']}\ \text{V}\), \(\varepsilon(6.5)=0\), \(\varepsilon(8.5)=${emfAt['8.5']}\ \text{V}\). Order: ${rkOrder.map(t => R`\(t=${t}\ \text{s}\)`).join(', ')}.` });
+  const Bpts = [[0, 0], [2, 4], [4, 4], [5, -2], [7, 0]];
+  Q.push({ part: 4, kind: 'drawGraph', prompt: R`A uniform field \(B_z(t)\) (positive out of the page) passes through a fixed rectangular loop of area \(A=0.50\ \text{m}^2\) lying in the page, as graphed below. Take the area vector out of the page (so a positive emf drives a counterclockwise current). <strong>Sketch the induced emf</strong> \(\varepsilon(t)\) on the empty graph.`,
+    fig: svg(620, 280, 'Magnetic field versus time', 'B rises linearly from 0 T at t = 0 to 4 T at 2 s, stays at 4 T until 4 s, drops linearly to −2 T at 5 s, then rises linearly back to 0 T at 7 s.', graphSVG({ w: 620, h: 280, x0: 0, x1: 7, y0: -3, y1: 5, dx: 1, dy: 1, pts: Bpts, xl: 'Time t (s)', yl: 'B_z (T)' })),
+    graph: { w: 620, h: 300, x0: 0, x1: 7, y0: -4, y1: 4, mdy: 0.5, xl: 'Time t (s)', yl: 'emf ε (V)', intervals: [[0, 2], [2, 4], [4, 5], [5, 7]], expected: [-1, 0, 3, -0.5], tol: 0.3 },
+    hint: R`In each interval \(\varepsilon=-A\,\dfrac{\Delta B}{\Delta t}\). For example, from \(0\) to \(2\ \text{s}\): \(\Delta B/\Delta t=2\ \text{T/s}\).`,
+    explain: R`\(0\)–\(2\ \text{s}\): \(\varepsilon=-(0.50)(2)=-1.0\ \text{V}\). \(2\)–\(4\ \text{s}\): \(0\). \(4\)–\(5\ \text{s}\): \(\varepsilon=-(0.50)(-6)=+3.0\ \text{V}\). \(5\)–\(7\ \text{s}\): \(\varepsilon=-(0.50)(1)=-0.50\ \text{V}\). The emf graph is a set of horizontal steps (the drawn solution is shown on your graph).` });
+  const fcur = []; for (let t = -3; t <= 3.0001; t += 0.05) fcur.push([t, 1 / Math.pow(1 + t * t, 1.5)]);
+  const hp = [['A', -2.2], ['B', -0.5], ['C', 0], ['D', 0.5], ['E', 2.2]];
+  Q.push({ part: 4, kind: 'hotspot', prompt: R`A bar magnet is pulled at constant speed straight through a stationary loop, north pole first; its center is at the center of the loop at \(t=0\). The graph shows the flux through the loop (area vector chosen so that \(\Phi>0\)). Click the instant at which the <strong>magnitude of the induced emf is largest while the magnet is moving away</strong> from the loop.`,
+    fig: svg(620, 290, 'Flux through a loop as a magnet passes through it', 'A symmetric bell-shaped curve peaking at t = 0. Labeled points: A far before the peak on the low flat part, B on the steep rising part, C at the peak, D on the steep falling part, E far after the peak on the low flat part.',
+      graphSVG({ w: 620, h: 290, x0: -3, x1: 3, y0: 0, y1: 1.2, dx: 1, dy: 0.2, noy: true, pts: fcur, xl: 'Time (arbitrary units)', yl: 'Flux Φ', extra: (X, Y) => hp.map(([l, t]) => { const y = 1 / Math.pow(1 + t * t, 1.5); return `<g class="hot" data-id="${l}" aria-label="Point ${l}"><circle class="hl" cx="${X(t)}" cy="${Y(y)}" r="15" fill="#ffffffaa" stroke="#111" stroke-width="2" stroke-dasharray="4 3"/><text x="${X(t)}" y="${Y(y) + 5}" text-anchor="middle" font-size="15" font-weight="700">${l}</text></g>`; }).join('') }), { group: true }),
+    answer: 'D',
+    fb: { A: 'At A the magnet is still approaching, and the curve is nearly flat there.', B: 'B is where |ε| is largest while the magnet is approaching. After t = 0 the magnet is moving away.', C: 'At C the flux is at its maximum: the slope is zero, so the emf is zero at that instant even though the magnet is moving.', E: 'At E the curve is nearly flat, so the emf is small.' },
+    hint: R`\(|\varepsilon|\) is largest where the graph is steepest. The magnet moves away after \(t=0\).`,
+    explain: R`After \(t=0\) the magnet is leaving; the graph is steepest at D, so \(|\varepsilon|\) is largest there. The emf has opposite signs at B and D, so the current reverses as the magnet passes through. At C, \(\varepsilon=0\). Both before entering and after leaving, the force of the coil on the magnet opposes its motion; the energy dissipated as heat comes from the work done by whoever pulls the magnet.` });
+
+  // ---------- PART 5 ----------
+  const N16 = pick([50, 80, 100, 120, 150]), B16 = rnd(0.2, 0.6, 0.05), s16 = rnd(8, 15, 1), f16 = pick([50, 60]), R16 = rnd(10, 50, 5);
+  const w16 = 2 * Math.PI * f16, e16 = N16 * B16 * (s16 / 100) ** 2 * w16, i16 = e16 / R16;
+  Q.push({ part: 5, kind: 'form', prompt: R`A generator coil has \(N=${N16}\) square turns, each \(${s16}\ \text{cm}\) on a side. It rotates at \(f=${f16}\ \text{Hz}\) in a uniform field \(B=${B16.toFixed(2)}\ \text{T}\) and is connected to a circuit of total resistance \(R=${R16}\ \Omega\). Find the maximum emf and the maximum current.`,
+    fig: svg(600, 200, 'Simple generator', 'A rectangular loop between a north pole face on the left and a south pole face on the right, rotating about a vertical axis, with field lines from N to S.',
+      `<rect width="600" height="200" fill="#e8f2fc"/><rect x="60" y="40" width="70" height="120" fill="#c62828"/><text x="95" y="108" text-anchor="middle" font-size="28" font-weight="700" fill="#fff">N</text><rect x="470" y="40" width="70" height="120" fill="#1565c0"/><text x="505" y="108" text-anchor="middle" font-size="28" font-weight="700" fill="#fff">S</text><g stroke="#5b2a86" stroke-width="2" marker-end="MK_V"><line x1="140" y1="60" x2="460" y2="60"/><line x1="140" y1="140" x2="460" y2="140"/></g><polygon points="250,55 350,70 350,150 250,135" fill="none" stroke="#a0521a" stroke-width="6"/><line x1="300" y1="25" x2="300" y2="180" stroke="#111" stroke-dasharray="5 4"/><path d="M270,30 A30,10 0 1 0 330,30" fill="none" stroke="#111" stroke-width="2" marker-end="MK_K"/><text x="338" y="28" font-size="16" font-style="italic">ω</text><text x="300" y="196" text-anchor="middle" font-size="13" fill="#5b2a86">B</text>`),
+    form: R`<p>Maximum emf \(\varepsilon_0=\) [[0]] V</p><p>Maximum current \(I_0=\) [[1]] A</p>`,
+    fields: [{ type: 'num', aria: 'Maximum emf in volts', value: e16 }, { type: 'num', aria: 'Maximum current in amperes', value: i16 }],
+    hint: R`\(\varepsilon_0=NBA\omega\) with \(A=s^2\) (in \(\text{m}^2\)) and \(\omega=2\pi f\). Then \(I_0=\varepsilon_0/R\).`,
+    explain: R`\(\omega=2\pi(${f16})=${sig(w16, 4)}\ \text{rad/s}\), \(A=(${(s16 / 100).toFixed(2)})^2=${sig((s16 / 100) ** 2, 3)}\ \text{m}^2\). \(\varepsilon_0=(${N16})(${B16.toFixed(2)})(${sig((s16 / 100) ** 2, 3)})(${sig(w16, 4)})=${sig(e16, 3)}\ \text{V}\); \(I_0=${sig(e16, 3)}/${R16}=${sig(i16, 3)}\ \text{A}\).` });
+  Q.push({ part: 5, kind: 'mcq', prompt: R`Two aluminum plates swing like pendulums through the gap of a strong magnet. The solid plate stops after a few swings; an identical plate with slots cut into it keeps swinging much longer. Why?`,
+    fig: svg(600, 220, 'Solid and slotted aluminum pendulum plates', 'Two pendulums hang from pivots. Their plates swing through the gap between magnet poles. The left plate is solid; the right plate has deep vertical slots.',
+      `<rect width="600" height="220" fill="#e8f2fc"/><g stroke="#333" stroke-width="3"><line x1="150" y1="15" x2="150" y2="120"/><line x1="450" y1="15" x2="450" y2="120"/></g><circle cx="150" cy="15" r="5"/><circle cx="450" cy="15" r="5"/><rect x="105" y="120" width="90" height="70" fill="#b8c2cc" stroke="#333" stroke-width="2"/><g><rect x="405" y="120" width="90" height="70" fill="#b8c2cc" stroke="#333" stroke-width="2"/><g fill="#e8f2fc"><rect x="418" y="120" width="7" height="55"/><rect x="438" y="120" width="7" height="55"/><rect x="458" y="120" width="7" height="55"/><rect x="478" y="120" width="7" height="55"/></g></g><text x="150" y="212" text-anchor="middle" font-size="14">Solid plate</text><text x="450" y="212" text-anchor="middle" font-size="14">Slotted plate</text><rect x="20" y="130" width="40" height="50" fill="#c62828"/><text x="40" y="162" text-anchor="middle" fill="#fff" font-weight="700">N</text><rect x="540" y="130" width="40" height="50" fill="#1565c0"/><text x="560" y="162" text-anchor="middle" fill="#fff" font-weight="700">S</text>`),
+    options: [
+      { t: 'The slots break up the closed paths of the eddy currents, so the induced currents and the retarding magnetic force are much smaller.', ok: true },
+      { t: 'The slots make the plate lighter, and a lighter pendulum swings longer.', ok: false, fb: 'The period and damping of a pendulum do not depend on mass this way; the key difference is the paths available to induced currents.' },
+      { t: 'The magnet magnetizes the solid plate, and the slots prevent the aluminum from becoming magnetized.', ok: false, fb: 'Aluminum is not ferromagnetic; the braking comes from induced (eddy) currents.' },
+      { t: 'The slots increase the magnetic flux through the plate, which speeds it up.', ok: false, fb: 'The slots do not increase the flux; they cut the conducting loops in which current can circulate.' }],
+    hint: R`As the plate enters and leaves the field, the flux through regions of the plate changes and currents circulate in the metal. What do they need in order to circulate?`,
+    explain: R`Eddy currents circulate in closed loops inside the solid plate and produce a force opposing the motion (magnetic braking), turning kinetic energy into heat (\(P=\varepsilon^2/R\)). Slots (or laminations) cut these loops, so far less current flows and the damping is small.` });
+
+  // ---------- PART 6 ----------
+  const B18 = rnd(0.3, 0.9, 0.05), l18 = rnd(0.2, 0.6, 0.05), v18 = rnd(2, 6, 0.5), R1 = rnd(2, 8, 1), R2 = rnd(4, 12, 1);
+  const e18 = B18 * l18 * v18, F18 = B18 * B18 * l18 * l18 * v18 * (1 / R1 + 1 / R2);
+  let crosses = ''; for (let x = 95; x <= 505; x += 45) for (let y = 70; y <= 160; y += 45) if (Math.abs(x - 296) > 30) crosses += `<text x="${x}" y="${y}" text-anchor="middle" font-size="18" fill="#5b2a86">×</text>`;
+  Q.push({ part: 6, kind: 'form', prompt: R`A conducting rod of length \(l=${l18.toFixed(2)}\ \text{m}\) slides on two parallel rails. Resistor \(R_1=${R1}\ \Omega\) connects the rails at the left end and \(R_2=${R2}\ \Omega\) at the right end. A uniform field \(B=${B18.toFixed(2)}\ \text{T}\) points into the page. An external agent pulls the rod to the <strong>left</strong> at constant speed \(v=${v18}\ \text{m/s}\). (Ignore the resistance of the rod and rails.)`,
+    fig: svg(600, 230, 'Sliding rod on rails between two resistors', 'Two horizontal rails. Resistor R1 joins them at the left end and R2 at the right end. A vertical rod in the middle moves left with velocity v. The magnetic field points into the page, shown by crosses.',
+      `<rect width="600" height="230" fill="#fff"/>${crosses}<g stroke="#333" stroke-width="4"><line x1="60" y1="40" x2="540" y2="40"/><line x1="60" y1="190" x2="540" y2="190"/></g><path d="M60,40 v45 l-10,5 l20,10 l-20,10 l20,10 l-20,10 l10,5 v45" fill="none" stroke="#333" stroke-width="3"/><path d="M540,40 v45 l-10,5 l20,10 l-20,10 l20,10 l-20,10 l10,5 v45" fill="none" stroke="#333" stroke-width="3"/><text x="28" y="120" font-size="16" font-style="italic">R₁</text><text x="556" y="120" font-size="16" font-style="italic">R₂</text><rect x="290" y="34" width="12" height="162" fill="#a0521a"/><line x1="285" y1="215" x2="215" y2="215" stroke="#111" stroke-width="3" marker-end="MK_K"/><text x="250" y="210" text-anchor="middle" font-size="16" font-style="italic">v</text><text x="318" y="120" font-size="16" font-style="italic">l</text>`),
+    form: R`<p>Magnitude of the induced emf: \(|\varepsilon|=\) [[0]] V</p><p>Force the agent must apply to keep \(v\) constant: \(F_{\text{ext}}=\) [[1]] N</p><p>Direction of the current \(I_1\) in the left loop (rod, rails, \(R_1\)): [[2]]</p>`,
+    fields: [{ type: 'num', aria: 'Magnitude of the emf in volts', value: e18 },
+      { type: 'num', aria: 'External force in newtons', value: F18, fb: 'Force: the rod carries I₁ + I₂, and F = I l B.' },
+      { type: 'select', aria: 'Direction of I1', options: ['clockwise', 'counterclockwise', 'no current'], answer: 0, fb: 'Direction of I₁: as the rod moves left, the left loop gets smaller — is the into-page flux through it increasing or decreasing?' }],
+    hint: R`\(|\varepsilon|=Blv\). Each resistor sees the full emf: \(I_1=|\varepsilon|/R_1\), \(I_2=|\varepsilon|/R_2\). The rod carries \(I=I_1+I_2\), and the magnetic force on it is \(F_B=IlB\); the agent must balance it.`,
+    explain: R`\(|\varepsilon|=(${B18.toFixed(2)})(${l18.toFixed(2)})(${v18})=${sig(e18, 3)}\ \text{V}\). \(F_{\text{ext}}=B^2l^2v\left(\dfrac1{R_1}+\dfrac1{R_2}\right)=${sig(F18, 3)}\ \text{N}\), to the left. The left loop's into-page flux decreases, so \(I_1\) is <strong>clockwise</strong> (it makes an into-page field); the right loop's flux increases, so \(I_2\) is counterclockwise.` });
+  const s19 = rnd(15, 25, 1), R19 = rnd(5, 20, 1), B19a = rnd(2.0, 3.0, 0.1), B19b = rnd(0.5, 1.0, 0.1), t19 = rnd(60, 120, 4);
+  const I19 = (s19 / 100) ** 2 * (B19a - B19b) / (t19 / 1000) / R19 * 1000;
+  let cr19 = ''; for (let x = 215; x <= 395; x += 45) for (let y = 65; y <= 155; y += 45) cr19 += `<text x="${x}" y="${y}" text-anchor="middle" font-size="18" fill="#5b2a86">×</text>`;
+  Q.push({ part: 6, kind: 'form', prompt: R`A wire and a \(${R19}\ \Omega\) resistor form a square circuit \(${s19}\ \text{cm}\times${s19}\ \text{cm}\). A uniform field directed <strong>into</strong> the page is steadily decreased from \(${B19a.toFixed(1)}\ \text{T}\) to \(${B19b.toFixed(1)}\ \text{T}\) in \(${t19}\ \text{ms}\). Find the induced current and its direction through the resistor.`,
+    fig: svg(600, 230, 'Square circuit with a resistor in a decreasing into-page field', 'A square loop with field crosses inside. A resistor sits in the middle of the bottom side, with point a on its left and point b on its right.',
+      `<rect width="600" height="230" fill="#fff"/>${cr19}<path d="M190,35 H410 V190 H335 l-6,-10 l-12,20 l-12,-20 l-12,20 l-12,-20 l-12,20 l-6,-10 H190 Z" fill="none" stroke="#333" stroke-width="3"/><circle cx="265" cy="190" r="4"/><circle cx="335" cy="190" r="4"/><text x="258" y="214" font-size="17" font-style="italic">a</text><text x="332" y="214" font-size="17" font-style="italic">b</text><text x="300" y="224" text-anchor="middle" font-size="13">${R19} Ω</text><text x="300" y="26" text-anchor="middle" font-size="14">${s19} cm</text><text x="420" y="118" font-size="14">${s19} cm</text>`),
+    form: R`<p>Induced current: \(I=\) [[0]] mA</p><p>Direction through the resistor: [[1]]</p>`,
+    fields: [{ type: 'num', aria: 'Induced current in milliamperes', value: I19 },
+      { type: 'select', aria: 'Direction through the resistor', options: ['from a to b', 'from b to a', 'no current'], answer: 1, fb: 'Direction: the into-page flux decreases, so the induced field points into the page. Which way around the loop is that, and which way does that send current along the bottom side?' }],
+    hint: R`\(|\varepsilon|=A\,\dfrac{|\Delta B|}{\Delta t}\) with \(A\) in \(\text{m}^2\) and \(\Delta t\) in seconds; then \(I=|\varepsilon|/R\).`,
+    explain: R`\(A=(${(s19 / 100).toFixed(2)})^2=${sig((s19 / 100) ** 2, 3)}\ \text{m}^2\), \(|\varepsilon|=${sig((s19 / 100) ** 2, 3)}\times\dfrac{${(B19a - B19b).toFixed(1)}}{${(t19 / 1000).toFixed(3)}}=${sig(I19 * R19 / 1000, 3)}\ \text{V}\), \(I=${sig(I19, 3)}\ \text{mA}\). The induced current is clockwise (to keep the into-page flux), so along the bottom side it flows from right to left: <strong>from b to a</strong> through the resistor.` });
+  const b20 = rnd(2, 10, 1), s20 = rnd(2, 8, 1), w20 = rnd(5, 15, 1), l20 = rnd(10, 30, 2);
+  const e20 = 2e-7 * b20 * (l20 / 100) * Math.log((s20 + w20) / s20) * 1e6;
+  Q.push({ part: 6, kind: 'form', prompt: R`A long straight wire carries an upward current \(I(t)=a+bt\) with \(b=${b20}\ \text{A/s}\). A rectangular loop of length \(l=${l20}\ \text{cm}\) (parallel to the wire) and width \(w=${w20}\ \text{cm}\) lies to the right of the wire, in the same plane, with its near side \(s=${s20}\ \text{cm}\) from the wire. Find the magnitude of the induced emf and the direction of the induced current.`,
+    fig: svg(600, 240, 'Straight wire beside a rectangular loop', 'A vertical wire on the left carries current I upward. To its right a rectangle of length l parallel to the wire and width w; the near side is a distance s from the wire.',
+      `<rect width="600" height="240" fill="#fff"/><line x1="120" y1="225" x2="120" y2="15" stroke="#0b57d0" stroke-width="4" marker-end="MK_B"/><text x="100" y="40" font-size="17" font-style="italic" fill="#0b57d0">I</text><rect x="210" y="55" width="230" height="130" fill="none" stroke="#333" stroke-width="3"/><line x1="120" y1="205" x2="210" y2="205" stroke="#111" marker-start="MK_K" marker-end="MK_K"/><text x="165" y="222" text-anchor="middle" font-size="16" font-style="italic">s</text><line x1="210" y1="205" x2="440" y2="205" stroke="#111" marker-start="MK_K" marker-end="MK_K"/><text x="325" y="222" text-anchor="middle" font-size="16" font-style="italic">w</text><line x1="465" y1="55" x2="465" y2="185" stroke="#111" marker-start="MK_K" marker-end="MK_K"/><text x="478" y="125" font-size="16" font-style="italic">l</text>`),
+    form: R`<p>\(|\varepsilon|=\) [[0]] µV</p><p>Direction of the induced current in the loop: [[1]]</p>`,
+    fields: [{ type: 'num', aria: 'Magnitude of the emf in microvolts', value: e20 },
+      { type: 'select', aria: 'Direction of the induced current', options: ['clockwise', 'counterclockwise', 'no current'], answer: 1, fb: 'Direction: to the right of an upward current the field points into the page, and it is growing.' }],
+    hint: R`\(\Phi_B=\dfrac{\mu_0 I l}{2\pi}\ln\!\left(\dfrac{s+w}{s}\right)\), so \(|\varepsilon|=\dfrac{\mu_0 b\, l}{2\pi}\ln\!\left(\dfrac{s+w}{s}\right)\). Note \(\dfrac{\mu_0}{2\pi}=2\times10^{-7}\ \text{T}\cdot\text{m/A}\), and \(1\ \text{µV}=10^{-6}\ \text{V}\).`,
+    explain: R`\(|\varepsilon|=(2\times10^{-7})(${b20})(${(l20 / 100).toFixed(2)})\ln\!\left(\dfrac{${s20 + w20}}{${s20}}\right)=${sig(e20 * 1e-6, 3)}\ \text{V}=${sig(e20, 3)}\ \text{µV}\). The field at the loop points into the page and increases, so the induced current is <strong>counterclockwise</strong>, making an out-of-page field that opposes the increase.` });
+  Q.forEach((q, i) => q.n = i + 1);
+}
+
+/* =====================================================================
+   ENGINE
+   ===================================================================== */
+const ST = { name: '', partner: '', score: 0, done: 0, results: [], shownParts: new Set(), instructor: false };
+function updateScore() {
+  $('#scoreTxt').textContent = `Score: ${ST.score} / 100`;
+  $('#progTxt').textContent = `${ST.done} / 20 done`;
+  $('#progFill').style.width = (ST.done / 20 * 100) + '%';
+  $('#progBar').setAttribute('aria-valuenow', ST.done);
+}
+function renderQuestion(i) {
+  const q = Q[i], act = $('#activity');
+  if (!ST.shownParts.has(q.part)) {
+    ST.shownParts.add(q.part);
+    const p = PARTS[q.part];
+    const sec = document.createElement('div');
+    sec.innerHTML = `<h2 class="part">${p.title}</h2><div class="intro">${p.html}</div>`;
+    act.appendChild(sec); typeset(sec);
+  }
+  const card = document.createElement('section');
+  card.className = 'q'; card.id = 'q' + q.n; card.setAttribute('aria-labelledby', 'qh' + q.n);
+  card.innerHTML = `<h3 id="qh${q.n}" tabindex="-1">Question ${q.n} of 20 <span class="tag">${TYPE_LABEL[q.kind]}</span><span class="pts">5 points · 3 attempts</span></h3>
+   <div class="prompt">${q.prompt}</div>
+   ${q.fig ? `<div class="figbox">${q.fig}</div>` : ''}
+   ${q.kind === 'drawGraph' ? '<div class="figbox pad"></div>' : ''}
+   <div class="widget"></div>
+   <div class="qctrl"><button type="button" class="chk">Check answer</button><button type="button" class="secondary hb" aria-expanded="false">Show hint</button>${ST.instructor ? '<button type="button" class="secondary ans">Show answer</button>' : ''}<span class="attempts">3 attempts left</span></div>
+   <div class="hint" hidden><strong>Hint:</strong> ${q.hint}</div>
+   <div class="fb" role="status" aria-live="polite"></div>
+   <div class="explain" hidden><strong>Solution:</strong> ${q.explain}</div>`;
+  act.appendChild(card);
+  const w = WIDGETS[q.kind](q, card.querySelector('.widget'));
+  typeset(card.querySelector('.prompt')); typeset(card.querySelector('.widget'));
+  let left = 3;
+  const fb = card.querySelector('.fb'), hint = card.querySelector('.hint'), hb = card.querySelector('.hb'), chk = card.querySelector('.chk'), att = card.querySelector('.attempts');
+  const showHint = () => { hint.hidden = false; hb.setAttribute('aria-expanded', 'true'); hb.textContent = 'Hint shown'; typeset(hint); };
+  hb.addEventListener('click', showHint);
+  const ansBtn = card.querySelector('.ans');
+  if (ansBtn) ansBtn.addEventListener('click', () => { if (w.reveal) w.reveal(); showHint(); const ex = card.querySelector('.explain'); ex.hidden = false; typeset(ex); ansBtn.disabled = true; ansBtn.textContent = 'Answer shown'; });
+  card._reveal = () => ansBtn && !ansBtn.disabled && ansBtn.click();
+  chk.addEventListener('click', () => {
+    const r = w.check(w.get());
+    if (r.incomplete) { fb.className = 'fb info'; fb.innerHTML = r.msg; return; }
+    left--;
+    if (r.ok) return finish(true);
+    if (left === 0) return finish(false, r.msg);
+    fb.className = 'fb bad';
+    fb.innerHTML = `<strong>Not yet.</strong> ${r.detected ? `(Your drawing was read as ${{ right: 'pointing right', left: 'pointing left', cw: 'clockwise', ccw: 'counterclockwise' }[r.detected]}.) ` : ''}${r.msg} You have ${left} attempt${left > 1 ? 's' : ''} left.`;
+    typeset(fb);
+    att.textContent = `${left} attempt${left > 1 ? 's' : ''} left`;
+    showHint();
+  });
+  function finish(ok, msg) {
+    const pts = ok ? 5 : 0; ST.score += pts; ST.done++; ST.results[i] = { part: q.part, pts };
+    w.disable(); if (!ok && w.reveal) w.reveal();
+    chk.disabled = true; hb.disabled = true;
+    att.textContent = ok ? `Earned 5 points` : `Earned 0 points`;
+    card.classList.add(ok ? 'done-ok' : 'done-bad');
+    fb.className = 'fb ' + (ok ? 'ok' : 'bad');
+    fb.innerHTML = ok ? `<strong>Correct! +5 points.</strong>` : `<strong>No attempts left — 0 points for this question.</strong> ${msg || ''} Read the solution below.`;
+    typeset(fb);
+    const ex = card.querySelector('.explain'); ex.hidden = false; typeset(ex);
+    updateScore();
+    if (i + 1 < Q.length) {
+      if (!document.getElementById('q' + (q.n + 1))) renderQuestion(i + 1);
+      const nb = document.createElement('button'); nb.type = 'button'; nb.className = 'nextbtn'; nb.textContent = `Go to Question ${q.n + 1}`;
+      nb.addEventListener('click', () => { const h = $('#qh' + (q.n + 1)); h.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' }); h.focus({ preventScroll: true }); });
+      card.appendChild(nb);
+    } else {
+      const nb = document.createElement('button'); nb.type = 'button'; nb.className = 'nextbtn'; nb.textContent = 'See my certificate of completion';
+      nb.addEventListener('click', showCert); card.appendChild(nb);
+    }
+  }
+}
+
+function showCert() {
+  const c = $('#cert'); const now = new Date();
+  const partNames = { 1: 'Observation', 2: 'Magnetic flux', 3: "Lenz's law", 4: 'Graphs', 5: 'Generators and eddy currents', 6: 'Quantitative problems' };
+  const rows = Object.keys(partNames).map(p => { const rs = ST.results.filter(r => r.part === +p); return `<tr><td style="text-align:left">${partNames[p]}</td><td>${rs.reduce((s, r) => s + r.pts, 0)} / ${rs.length * 5}</td></tr>`; }).join('');
+  let conf = ''; const cols = ['#e63946', '#f4a261', '#2a9d8f', '#457b9d', '#9b5de5', '#ffd166'];
+  for (let k = 0; k < 40; k++) { const x = Math.random() * 600, y = Math.random() * 120, col = pick(cols), d = (Math.random() * 3).toFixed(2); conf += Math.random() < 0.5 ? `<circle cx="${x}" cy="${y}" r="${3 + Math.random() * 3}" fill="${col}" style="animation-delay:${d}s"/>` : `<rect x="${x}" y="${y}" width="7" height="11" fill="${col}" transform="rotate(${Math.random() * 90} ${x} ${y})" style="animation-delay:${d}s"/>`; }
+  c.innerHTML = `<div class="certcard">
+   <svg viewBox="0 0 600 190" role="img" aria-label="Celebration: a brightly lit light bulb surrounded by confetti" style="width:100%;max-width:600px">
+    <g class="confetti">${conf}</g>
+    <defs><radialGradient id="glow"><stop offset="0" stop-color="#ffe066"/><stop offset="1" stop-color="#ffe06600"/></radialGradient></defs>
+    <circle cx="300" cy="85" r="80" fill="url(#glow)"/>
+    <g stroke="#f4a100" stroke-width="5" stroke-linecap="round">${[0, 1, 2, 3, 4, 5, 6, 7].map(k => { const a = k * Math.PI / 4 - Math.PI / 2; return `<line x1="${300 + 52 * Math.cos(a)}" y1="${80 + 52 * Math.sin(a)}" x2="${300 + 72 * Math.cos(a)}" y2="${80 + 72 * Math.sin(a)}"/>`; }).join('')}</g>
+    <circle cx="300" cy="78" r="38" fill="#fff3a6" stroke="#8a6d00" stroke-width="3"/><path d="M288,112 L290,96 L296,88 L300,96 L304,88 L310,96 L312,112" fill="none" stroke="#d35400" stroke-width="3"/>
+    <rect x="285" y="113" width="30" height="20" rx="3" fill="#8a8f99"/><line x1="285" y1="120" x2="315" y2="120" stroke="#5c6068" stroke-width="2"/><line x1="285" y1="127" x2="315" y2="127" stroke="#5c6068" stroke-width="2"/>
+   </svg>
+   <h2 id="certH" tabindex="-1">Certificate of Completion</h2>
+   <p style="margin:.2rem 0">This certifies that</p>
+   <p class="nm" id="certNames"></p>
+   <p style="margin:.2rem 0">completed the guided activity<br><strong>Electromagnetic Induction: from observation to calculation (PHY2049)</strong></p>
+   <p style="font-size:1.5rem;font-weight:700;margin:.5rem 0">Score: ${ST.score} / 100</p>
+   <table><thead><tr><th scope="col">Part</th><th scope="col">Points</th></tr></thead><tbody>${rows}</tbody></table>
+   <p>Completed on <strong id="certTime"></strong></p>
+   <div class="btnrow" style="justify-content:center"><button type="button" id="bCopy">Copy completion record</button><button type="button" class="secondary" id="bAgain">Start over with new numbers</button></div>
+   <p id="copyMsg" role="status"></p>
+   <p style="font-size:.9rem;color:var(--muted)">Take a screenshot of this certificate to submit as proof of completion.</p>
+  </div>`;
+  const names = ST.partner ? `${ST.name} and ${ST.partner}` : ST.name;
+  c.querySelector('#certNames').textContent = names;
+  const ts = now.toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' });
+  c.querySelector('#certTime').textContent = ts;
+  c.style.display = 'block';
+  c.querySelector('#bCopy').addEventListener('click', async () => {
+    const txt = `Electromagnetic Induction guided activity (PHY2049) — completed by ${names} on ${ts}. Score: ${ST.score}/100.`;
+    try { await navigator.clipboard.writeText(txt); $('#copyMsg').textContent = 'Copied to the clipboard.'; } catch (e) { $('#copyMsg').textContent = 'Copying is not allowed here. Record: ' + txt; }
+  });
+  c.querySelector('#bAgain').addEventListener('click', restart);
+  c.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+  c.querySelector('#certH').focus({ preventScroll: true });
+}
+function restart() {
+  ST.score = 0; ST.done = 0; ST.results = []; ST.shownParts = new Set();
+  $('#activity').innerHTML = ''; $('#cert').style.display = 'none'; $('#cert').innerHTML = '';
+  buildQuestions(); updateScore(); renderQuestion(0);
+  window.scrollTo(0, 0); $('#qh1').focus({ preventScroll: true });
+}
+applyTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light', false);
+$('#bTheme').addEventListener('click', () => applyTheme(isDark() ? 'light' : 'dark', true));
+try { const mq = matchMedia('(prefers-color-scheme: dark)'); mq.addEventListener('change', e => { let saved = null; try { saved = localStorage.getItem('emi-theme'); } catch (_) { } if (!saved) applyTheme(e.matches ? 'dark' : 'light', false); }); } catch (e) { }
+
+function startInstructor() {
+  if (ST.instructor) return;
+  ST.instructor = true; ST.name = 'Instructor'; ST.partner = '';
+  $('#start').style.display = 'none'; $('#app').style.display = 'block';
+  buildQuestions(); updateScore();
+  const act = $('#activity');
+  const bar = document.createElement('div'); bar.className = 'intro';
+  bar.innerHTML = `<h2 style="margin:.1rem 0 .4rem;font-size:1.15rem">Instructor view</h2><p style="margin:.2rem 0">All 20 questions are open. Each question has a <strong>Show answer</strong> button; you can also try any question normally. Scores here are not recorded anywhere.</p><div class="btnrow"><button type="button" id="bAllAns">Show all answers</button><button type="button" class="secondary" id="bNewNums">New random numbers</button></div>`;
+  act.appendChild(bar);
+  for (let i = 0; i < Q.length; i++) renderQuestion(i);
+  $('#bAllAns').addEventListener('click', () => document.querySelectorAll('section.q').forEach(c => c._reveal && c._reveal()));
+  $('#bNewNums').addEventListener('click', () => { ST.instructor = false; ST.score = 0; ST.done = 0; ST.results = []; ST.shownParts = new Set(); act.innerHTML = ''; startInstructorCore(); });
+  bindSim(); requestAnimationFrame(t => { lastT = t; loop(t); });
+}
+function startInstructorCore() {
+  // rebuild questions without re-binding the simulation
+  ST.instructor = true; buildQuestions(); updateScore();
+  const act = $('#activity');
+  const bar = document.createElement('div'); bar.className = 'intro';
+  bar.innerHTML = `<h2 style="margin:.1rem 0 .4rem;font-size:1.15rem">Instructor view</h2><p style="margin:.2rem 0">New random numbers generated. Each question has a <strong>Show answer</strong> button.</p><div class="btnrow"><button type="button" id="bAllAns">Show all answers</button><button type="button" class="secondary" id="bNewNums">New random numbers</button></div>`;
+  act.appendChild(bar);
+  for (let i = 0; i < Q.length; i++) renderQuestion(i);
+  $('#bAllAns').addEventListener('click', () => document.querySelectorAll('section.q').forEach(c => c._reveal && c._reveal()));
+  $('#bNewNums').addEventListener('click', () => { ST.score = 0; ST.done = 0; ST.results = []; ST.shownParts = new Set(); act.innerHTML = ''; startInstructorCore(); });
+}
+let simStarted = false;
+if (location.hash === '#instructor') startInstructor();
+window.addEventListener('hashchange', () => { if (location.hash === '#instructor' && $('#app').style.display !== 'block') startInstructor(); });
+$('#startForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const n = $('#fname').value.trim();
+  if (!n) { $('#startErr').textContent = 'Please enter your first name to start.'; $('#fname').focus(); return; }
+  ST.name = n.split(/\s+/)[0]; ST.partner = $('#pname').value.trim().split(/\s+/)[0] || '';
+  $('#start').style.display = 'none'; $('#app').style.display = 'block';
+  buildQuestions(); updateScore(); renderQuestion(0);
+  bindSim(); requestAnimationFrame(t => { lastT = t; loop(t); });
+  $('#simH').setAttribute('tabindex', '-1'); $('#simH').focus();
+});
+</script>
+</body>
+</html>
